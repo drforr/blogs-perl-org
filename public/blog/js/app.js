@@ -125,7 +125,6 @@ $(document).ready(function() {
     });
 
 // ajax when toggle changes.
-// ajax when toggle changes.
     $(function(){
         $('#cmn-toggle-4').on('change',function() {
             var theme = $('#cmn-toggle-4').is(':checked');
@@ -154,7 +153,6 @@ $(document).ready(function() {
         });
         });
     });
-
 
     // Leave a comment for a blog post
     $("#reply_post_comment_button").on('click', function (e){
