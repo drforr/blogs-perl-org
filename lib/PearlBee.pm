@@ -103,6 +103,7 @@ get '/theme' => sub{
   my $theme = $user->theme;
   return to_json($theme);
 };
+
 =head
 
 Home page
