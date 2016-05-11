@@ -239,36 +239,4 @@ sub as_hashref_sanitized {
   return $href;
 }
 
-=head2 posts
-
-Return a list of associated posts
-
-=cut
-
-sub posts {
-  my ($self) = @_;
-  my $schema = $self->result_source->schema;
-  my @blog_posts = $schema->resultset('BlogPost')->create({
-    blog_id => $self->id
-  });
-
-  return map { $self->resultset('Post')->find({ id => $_->id }) } @blog_posts;
-}
-
-=head2 pages
-
-Return a list of associated pages
-
-=cut
-
-sub pages {
-  my ($self) = @_;
-  my $schema = $self->result_source->schema;
-  my @blog_pages = $schema->resultset('BlogPage')->create({
-    blog_id => $self->id
-  });
-
-  return map { $self->resultset('Page')->find({ id => $_->id }) } @blog_pages;
-}
-
 1;

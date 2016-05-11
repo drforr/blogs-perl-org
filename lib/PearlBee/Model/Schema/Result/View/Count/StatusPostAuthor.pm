@@ -13,16 +13,14 @@ __PACKAGE__->result_source_instance->is_virtual(1);
 __PACKAGE__->result_source_instance->view_definition(
     q[
       SELECT
-      	SUM( CASE WHEN p.status = 'published' THEN 1 ELSE 0 END ) AS published,
-      	SUM( CASE WHEN p.status = 'trash'     THEN 1 ELSE 0 END ) AS trash,
-      	SUM( CASE WHEN p.status = 'draft'     THEN 1 ELSE 0 END ) AS draft,
-      	COUNT(*)                                                  AS total
+      	SUM( CASE WHEN status = 'published' THEN 1 ELSE 0 END ) AS published,
+      	SUM( CASE WHEN status = 'trash'     THEN 1 ELSE 0 END ) AS trash,
+      	SUM( CASE WHEN status = 'draft'     THEN 1 ELSE 0 END ) AS draft,
+      	COUNT(*)                                                AS total
       FROM
-      	post p
-      JOIN blog_post bp ON bp.post_id = p.id
-      JOIN blog_owner bo ON bo.blog_id = bp.blog_id
+      	post
       WHERE
-        bo.user_id = ?
+        user_id = ?
     ]
 );
 

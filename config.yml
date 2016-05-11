@@ -39,7 +39,7 @@ mail_server:
 plugins:
       DBIC:
         default:
-          dsn: dbi:Pg:database=blogs_perl_org;host=localhost
+          dsn: dbi:Pg:database=blogs_perl_org;host=139.162.204.109
           schema_class: PearlBee::Model::Schema
           user: jgoff
           password: 
@@ -90,6 +90,7 @@ blogs:
   user_posts: 10
   default_name: 'I Blog about Perl'
   default_description: 'A blog about the Perl programming language'
+
 
 # Specifics
 email_signature:          'The Blogs.Perl.Org Team'

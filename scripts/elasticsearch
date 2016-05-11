@@ -56,8 +56,7 @@ sub index_posts {
   my $in_sth = $in_dbh->prepare(<<'EOF');
   SELECT u.username, p.id, p.slug, p.title, p.content, p.content_more, p.created_date
     FROM post p
-    JOIN blog_post bp ON p.id = bp.post_id
-    JOIN users u ON bp.user_id = u.id
+    JOIN users u ON p.user_id = u.id
 ORDER BY p.id
 EOF
 

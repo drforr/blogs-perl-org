@@ -189,6 +189,21 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 user
+
+Type: belongs_to
+
+Related object: L<PearlBee::Model::Schema::Result::Users>
+
+=cut
+
+__PACKAGE__->belongs_to(
+  "user",
+  "PearlBee::Model::Schema::Result::Users",
+  { id => "user_id" },
+  { is_deferrable => 1, on_delete => "RESTRICT", on_update => "RESTRICT" },
+);
+
 =head2 categories
 
 Type: many_to_many

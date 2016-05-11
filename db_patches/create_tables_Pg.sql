@@ -23,7 +23,6 @@ CREATE TYPE active_state AS ENUM (
   'pending'
 );
 
-
 CREATE TABLE theme (
   name varchar(255) NOT NULL UNIQUE,
   PRIMARY KEY (name)
@@ -108,7 +107,6 @@ CREATE TABLE blog (
 
 CREATE TABLE blog_owners (
   user_id integer NOT NULL REFERENCES users (id),
-  is_admin boolean NOT NULL,
   blog_id integer NOT NULL REFERENCES blog (id),
   created_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   status active_state NOT NULL DEFAULT 'inactive',
@@ -135,7 +133,6 @@ CREATE TABLE post_format (
   PRIMARY KEY (name)
 );
 
-
 CREATE TYPE post_status AS ENUM (
   'published',
   'trash',
@@ -154,6 +151,7 @@ CREATE TABLE post (
   created_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   type varchar(255) NOT NULL DEFAULT 'HTML' REFERENCES post_format (name),
   status post_status DEFAULT 'draft',
+  user_id integer NOT NULL REFERENCES users (id),
   PRIMARY KEY (id)
 );
 
@@ -169,21 +167,8 @@ CREATE TABLE page (
   created_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   type varchar(255) NOT NULL DEFAULT 'HTML' REFERENCES post_format (name),
   status post_status DEFAULT 'draft',
+  user_id integer NOT NULL REFERENCES users (id),
   PRIMARY KEY (id)
-);
-
-
-CREATE TABLE blog_post (
-  blog_id integer NOT NULL REFERENCES blog (id),
-  post_id integer NOT NULL REFERENCES post (id),
-  PRIMARY KEY (blog_id,post_id)
-);
-
-
-CREATE TABLE blog_page (
-  blog_id integer NOT NULL REFERENCES blog (id),
-  page_id integer NOT NULL REFERENCES page (id),
-  PRIMARY KEY (blog_id,page_id)
 );
 
 
