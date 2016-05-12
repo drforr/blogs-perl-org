@@ -97,8 +97,8 @@ sub create_hashed_with_blog {
 
   $schema->resultset('BlogOwner')->create({
     blog_id  => $blog->id,
-    is_admin => 1,
     user_id  => $user->id,
+    is_admin =>"true",
   });
 }
 

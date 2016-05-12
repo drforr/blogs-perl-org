@@ -36,11 +36,9 @@ get '/admin/users/page/:page' => sub {
     @users = resultset('Users')->search({ status => { '!=' => 'pending' } }, { order_by => { -desc => "register_date" }, rows => $nr_of_rows, page => $page });
   }
   
-  my $all       = resultset('Users')->search()->count;
-  my $active    = resultset('Users')->search({ status => 'active'    })->count;
-  my $inactive  = resultset('Users')->search({ status => 'inactive'  })->count;
-  my $suspended = resultset('Users')->search({ status => 'suspended' })->count;
-  my $pending   = resultset('Users')->search({ status => 'pending'   })->count;
+  my $count = resultset('View::Count::StatusUser')->first;
+  
+  my ($all, $active, $inactive, $suspended, $pending) = $count->get_all_status_counts;
   
   if (! session('multiuser')) {
     # do not count 'pending' users

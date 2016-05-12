@@ -221,8 +221,8 @@ EOS
 
   my @fields_owner = qw( id user_id );
   my $out_owner_sth = $out_dbh->prepare( <<'EOS' );
-INSERT INTO blog_owners(blog_id,user_id,is_admin)
-          VALUES(?,?,?)
+INSERT INTO blog_owners(blog_id,user_id)
+          VALUES(?,?)
 EOS
 
   $in_sth->execute;
@@ -247,7 +247,7 @@ EOS
     $out_sth->execute( @{$out_blog}{@fields} ) unless $dry_run;
 
     $blog_user{$out_blog->{id}} = $out_blog->{user_id};
-    $out_owner_sth->execute( @{$out_blog}{@fields_owner}, 1 ) unless $dry_run;
+    $out_owner_sth->execute( @{$out_blog}{@fields_owner} ) unless $dry_run;
   }
   print "\n";
 }
@@ -290,7 +290,6 @@ sub map_post {
   };
 }
 
-my %post_user; #key $post_id, value $user_id
 my %user_post; #key $user_id, value @{ $post_id }
 my %blog_post; #key $blog_id, value @{ $post }
 my %tag; #key $tag_name, value ... will be tag ID eventually.
@@ -340,7 +339,6 @@ EOS
     print '.' if $count++ % 100 == 0;
 
     my $out_post = map_post( $in_post );
-    $post_user{ $out_post->{id} } = $out_post->{user_id};
     push @{ $user_post{ $out_post->{user_id} } }, $out_post->{id};
     push @{ $blog_post{ $out_post->{blog_id} } }, $out_post->{id};
     if ( $out_post->{keywords} ) {
@@ -382,7 +380,6 @@ sub map_page {
   };
 }
 
-my %page_user; #key $page_id, value $user_id
 my %user_page; #key $user_id, value @{ $page_id }
 my %blog_page; #key $blog_id, value @{ $page }
 
@@ -407,7 +404,7 @@ ORDER BY entry_id
 EOS
 
   my @fields =
-    qw(id title slug description content content_more created_date status);
+    qw(id title slug description content content_more created_date status user_id);
   my $out_sth = $out_dbh->prepare( <<'EOS' );
 INSERT INTO page(id,
                  title,
@@ -416,8 +413,9 @@ INSERT INTO page(id,
                  content,
                  content_more,
                  created_date,
-                 status)
-          VALUES(?,?,?,?,?,?,?,?)
+                 status,
+                 user_id)
+          VALUES(?,?,?,?,?,?,?,?,?)
 EOS
 
   $in_sth->execute();
@@ -427,7 +425,6 @@ EOS
     print '.' if $count++ % 100 == 0;
 
     my $out_page = map_page( $in_page );
-    $page_user{ $out_page->{id} } = $out_page->{user_id};
     push @{ $user_page{ $out_page->{user_id} } }, $out_page->{id};
     push @{ $blog_page{ $out_page->{blog_id} } }, $out_page->{id};
     if ( $out_page->{keywords} ) {
@@ -483,50 +480,6 @@ EOS
     my $slug = string_to_slug( $name );
     $out_sth->execute($tag_split->{$name}, $name, $slug) unless $dry_run;
   }
-  print "\n";
-}
-
-###############################################################################
-
-sub synthesize_blog_posts {
-  my ( $blog_posts ) = @_;
-  print "synthesizing blog_posts ";
-  my $out_sth = $out_dbh->prepare( <<'EOS' );
-INSERT INTO blog_post( blog_id, post_id )
-            VALUES( ?, ? )
-EOS
-
-  my $count = 0;
-
-  for my $blog_id ( keys %{ $blog_posts } ) {
-    for my $post_id ( @{ $blog_posts->{$blog_id} } ) {
-      print '.' if $count++ % 100 == 0;
-      $out_sth->execute( $blog_id, $post_id ) unless $dry_run;
-    }
-  }
-
-  print "\n";
-}
-
-###############################################################################
-
-sub synthesize_blog_pages {
-  my ( $blog_page ) = @_;
-  print "synthesizing blog_pages ";
-  my $out_sth = $out_dbh->prepare( <<'EOS' );
-INSERT INTO blog_page( blog_id, page_id )
-            VALUES( ?, ? )
-EOS
-
-  my $count = 0;
-
-  for my $blog_id ( keys %{ $blog_page } ) {
-    for my $page_id ( @{ $blog_page->{$blog_id} } ) {
-      print '.' if $count++ % 100 == 0;
-      $out_sth->execute( $blog_id, $page_id ) unless $dry_run;
-    }
-  }
-
   print "\n";
 }
 
@@ -851,8 +804,6 @@ create_avatars;
 migrate_blogs( \%users );
 migrate_posts( \%tag, \%tag_split );
 migrate_pages( \%tag, \%tag_split );
-synthesize_blog_posts( \%blog_post );
-synthesize_blog_pages( \%blog_page );
 migrate_some_tags( \%tag );
 synthesize_tags( \%tag, \%tag_split );
 synthesize_post_tags( \%tag, \%tag_split );
