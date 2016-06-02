@@ -34,6 +34,11 @@ use PearlBee::Admin;
 # Author controllers
 use PearlBee::Author::Post;
 use PearlBee::Author::Comment;
+use PearlBee::Author::Category;
+use PearlBee::Author::Settings;
+use PearlBee::Author::Tag;
+use PearlBee::Author::User;
+use PearlBee::Author::Blog;
 
 use PearlBee::Helpers::Email qw(send_email_complete);
 use PearlBee::Helpers::Util qw(generate_crypted_filename map_posts create_password);

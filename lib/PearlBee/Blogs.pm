@@ -64,9 +64,9 @@ get '/blogs/user/:username/slug/:slug' => sub {
                  resultset('Blog')->find({ id => $blog_owner->blog_id });
   }
   
-  my $blog          = resultset('Blog')->find ({slug =>$slug});
-  my $nr_of_authors = resultset('BlogOwner')->
-                      search ({blog_id => $blog->id})->count;
+
+  my $blog = resultset('Blog')->find ({slug =>$slug});
+  my $nr_of_authors = resultset('BlogOwner')->search ({blog_id => $blog->id})->count;
 
   for my $blog_owner (@blog_owners){
     push @authors, map { $_->as_hashref_sanitized } 
