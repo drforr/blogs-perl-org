@@ -42,9 +42,19 @@ __PACKAGE__->table("blog_owners");
   data_type: 'integer'
   is_nullable: 0
 
+=head2 is_admin
+
+  data_type: 'boolean'
+  is_nullable: 0
+
 =head2 blog_id
 
   data_type: 'integer'
+  is_nullable: 0
+
+=head2 is_admin
+
+  data_type: 'boolean'
   is_nullable: 0
 
 =head2 created_date
@@ -66,6 +76,8 @@ __PACKAGE__->table("blog_owners");
 __PACKAGE__->add_columns(
   "user_id",
   { data_type => "integer", is_nullable => 0 },
+  "is_admin",
+  { data_type => "boolean", is_nullable => 0 },
   "blog_id",
   { data_type => "integer", is_nullable => 0 },
   "created_date",

@@ -180,14 +180,21 @@ post '/register_success' => sub {
     };
   }
 
-  my $date  = DateTime->now();
-  my $token = generate_hash( $params->{'email'} . $date );
+  my $token            = generate_hash( $params->{'email'} );
+  my $blog_name        = $params->{name} //
+                         config->{blogs}{default_name};
+  my $blog_description = $params->{description} //
+                         config->{blogs}{default_description};
+  my $blog_timezone    = $params->{timezone} //
+                         config->{blogs}{default_timezone};
 
   resultset('Users')->create_hashed_with_blog({
     username       => $params->{username},
     password       => $params->{password},
     email          => $params->{email},
-    name           => $params->{name},
+    name           => $blog_name,
+    description    => $blog_description,
+    timezone       => $blog_timezone,
     role           => 'author',
     status         => 'pending',
     activation_key => $token,

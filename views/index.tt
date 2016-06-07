@@ -1,4 +1,5 @@
 [% SET global.template_name = 'homepage' %]
+<link href="/blog/css/multiblog.css" rel="stylesheet">
 
 <div class="blog">
 
@@ -63,7 +64,9 @@
                         </div>
                          <div class="info-entry">
                            <div class="user">
-                             <a href="/profile/author/[% post.user.username %]">[% post.user.name %]</a>
+                             <a class="user-name" href="/profile/author/[% post.user.username %]">[% post.user.name %]</a>
+                               <span>in</span>
+                             <a class="blog-name" href="/blogs/user/[% post.user.username | uri %]/slug/[% post.blog.slug %]" >[% post.blog.name %]</a>
                            </div>
                            <div class="date">
                              [% post.created_date_human %]

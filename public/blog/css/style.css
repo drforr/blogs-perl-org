@@ -3272,24 +3272,24 @@ Paul: L-am scos fiindca aranja poza aiurea in modal ope mobile
 }
 /* !!!! delete when multiple blogs feature enabled !!!!!! */
 
-.blog .info-blog {
-   display: none;
-}
-.blog_author #author-tab-content1 .info-entry {
-   display: none;
-}
-.blog .info-blog:first-child > .entry-name {
-   display: block;
-}
-.blog .info-blog:first-child > .info-blog {
-   display: block;
-}
-.blog_author #author-tab-content1 .info-entry:first-child {
-   display: block;
-}
-.blog .info-blog:first-child {
-   display: block;
-}
+/*.blog .info-blog {*/
+   /*display: none;*/
+/*}*/
+/*.blog_author #author-tab-content1 .info-entry {*/
+   /*display: none;*/
+/*}*/
+/*.blog .info-blog:first-child > .entry-name {*/
+   /*display: block;*/
+/*}*/
+/*.blog .info-blog:first-child > .info-blog {*/
+   /*display: block;*/
+/*}*/
+/*.blog_author #author-tab-content1 .info-entry:first-child {*/
+   /*display: block;*/
+/*}*/
+/*.blog .info-blog:first-child {*/
+   /*display: block;*/
+/*}*/
 /* End */
 
 

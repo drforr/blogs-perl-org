@@ -8,7 +8,7 @@ use Dancer2;
 use Dancer2::Plugin::DBIC;
 use PearlBee::Model::Schema;
 use PearlBee::Helpers::Util qw(map_posts);
-use PearlBee::Helpers::ElasticSearch qw(search_posts search_comments);
+use PearlBee::Helpers::ElasticSearch qw(search_posts search_comments search_blogs);
 use Data::Dumper;
 
 =head2 map_user
@@ -32,6 +32,29 @@ sub map_user {
     };
 
     return $user_href;
+}
+
+=head2 map_blogs
+
+Add informations for every blog.
+
+=cut
+
+sub map_blog {
+    my ($blog) = @_;
+    my $contributors  = resultset('BlogOwner')->count({ blog_id => $blog->{id} });
+    my $entries       = resultset('BlogPost') ->count({ blog_id => $blog->{id} });
+    my $owner         = resultset('BlogOwner')->find({ blog_id => $blog->{id} });
+    my $user          = resultset('Users')    ->find({ id => $owner->user_id }); 
+
+    $blog->{counts} = {
+      contributors    => $contributors,
+      entries         => $entries,
+    };
+    $blog->{user_info}={
+       username        => $user->username, 
+    };
+    return $blog;
 }
 
 =head2 /search/user-info/:query route
@@ -124,6 +147,31 @@ get '/search/users/:query' => sub {
     $json->allow_blessed(1);
     $json->convert_blessed(1);
     return $json->encode({ posts => \@results });
+};
+
+get '/search/blogs/:query' => sub {
+    my $search_query = route_parameters->{'query'};
+    my @blogs         = resultset('Blog')->search_lc($search_query);
+    @blogs = map { $_->as_hashref } @blogs;    
+    my $json = JSON->new;
+    $json->allow_blessed(1);
+    $json->convert_blessed(1);
+    return $json->encode({ blogs => \@blogs });
+};
+
+get '/search/blogs/:query/:page' => sub {
+    my $search_query = route_parameters->{'query'};
+    my $page = route_parameters->{'page'};
+    my @results =
+        PearlBee::Helpers::ElasticSearch::search_blogs($search_query,$page);
+           
+    my $json = JSON->new;
+    $json->allow_blessed(1);
+    $json->convert_blessed(1);
+    #return $json->encode({ blogs => \@results });
+    return $json->encode(
+        { blogs => [ map { map_blog($_) } @results ] } 
+        );
 };
 
 true;

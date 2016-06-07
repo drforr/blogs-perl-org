@@ -1,0 +1,71 @@
+
+/*blog is displayed on the index, author profile [tab entries]*/
+.posts.listings .info-entry .user span,
+.blog_author .info-entry .user span,
+.search-page .user span{
+    color: #8c8c8c;
+}
+.posts.listings .info-entry .date,
+.blog_author .info-entry .date{
+    font-size: 15px;
+}
+
+/*BlogPage => blogs/user/slug*/
+.blogs .no-more-listing{
+    text-align: left;
+    padding: 15px;
+    padding-left: 0;
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+/*BlogPage => popup authors*/
+.info-blog a.number-authors{
+    text-transform: lowercase;
+    font-weight: normal;
+    font-size: 15px;
+}
+#author-modal{
+    overflow: hidden;
+}
+#author-modal .modal-dialog{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    left: 0;
+    padding: 0;
+}
+#author-modal .modal-content{
+    width: 50%;
+    height: 50%;
+    left: 0;
+    right: 0;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}
+#author-modal .modal-header{
+    height: 15%;
+}
+#author-modal .modal-body {
+    position: relative;
+    padding: 20px;
+    overflow-y: auto;
+    height: 85%;
+}
+#author-modal .row{
+    margin-bottom: 35px;
+}
+#author-modal ul li a.author-info{
+    text-transform: uppercase;
+    font-size: 18px;
+    color: #428bca;
+}
+#author-modal img.author-image{
+    width: 75px;
+    height: 75px;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+}

@@ -89,6 +89,36 @@ __PACKAGE__->table("blog");
   extra: {list => ["inactive","active","suspended","pending"]}
   is_nullable: 0
 
+=head2 social_media
+
+  data_type: 'boolean'
+  is_nullable: 0
+  default_value: false
+
+=head2 multiuser
+
+  data_type: 'boolean'
+  is_nullable: 0
+  default_value: false
+
+=head2 accept_comments
+
+  data_type: 'boolean'
+  is_nullable: 0
+  default_value: false
+
+=head2 timezone
+
+  data_type: 'varchar'
+  is_nullable: 0
+  size: 255
+
+=head2 avatar_path
+
+  data_type: 'varchar'
+  is_nullable: 0
+  size: 255
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -123,6 +153,16 @@ __PACKAGE__->add_columns(
   },
   "email_notification",
   { data_type => "integer", is_auto_increment => 0, is_nullable => 0 },
+  "social_media",
+  { data_type => "boolean", is_auto_increment => 0, is_nullable => 0 },
+  "multiuser",
+  { data_type => "boolean", is_auto_increment => 0, is_nullable => 0 },
+  "accept_comments",
+  { data_type => "boolean", is_auto_increment => 0, is_nullable => 0 },
+  "timezone",
+  { data_type => "varchar", is_nullable => 0, size => 255 },
+  "avatar_path",
+  { data_type => "varchar", is_nullable => 0, size => 255 },
 );
 
 =head1 PRIMARY KEY
@@ -167,13 +207,23 @@ Return a non-blessed version of a blog database row
 sub as_hashref {
   my ($self)       = @_;
   my $blog_as_href = {
-    id           => $self->id,
-    name         => $self->name,
-    description  => $self->description,
-    slug         => $self->slug,
-    created_date => $self->created_date,
-    edited_date  => $self->edited_date,
-    status       => $self->status,
+    id                 => $self->id,
+    name               => $self->name,
+    description        => $self->description,
+    slug               => $self->slug,
+    created_date       => $self->created_date,
+    edited_date        => $self->edited_date,
+    status             => $self->status,
+    email_notification => $self->email_notification,
+    social_media       => $self->social_media,
+    multiuser          => $self->multiuser,
+    accept_comments    => $self->accept_comments,
+    timezone           => $self->timezone,
+    avatar_path        => $self->avatar_path,
+    nr_of_posts        => $self->nr_of_posts,
+    nr_of_contributors => $self->nr_of_contributors,
+    nr_of_comments     => $self->nr_of_comments,
+    blog_creator       => $self->blog_creator->as_hashref_sanitized,
   };          
               
   return $blog_as_href;
@@ -191,6 +241,83 @@ sub as_hashref_sanitized {
 
   delete $href->{id};
   return $href;
+}
+
+=head2
+  
+  Return the number of posts for each blog.
+
+=cut
+
+sub nr_of_posts {
+  my ($self)    = @_;
+  my $schema    = $self->result_source->schema;
+  
+  my $nr_of_posts = $schema->resultset('BlogPost')->
+                    search({ blog_id => $self->id })->count;
+ 
+  return $nr_of_posts;
+}
+
+=head2
+  
+  Return the number of contributors for each blog.
+
+=cut
+
+sub nr_of_contributors {
+  my ($self)    = @_;
+  my $schema    = $self->result_source->schema;
+  
+  my $nr_of_contributors = $schema->resultset('BlogOwner')->
+                    search({ blog_id => $self->id })->count;
+ 
+  return $nr_of_contributors;
+}
+
+=head2
+  
+  Return the number of comments from all the posts for each blog.
+
+=cut
+
+sub nr_of_comments {
+  my ($self)    = @_;
+  my $schema    = $self->result_source->schema;
+
+  my $nr_of_comments;
+  my @posts = $schema->resultset('BlogPost')->
+                    search({ blog_id => $self->id });
+  
+  if (scalar @posts == 0){
+    $nr_of_comments = 0;
+  }
+
+  for my $iterator (@posts){
+    my $total =  $schema -> resultset('Comment')->search({post_id => $iterator->post_id})->count;
+    $nr_of_comments += $total;
+  }
+
+  return $nr_of_comments;
+}
+
+sub blog_creator {
+  my ($self)    = @_;
+  my $schema    = $self->result_source->schema;
+  my $id = $self->id;
+  my $blog_owner;
+   $blog_owner   = resultset('BlogOwner')->
+                    find({ 
+                      blog_id => $id
+                      } ,
+                      {
+                        order_by  => { -asc => "created_date" }
+                      }
+                    );
+
+   my $blog_creator = $schema->resultset('Users')->find({id => $blog_owner->user_id});
+   
+   return $blog_creator; 
 }
 
 1;

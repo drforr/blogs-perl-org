@@ -97,6 +97,9 @@
 
 
 /*blogs/profile page*/
+.blog .blog-top-part{
+    border: 1px solid #eaeaea;
+}
 .blog .blog-top-part .entry-name{
     color: #000;
 }
@@ -135,3 +138,7 @@ color: #333333;
    background-repeat: repeat;
 }
 
+/*multiblog - search blogs[tab4]*/
+#tab-content4 .entry{
+    border-bottom: 1px solid #eaeaea;
+}

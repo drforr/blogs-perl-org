@@ -158,14 +158,47 @@ get '/feed/author/:username' => sub {
 
 =head2 /feed/author/:username/blog/:slug route
 
-Blog ID
+Feed for blog.
 
 =cut
 
 get '/feed/author/:username/blog/:slug' => sub { 
-  my $username = route_parameters->{username};
-  
-  redirect "/feed/author/$username";
+    my $feed;
+    my $username    = route_parameters->{username};
+    my $slug        = route_parameters->{slug};
+    my $blog        = resultset('Blog')->find({slug => $slug});
+    my @blog_post   = reverse resultset('BlogPost')->search({blog_id => $blog->id});
+    my @posts;
+    foreach my $post (@blog_post){
+        push @posts ,  resultset('Post')->search(
+        { id => $post->post_id },
+        { order_by => { -desc => "created_date" }, rows => 10 }
+    );
+    }
+
+    try {
+        $feed = create_feed(
+            format  => params->{format} ||
+                       config->{plugins}{feed}{format},
+            title   => config->{plugins}{feed}{title},
+            entries => [ map { title => $_->title,
+                link =>  '/post/' . $_->slug  }, @posts ],
+        );
+    }
+    catch {
+        my ( $exception ) = @_;
+        if ( $exception->does('FeedInvalidFormat') ) {
+            return $exception->message;
+        }
+        elsif ( $exception->does('FeedNoFormat') ) {
+            return $exception->message;
+        }
+        else {
+            $exception->rethrow;
+        }
+    };
+
+    return $feed;
 
 };
 

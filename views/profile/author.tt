@@ -2,6 +2,7 @@
 
 <link href="/blog/css/author.css" rel="stylesheet">
 <link href="/blog/css/search.css" rel="stylesheet">
+<link href="/blog/css/multiblog.css" rel="stylesheet">
 
 <div class="author-page">
     <!--author-description top-->
@@ -127,12 +128,15 @@
                                     <div class="bubble">
                                         <img class="user-image" src="">
                                     </div>
+                                    [% FOREACH blog in blogs %]
                                     <div class="info-entry">
                                         <div class="user">
-                                            <a href=""></a>
+                                            <a class="user-name" href=""></a>
+                                            <span> in </span>
+                                            <a class="blog-name" href=""></a>
                                         </div>
+                                    [% END %]
                                         <div class="date">
-
                                         </div>
                                         [% FOREACH category in post.post_categories %]
                                         <div class="block_elements">
@@ -148,7 +152,7 @@
                                     [% INCLUDE cover.tt %]
 
                                     <!-- Post content -->
-                                    <div class="post_preview truncate">
+                                    <div class="post_preview truncate"> 
                                         <div class="post_preview_wrapper">
                                             <p>
                                                 [% post.content %]

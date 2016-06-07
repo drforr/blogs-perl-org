@@ -24,6 +24,7 @@ sub can_create {
   my $user_id = $params->{user_id};
   my $status  = $params->{status};
   my $cover   = $params->{cover};
+  my $blog    = $params->{blog};
 
   my $page = $self->create_with_slug({
     title   => $title,
@@ -31,6 +32,11 @@ sub can_create {
     user_id => $user_id,
     status  => $status,
     cover   => $cover,
+  });
+
+  my $blog_page = $self->create({
+    blog_id => $blog,
+    page_id => $page->id
   });
 
   return $page;

@@ -30,6 +30,9 @@ DROP TABLE oauth;
 DROP TABLE users;
 DROP TABLE theme;
 
+DROP TABLE notification;
+DROP TABLE notification_type;
+
 DROP TYPE active_state;
 
 DROP TABLE role;

@@ -426,6 +426,7 @@ sub as_hashref {
     type         => $self->type,
     status       => $self->status,
     user_id      => $self->user_id,
+    blog         => $self->blog->as_hashref,
   };          
               
   return $page_obj;
@@ -443,6 +444,7 @@ sub as_hashref_sanitized {
 
   delete $href->{id};
   delete $href->{user_id};
+  delete $href->{blog}->{id};
   return $href;
 }
 
@@ -483,6 +485,23 @@ sub massaged_content {
 sub massaged_content_more {
   my ($self)  = @_;
   return $self->_massage_content( $self->content_more );
+}
+
+=head2 blog
+
+Return the blog object for the given page
+
+=cut
+
+sub blog {
+  my ($self)    = @_;
+  my $schema    = $self->result_source->schema;
+  my $blog_post = $schema->resultset('BlogPage')->
+                    find({ page_id => $self->id });
+  my $blog      = $schema->resultset('Blog')->
+                    find({ id => $blog_post->blog_id });
+
+  return $blog;
 }
 
 1;

@@ -10,7 +10,7 @@ use Search::Elasticsearch;
 
 require Exporter;
 our @ISA 	= qw(Exporter);
-our @EXPORT_OK 	= qw/search_posts search_comments/;
+our @EXPORT_OK 	= qw/search_posts search_comments search_blogs/;
 
 =head2 index_comment( $comment )
 
@@ -148,6 +148,47 @@ sub search_comments {
     return @results;
 }
 
+=head2 search_blogs( $text, $page )
+
+Search for posts by title only
+
+=cut
+
+sub search_blogs {
+    my ($text,$page) = @_;
+    my $page_size    = config->{search}{nr_of_blogs} || 10;
+    my $es           = Search::Elasticsearch->new;
+
+    my $start = $page * $page_size;
+    my $elastic_results = $es->search(
+        index => 'blogs',
+        params => { from => $start, size => $page_size },
+        body => {
+            query => {
+        bool => {
+            should => [
+                        { match => { name => $text } },
+            ]
+                }
+            }
+        }
+    );
+
+    my @results;
+    for my $result ( @{ $elastic_results->{hits}{hits} } ) {
+        my $rs = resultset('Blog')->find({ id => $result->{_id} });
+        next unless $rs and $rs->id;
+        # my $blog_avatar = $rs->blog->avatar;
+        # if ( $blog_avatar and $blog_avatar =~ m{ ^/blog }x ) {
+        #     $blog_avatar = "";
+        # }                
+    my $href = $rs->as_hashref;
+    push @results, $href;
+    }
+
+    return @results;
+}
+
 =head2 indexDB()
 
 Index the DB for elastic
@@ -165,6 +206,7 @@ sub indexDB {
         $es->indices->delete( index => 'posts' );
         $es->indices->delete( index => 'users' );
         $es->indices->delete( index => 'tags' );
+        $es->indices->delete( index => 'blogs' );
     } catch {
         warn "Indexes were probably not yet created before, so nothing to delete.\n"
     };
@@ -172,7 +214,7 @@ sub indexDB {
     $es->indices->create( index => 'posts' );
     $es->indices->create( index => 'users' );
     $es->indices->create( index => 'tags' );
-
+    $es->indices->create( index => 'blogs' );
     my $posts = resultset('Post')->search({});
     while ( my $post = $posts->next()) {
         if($post->status eq 'published') {
@@ -214,6 +256,19 @@ sub indexDB {
             body  => {
                 name => $tag->name,
                 slug => $tag->slug
+            }
+        );
+    };
+
+    my $blogs = resultset('Blog')->search({});
+    while ( my $blog = $blogs->next()) {
+        $es->index(
+            index => 'blogs',
+            type  => 'blogs',
+            id    => $blog->id,
+            body  => {
+                name => $blog->name,
+                slug => $blog->slug
             }
         );
     };

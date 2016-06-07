@@ -46,7 +46,8 @@ get '/admin/posts/page/:page' => sub {
     my $current_page    = $page;
     my $pages_per_set   = 7;
     my $pagination      = generate_pagination_numbering($total_posts, $posts_per_page, $current_page, $pages_per_set);
-
+    map { $_->as_hashref } @posts ;
+    
     template 'admin/posts/list',
       {
         posts         => \@posts,
@@ -187,11 +188,21 @@ any '/admin/posts/add' => sub {
           # Set the proper timezone
           #
           my $user              = session('user');
+          my $user_obj         = resultset('Users')->find_by_session(session);
           my ($slug, $changed)  = resultset('Post')->check_slug( params->{slug} );
+          my $post;             
+          my $cover_filename;
+          my @blog_owners = resultset('BlogOwner')->search({ user_id => $user_obj->id});
+          my @blogs; 
+          my $blog;
+          for my $blog_owner ( @blog_owners ) {
+          push @blogs, map { $_->as_hashref }
+                   resultset('Blog')->search({ id => $blog_owner->blog_id });
+                 }
+          $blog = $blogs[0];     
           session warning => 'The slug was already taken but we generated a similar slug for you! Feel free to change it as you wish.' if ($changed);
 
           # Upload the cover image first so we'll have the generated filename ( if exists )
-          my $cover_filename;
           if ( upload('cover') ) {
               my $cover        = upload('cover');
               $cover_filename  = generate_crypted_filename();
@@ -211,6 +222,7 @@ any '/admin/posts/add' => sub {
               status  => params->{status},
               cover   => ( $cover_filename ) ? $cover_filename : '',
               type    => params->{type} || 'HTML',
+              blog_id => $blog->{id},
           };
           $post = resultset('Post')->can_create($params);
   
@@ -258,17 +270,19 @@ get '/admin/posts/edit/:slug' => sub {
     my $joined_tags = join( ', ', @tag_names );
 
     # Prepare the categories
-    my @categories;
-    push( @categories, $_->category ) foreach (@post_categories);
+    my @category_names;
+    push( @category_names, $_->category->name ) foreach (@post_categories);
+    my $joined_categories = join( ', ', @category_names );
+
 
     # Array of post categories id for populating the checkboxes
     my @categories_ids;
-    push( @categories_ids, $_->id ) foreach (@categories);
+    # push( @categories_ids, $_->id ) foreach (@categories);
 
     my $params = {
         post           => $post,
         tags           => $joined_tags,
-        categories     => \@categories,
+        categories     => $joined_categories,
         all_categories => \@all_categories,
         ids            => \@categories_ids,
         all_tags       => \@all_tags

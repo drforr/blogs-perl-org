@@ -1,5 +1,6 @@
 [% SET global.template_name = 'search' %]
 <link href="/blog/css/search.css" rel="stylesheet">
+<link href="/blog/css/multiblog.css" rel="stylesheet">
 
 <div class="search-page">
 
@@ -7,7 +8,7 @@
         <div class="search-input">
             <div class="container">
                 <input type="text" name="search_term" placeholder="Search blogs.perl.org"/>
-                <p>Search in headline, people, keywords, content, tags</p>
+                <p>Search in titles, blogs, people, keywords, content, tags & categories</p>
             </div>
         </div>
 
@@ -44,14 +45,20 @@
                         <span>tags</span>
                     </label>
 
+                    <!-- Radio button and lable for #tab-content4 -->
+                    <input type="radio" name="tabs" id="tab4" data-search-term="">
+                    <label for="tab4">
+                        <span>blogs</span>
+                    </label>
+
+                    <!--tab-content1-->
                     <div id="tab-content1" class="tab-content">
                         <div class="posts listings">
                             <div class="col-xs-2">
-
                             </div>
                             <div class="col-xs-10 no-padding">
-
                             </div>
+
                             <div class="progressloader-holder" hidden>
                                 <div class="progressloader">
                                     <div class="spinner">
@@ -70,23 +77,18 @@
                                     </div>
                                     <div class="info-entry">
                                         <div class="user">
-                                            <a href="/profile/author/[% post.user.username | uri %]"></a>
+                                            <a class="user-name" href="/profile/author/[% post.user.username | uri %]"></a>
+                                            <span>in</span>
+                                            <a class="blog-name" href="/blogs/user/[% post.user.username | uri %]/slug/[% post.blog.slug %]" >[% post.blog.name %]</a>
                                         </div>
                                         <div class="date">
                                         </div>
-                                        [% FOREACH category in post.post_categories %]
-                                        <div class="block_elements">
-                                            <i class="icon-list"></i> <a href="/posts/category/[% category.category.slug %]"></a>
-                                        </div>
-                                        [% END %]
                                     </div>
                                     <div class="post-heading">
                                         <h2><a href="/post/[% post.slug %]"></a></h2>
                                     </div>
 
                                     <!-- Post cover -->
-                                    [% INCLUDE cover.tt %]
-
                                     <!-- Post content -->
                                     <div class="post_preview truncate">
                                         <div class="post_preview_wrapper">
@@ -102,54 +104,7 @@
                                     <a href="/post/[% post.slug %]" class="read-more">Read More...</a>
                                 </div>
                             </div>
-                            [% FOREACH post in posts %]
 
-                            <div class="entry clearfix">
-                                <div class="col-md-2">
-                                </div>
-                                <div class="text-listing-entries col-md-10 col-xs-12">
-                                    <div class="bubble">
-<img class="user-image" src="/avatar/[% post.user.username %]" />
-                                    </div>
-                                    <div class="info-entry">
-                                        <div class="user">
-                                            <a href="/profile/author/[% post.user.username | uri %]">[% post.user.name %]</a>
-                                        </div>
-                                        <div class="date">
-                                            [% post.created_date_human %]
-                                        </div>
-                                        [% FOREACH category in post.post_categories %]
-                                        <div class="block_elements">
-                                            <i class="icon-list"></i> <a href="/posts/category/[% category.category.slug %]">[% category.category.name %]</a>
-                                        </div>
-                                        [% END %]
-                                    </div>
-                                    <div class="post-heading">
-                                        <h2><a href="/post/[% post.slug %]">[% post.title %]</a></h2>
-                                    </div>
-
-                                    <!-- Post cover -->
-                                    [% INCLUDE cover.tt %]
-
-                                    <!-- Post content -->
-                                    <div class="post_preview truncate">
-                                        <div class="post_preview_wrapper">
-                                            <p>
-                                                [% post.content %]
-                                                [% post.content_more %]
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <!-- Read more -->
-                                    [% SET nr_of_comments = post.nr_of_comments %]
-                                    <div class="block_elements comments-listings">
-                                        <a href="/post/[% post.slug %]#comments"> [% IF nr_of_comments == 1 %] Comment [% ELSE %] Comments [% END %] ([% nr_of_comments %])</a>
-                                    </div>
-                                    <a href="/post/[% post.slug %]" class="read-more">Read More...</a>
-                                </div>
-                            </div>
-                            [% END %]
                             <div class="loading-posts no-posts-messages">
                                 <div class="col-xs-2">
                                 </div>
@@ -163,25 +118,20 @@
                                             <div class="bounce2"></div>
                                             <div class="bounce3"></div>
                                         </div>
-
                                     </div>
                                 </div>
+                                <div id="display_msg_posts1" class="no-more-listing col-xs-10 hidden">
+                                    <h4>No more posts</h4>
+                                </div>
                             </div>
-                            [% IF posts.first %]
-                            <!-- Pagination -->
 
-                            <!-- Each posts should be enclosed inside "entry" class" -->
-                            <!-- Post one -->
-
-                            [% ELSE %]
                             <br />
                             <h5 class="no-posts no-posts-found1" hidden>We're sorry, no results were found for your <br />search criteria</h5>
-                            [% END %]
                         </div>
-
                     </div> <!-- #tab-content1 -->
-                    <div id="tab-content2" class="tab-content"><!-- #tab-content2 -->
 
+                    <!-- #tab-content2 -->
+                    <div id="tab-content2" class="tab-content">
                         <div class="people clearfix">
                             <div class="col-md-12 user-info-listing row">
                                 <div class="progressloader-holder" hidden>
@@ -195,7 +145,7 @@
                                 </div>
                                 <div class="user-info-entry hidden row">
                                     <div class="bubble col-xs-1">
-<img class="user-image" src="/avatar/[% post.user.username %]" />
+                                        <img class="user-image" src="/avatar/[% post.user.username %]" />
                                     </div>
                                     <div class="info-entry col-xs-5">
                                         <div class="user">
@@ -215,10 +165,10 @@
                                 <h5 class="no-posts2 no-posts-found" hidden >We're sorry, no results were found for your <br />search criteria</h5>
                             </div>
                         </div>
-
                     </div>
 
-                    <div id="tab-content3" class="tab-content"><!-- #tab-content3 -->
+                    <!-- #tab-content3 -->
+                    <div id="tab-content3" class="tab-content">
                         <div class="progressloader-holder" hidden>
                             <div class="progressloader">
                                 <div class="spinner">
@@ -234,9 +184,80 @@
                         <h5 class="no-posts3 no-posts-found" hidden>We're sorry, no results were found for your <br />search criteria</h5>
                     </div>
 
+                    <!-- #tab-content4 -->
+                    <div id="tab-content4" class="tab-content">
+                        <div class="col-xs-2">
+                        </div>
+                        <div class="col-xs-10 no-padding">
+                        </div>
+
+                        <div class="posts listings">
+                            <div class="progressloader-holder hidden">
+                                <div class="progressloader">
+                                    <div class="spinner">
+                                        <div class="bounce1"></div>
+                                        <div class="bounce2"></div>
+                                        <div class="bounce3"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="entry clearfix hidden">
+                                <div class="col-md-2">
+                                </div>
+                                <!--<div class="text-listing-entries col-md-10 col-xs-12">-->
+                                    <!--<div class="bubble">-->
+                                    <!--<img class="user-image" src="/avatar/[% post.user.username %]" />-->
+                                <!--</div>-->
+                                <div class="info-entry">
+                                    <div class="blog-part">
+                                        <a class="blog-name" href="" ></a>
+                                    </div>
+                                    <ul class="info-blog">
+                                        <li class="information-blog"> </li>
+                                        <li><span class="entries-count"></span> entries on the blog</li>
+                                        <li><span class="authors-count"></span> authors</li>
+                                        <li>
+                                            <a class="pull-right blog-slug" href="">Go to blog</a>
+                                        </li>
+                                    </ul>
+                                    <div class="date">
+                                    </div>
+                                </div>
+
+                                    <!-- Go to blog -->
+                                    <!--<div class="block_elements comments-listings">-->
+                                        <!--<a href="/post/[% post.slug %]#comments"></a>-->
+                                    <!--</div>-->
+                                    <!--<a class="blog-name" href="" >Go to blog </a>-->
+                            </div>
+                        </div>
+
+                            <div class="loading-posts no-posts-messages">
+                                <div class="col-xs-2">
+                                </div>
+                                <div class="view-more col-xs-10">
+                                    <div class="bubble">
+                                        <button id="search-more-blogs" data-page-number="0" class="btn btn-primary btn-xs more-posts" type="button">more</button>
+                                    </div>
+                                    <div style="display: none" class="progressloader">
+                                        <div class="spinner">
+                                            <div class="bounce1"></div>
+                                            <div class="bounce2"></div>
+                                            <div class="bounce3"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="display_msg_posts4" class="no-more-listing col-xs-10 hidden">
+                                    <h4>No more blogs</h4>
+                                </div>
+                            </div>
+                            <br />
+
+                            <h5 class="no-posts no-posts-found4" hidden>We're sorry, no results were found for your <br />search criteria</h5>
+                        </div> <!-- #tab-content4 -->
+                    </div>
 
                 </div>
             </div>
         </div>
     </div>
-</div>

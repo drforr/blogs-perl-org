@@ -39,7 +39,7 @@ mail_server:
 plugins:
       DBIC:
         default:
-          dsn: dbi:Pg:database=blogs_perl_org;host=139.162.204.109
+          dsn: dbi:Pg:database=blogs_perl_org_multiblog
           schema_class: PearlBee::Model::Schema
           user: jgoff
           password:
@@ -105,16 +105,17 @@ user_pics:        '/home/jgoff/userpics/userpics'
 
 # number of items to display per page
 blogs:
-  user_posts: 10
-  default_name: 'I Blog about Perl'
+  user_posts:          10
+  default_name:        'I Blog about Perl'
   default_description: 'A blog about the Perl programming language'
+  default_timezone   : 'Europe/Bucharest'
 
 
 # Specifics
-email_signature:          'The Blogs.Perl.Org Team'
-default_email_sender:     'no-reply@pearlbee.com'
-welcome_email_subject:    'Welcome to Blogs.Perl.Org!'
-posts_on_page:            5
-blogs_on_page:            5
+email_signature:       'The Blogs.Perl.Org Team'
+default_email_sender:  'no-reply@pearlbee.com'
+welcome_email_subject: 'Welcome to Blogs.Perl.Org!'
+posts_on_page:         5
+blogs_on_page:         5
 search:
   user_posts: 10

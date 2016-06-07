@@ -20,8 +20,8 @@
 	        <div class="awidget-body">          
 
 	        	<a href="/admin/users/page/1"> 	All </a>([% all %]) | 
-	        	<a href="/admin/users/deactivated/page/1"> Inactive </a>([% inactive %]) | 
-	        	<a href="/admin/users/activated/page/1"> Active </a>([% active %]) |
+	        	<a href="/admin/users/inactive/page/1"> Inactive </a>([% inactive %]) | 
+	        	<a href="/admin/users/active/page/1"> Active </a>([% active %]) |
 				[% IF session.multiuser %]
 				  <a href="/admin/users/suspended/page/1"> Suspended </a>([% suspended %]) |
 				  <a href="/admin/users/pending/page/1"> Pending </a>([% pending %])

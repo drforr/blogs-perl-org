@@ -234,6 +234,91 @@ post '/profile-image' => sub {
     };
 };
 
+=head2 /blog-image/:slug route
+
+Create/update/delete a blog
+
+=cut
+
+post '/blog-image/:slug' => sub {
+
+  my $slug        = route_parameters->{'slug'};
+  my $params      = params;
+  my $file        = $params->{file};
+  my $user        = session('user');
+  my $res_user    = resultset('Users')->find_by_session(session);
+  my $upload_dir  = "/" . config->{'avatar'}{'path'};
+  my $folder_path = config->{user_pics};
+  #my $blog        = resultset('Blog')->find({ slug => $slug });
+  my @blog_owners = resultset('BlogOwner')->search({ user_id => $res_user->id, is_admin => '1' });
+  my $blog;
+  my $errorflag = 0;
+  for my $blog_owner ( @blog_owners ) {
+  $blog = resultset('Blog')->search({ id => $blog_owner->blog_id, slug => $slug });
+  }
+  my $message;
+
+  if ( $blog ) {
+    my $filename = sprintf( config->{'avatar'}{'blog-format'},
+                            $blog->id, $res_user->id );
+
+    if ( $params->{action_form} eq 'crop' ) {
+      if ( $params->{width} > 0 ) {
+        if ( $params->{file} ) {
+          my $logo = PearlBee::Helpers::ProcessImage->new(
+            request->uploads->{file}->tempname
+          );
+          try {
+            $logo->resize( $params, $folder_path, $filename );
+          } 
+          catch {
+            info 'There was an error resizing your avatar: ' . Dumper $_;
+          };
+        }
+        else {
+          my $logo = PearlBee::Helpers::ProcessImage->new(
+            $folder_path . '/' . $filename
+          );
+#        try {
+          $logo->resize( $params, $folder_path, $filename );
+#        } 
+#        catch {
+#          info 'There was an error resizing your avatar: ' . Dumper $_;
+#        };
+        }
+      }
+    
+      $blog->update({ avatar_path => $upload_dir . $filename });
+      $message = "Your profile picture has been changed.";
+    }
+    elsif ( $params->{action_form} eq 'delete' ) {
+      $blog->update({ avatar_path => '' });
+    
+      $message = "Your picture has been deleted";
+    }
+    else {
+    }
+  }
+  else {
+    $message="You do not have the rights to change the blog's picture";
+    $errorflag = 1;
+  }
+
+  session( 'user', $res_user->as_hashref_sanitized );
+  if ($errorflag == 0){
+  template 'blog-profile',
+    {
+      success => $message
+    };
+  }
+  else {
+    template 'blog-profile',
+    {
+      warning => $message
+    };
+  }
+};
+
 =head2 /profile_password route
 
 =cut

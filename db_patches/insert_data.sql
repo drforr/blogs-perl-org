@@ -245,21 +245,31 @@ INSERT INTO acl VALUES
 ;
 
 
+INSERT INTO notification_type VALUES('comment'),
+                                    ('invitation'),
+                                    ('response'),
+                                    ('changed role')
+;
+
+
 INSERT INTO post_format VALUES('HTML'),
                               ('Markdown'),
                               ('Markdown_With_Smartypants'),
                               ('RichText'),
-                              ('Textile2');
+                              ('Textile2')
+;
 
 
 INSERT INTO theme VALUES('light'),
-                        ('dark');
+                        ('dark')
+;
 
 
 INSERT INTO oauth VALUES('LinekdIn'),
                         ('Facebook'),
                         ('GitHub'),
-                        ('Twitter');
+                        ('Twitter')
+;
 
 --
 -- Administrator users are created during the import

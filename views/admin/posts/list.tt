@@ -12,10 +12,10 @@
         <div class="awidget">
            <div class="awidget-head">
                [% IF status %]
-				  <h3>All [% status %] posts</h3>
-			   [% ELSE %]
-				  <h3>All posts</h3>
-			   [% END %]
+                <h3>All [% status %] posts</h3>
+               [% ELSE %]
+                <h3>All posts</h3>
+                [% END %]
            </div>
            <div class="awidget-body">
               
@@ -30,6 +30,7 @@
                  <tr>
                    <th> Author     </th>
                    <th> Title      </th>
+                   <th> Blogs      </th>
                    <th> Categories </th>
                    <th> Tags       </th>
                    <th> Comments   </th>
@@ -75,6 +76,10 @@
                       [% ELSE %]
                         <a href="/[% role %]/posts/trash/[% post.id %]"> Trash </a>
                       [% END %]
+                    </td>
+
+                    <td>
+                          <a href="/blogs/user/[% post.user.username %]/slug/[%post.blog.slug%]"> [% post.blog.name %] </a>
                     </td>
 
                     <td>

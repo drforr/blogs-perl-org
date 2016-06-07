@@ -22,10 +22,12 @@
 				<table class="table table-hover table-bordered">
 					<thead>
 						<tr>
-							<th> Author </th>
+							<th> Author  </th>
 							<th> Comment </th>
-							<th> Post </th>
-							<th> Type </th>
+							<th> Post 	 </th>
+							<th> Blog 	 </th>
+							<th> Status  </th>
+							<th> Action  </th>
 						</tr>
 					</thead>
 					<tbody>
@@ -87,6 +89,10 @@
 								</td>
 
 								<td width="15%"> <a href="/post/[% comment.post.slug %]"> [% comment.post.title %] </a> </td>
+
+								<td width="15%"> <a href="/blogs/user/[% comment.post.user.username %]/slug/[%comment.post.blog.slug%]">[% comment.post.blog.name %] </a> </td>
+
+								<td width="15%"> <a href="/blogs/user/[][% comment.post.slug %]"> [% comment.post.blog.status %] </a> </td>
 								
 								 <td width="10%">
 									[% IF comment.reply_to %]

@@ -114,7 +114,8 @@
 }
 #tab1:checked ~ #tab-content1,
 #tab2:checked ~ #tab-content2,
-#tab3:checked ~ #tab-content3 {
+#tab3:checked ~ #tab-content3,
+#tab4:checked ~ #tab-content4{
     display: block;
 }
 .no-posts2, .no-posts3, .no-posts-found1 {
@@ -321,3 +322,33 @@
         width: 70%;
     }
 }
+
+/*MULTI-BLOG */
+#tab-content4 .text-listing-entries::before, .loading-posts .view-more::before{
+     display: none;
+}
+.info-entry .blog-part a.blog-name{
+    font-size: 18px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+.info-entry ul.info-blog{
+    padding-left: 0;
+    font-size: 15px;
+}
+.info-entry ul.info-blog li{
+    list-style: none;
+}
+.info-entry ul.info-blog li span{
+    font-weight: bold;
+}
+
+.no-more-listing {
+    padding: 0;
+}
+.no-more-listing h4{
+    font-weight: bold;
+    color: #0FA6BC;
+    padding: 15px;
+}
+/*END MULTI-BLOG*/

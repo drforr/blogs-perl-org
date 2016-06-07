@@ -50,10 +50,10 @@ $(document).ready(function() {
     //  END - Blog start overlay
     //  cookie for "cookie bar"
     function cookiesAccept(){
-       days=60;
-       myDate = new Date();
-       myDate.setTime(myDate.getTime()+(days*24*60*60*1000));
-       document.cookie = 'cookies=Accepted; expires=' + myDate.toGMTString();
+        days=60;
+        myDate = new Date();
+        myDate.setTime(myDate.getTime()+(days*24*60*60*1000));
+        document.cookie = 'cookies=Accepted; expires=' + myDate.toGMTString();
     }
 
     var cookie = document.cookie.split(';')
@@ -63,8 +63,8 @@ $(document).ready(function() {
 
     if (!(cookie && cookie[1]==='Accepted')) {
         $(".cookies").css("display", "block");
-       // $(".header").css("transition","none");
-       $(".header").css("top","0px");
+        // $(".header").css("transition","none");
+        $(".header").css("top","0px");
     }
 
     $('.closeCookie').on('click', function(){
@@ -94,24 +94,24 @@ $(document).ready(function() {
 
 
     // prettyprint
-    $('pre').each(function(){ 
+    $('pre').each(function(){
         var class_name = $(this).attr('class');
         if (class_name != undefined) {
-          $( "pre" ).removeClass().addClass( "prettyprint lang-" );
+            $( "pre" ).removeClass().addClass( "prettyprint lang-" );
             //$(this).className = $(this).attr('class', class_name.replace(/brush:/,'prettyprint lang-').replace(/;$/,''));
         } else {
-          $( "pre" ).removeClass().addClass( "prettyprint lang-" );
+            $( "pre" ).removeClass().addClass( "prettyprint lang-" );
 
         }
     });
 
-    $('code').each(function(){ 
-      $( "code" ).removeClass().addClass( "prettyprint lang-" );
+    $('code').each(function(){
+        $( "code" ).removeClass().addClass( "prettyprint lang-" );
     });
     // END prettyprint
 
 
-/* ===== comments - not used ? - TODO: check if needed and remove if not ========== */
+    /* ===== comments - not used ? - TODO: check if needed and remove if not ========== */
     $(".reply_comment_div").each(function(){
         $(this).hide();
         $(this).find('form').prepend('<input type="hidden" value="' + this.id + '" name="in_reply_to" />');
@@ -137,12 +137,12 @@ $(document).ready(function() {
         var reply_comm = this.id + '_div';
 
         if ($("#" + reply_comm).is(":visible")) {
-             $( "#" + reply_comm ).hide();
+            $( "#" + reply_comm ).hide();
         } else {
             $( "#" + reply_comm ).show();
         }
     });
-/* ======================================================================== */
+    /* ======================================================================== */
 
 
 
@@ -153,56 +153,56 @@ $(document).ready(function() {
             var theme = $('#cmn-toggle-4').is(':checked');
             console.log("theme:",theme);
             $.ajax({
-         //Assuming an endpoint here that responds to GETs with a response.
+                //Assuming an endpoint here that responds to GETs with a response.
                 url: "/theme" ,
                 method: "POST",
                 contentType: "application/x-www-form-urlencoded",
-               data: { 
-                  theme: theme
+                data: {
+                    theme: theme
                 }
             })
-            .done(function (data) {
-                var themeq = data.toString();
-                var url = window.location.href;
-                //var posts = JSON.parse();
-                //console.log(themeq[]);
+                .done(function (data) {
+                    var themeq = data.toString();
+                    var url = window.location.href;
+                    //var posts = JSON.parse();
+                    //console.log(themeq[]);
 
-                $('.bubble').each(function() {
+                    $('.bubble').each(function() {
 
-                    var src = $( this ).parent().find('img').attr('src');
-                    console.log("src:",src);
-                  
-                    var userImg = $( this ).parent().find('img');
-                    if (src !== undefined) { 
-                        var defaultAvatar = (src.match(/\/blog\/img/g)||[]).length;
+                        var src = $( this ).parent().find('img').attr('src');
+                        console.log("src:",src);
 
-                        if (themeq === "light") {
-                            $(".defaultAvatar").attr("src", "/blog/img/male-user-light.png");
-                        } else if (themeq === "dark") {
-                            $(".defaultAvatar").attr("src", "/blog/img/male-user.png");
-                        }
+                        var userImg = $( this ).parent().find('img');
+                        if (src !== undefined) {
+                            var defaultAvatar = (src.match(/\/blog\/img/g)||[]).length;
 
-                        if (themeq === "light" && defaultAvatar === 1) {
-                            $("#theme").attr("href", "/blog/css/light.css");
-                            $("#cmn-toggle-4").attr('checked', true);
-                            userImg.attr('src', "/blog/img/male-user-light.png");
-                        } 
-                         else if (themeq === "light" && defaultAvatar === 0) {
-                            $("#theme").attr("href", "/blog/css/light.css");
-                            $("#cmn-toggle-4").attr('checked', true);
+                            if (themeq === "light") {
+                                $(".defaultAvatar").attr("src", "/blog/img/male-user-light.png");
+                            } else if (themeq === "dark") {
+                                $(".defaultAvatar").attr("src", "/blog/img/male-user.png");
+                            }
+
+                            if (themeq === "light" && defaultAvatar === 1) {
+                                $("#theme").attr("href", "/blog/css/light.css");
+                                $("#cmn-toggle-4").attr('checked', true);
+                                userImg.attr('src', "/blog/img/male-user-light.png");
+                            }
+                            else if (themeq === "light" && defaultAvatar === 0) {
+                                $("#theme").attr("href", "/blog/css/light.css");
+                                $("#cmn-toggle-4").attr('checked', true);
+                            }
+                            else if (themeq === "dark" && defaultAvatar === 1) {
+                                $("#theme").attr("href", "/blog/css/dark.css");
+                                $("#cmn-toggle-4").attr('checked', false);
+                                userImg.attr('src', "/blog/img/male-user.png");
+                            }
+                            else if (themeq === "dark" && defaultAvatar === 0) {
+                                $("#theme").attr("href", "/blog/css/dark.css");
+                                $("#cmn-toggle-4").attr('checked', false);
+                            }
                         }
-                         else if (themeq === "dark" && defaultAvatar === 1) {
-                             $("#theme").attr("href", "/blog/css/dark.css"); 
-                             $("#cmn-toggle-4").attr('checked', false);
-                             userImg.attr('src', "/blog/img/male-user.png");
-                        }
-                         else if (themeq === "dark" && defaultAvatar === 0) {
-                              $("#theme").attr("href", "/blog/css/dark.css");
-                              $("#cmn-toggle-4").attr('checked', false);
-                        }
-                    }
-             });
-        });
+                    });
+                });
         });
     });
     // END theme changes
@@ -290,73 +290,76 @@ $(document).ready(function() {
             url: url + '/page/' + pageNumber + '?format=JSON',
             type: 'GET'
         })
-        .done(function(data) {
-            var posts = JSON.parse(data).posts;
+            .done(function(data) {
+                var posts = JSON.parse(data).posts;
 
-            if (posts.length === 0) {
-                button.parents('.loading-posts').addClass('hidden');
-                $('.no-more-posts').show();
-            } else {
-                // TODO: daca se schimba in back-end si vin cate 10 odata, schimba aici in 10
-                if (posts.length < 10) {
+                if (posts.length === 0) {
                     button.parents('.loading-posts').addClass('hidden');
                     $('.no-more-posts').show();
                 } else {
-                    button.parents('.loading-posts').removeClass('hidden');
-                }
-
-                // Once the server responds with the result, update the
-                //  textbox with that result.
-                for (var i = 0; i < posts.length; i++) {
-                    var entryItem = $(".entry").get(0),
-                        newItem = $(entryItem).clone(),
-                        commentsText;
-
-                    if (posts[i].nr_of_comments == 1) {
-                        commentsText =  "Comment (" + posts[i].nr_of_comments + ")";
+                    // TODO: daca se schimba in back-end si vin cate 10 odata, schimba aici in 10
+                    if (posts.length < 10) {
+                        button.parents('.loading-posts').addClass('hidden');
+                        $('.no-more-posts').show();
                     } else {
-                        commentsText = "Comments (" + posts[i].nr_of_comments + ")";
+                        button.parents('.loading-posts').removeClass('hidden');
                     }
 
-                    newItem.find(".user a").attr("href", "/profile/author/" + posts[i].user.username);
-                    newItem.find(".post_preview_wrapper").html(posts[i].content.replace(/<img[^>]+>(<\/img>)?|<iframe.+?<\/iframe>|<video[^>]+>(<\/video>)?/g, ''));
-                    newItem.find(".post-heading h2 a").attr("href", "/post/" + posts[i].slug);
-                    newItem.find(".user a").html(posts[i].user.name);
-                    newItem.find(".post-heading h2 a").html(posts[i].title);
-                    newItem.find(".comments-listings a").text(commentsText);
-                    newItem.find(".comments-listings a").attr("href", "/post/" + posts[i].slug + "#comments");
-                    newItem.find(".text-listing-entries a.read-more").attr("href", "/post/" + posts[i].slug);
-                    newItem.find(".date").text(posts[i].created_date_human);
+                    // Once the server responds with the result, update the
+                    //  textbox with that result.
+                    for (var i = 0; i < posts.length; i++) {
+                        var entryItem = $(".entry").get(0),
+                            newItem = $(entryItem).clone(),
+                            commentsText;
 
-                    if (posts[i].post_categories) {
-                        var categoryItem = newItem.find('.category-item.hidden');
-                        for (var j = 0; j < posts[i].post_categories.length; j++) {
-                            var newCategoryItem = categoryItem.clone();
-
-                            newCategoryItem.find('a').text(posts[i].post_categories[j].category.name);
-                            newCategoryItem.find('a').attr('href', '/posts/category/' + posts[i].post_categories[j].category.slug);
-
-                            newCategoryItem.removeClass('hidden');
-                            newCategoryItem.insertAfter(newItem.find('.category-item').last());
+                        if (posts[i].nr_of_comments == 1) {
+                            commentsText =  "Comment (" + posts[i].nr_of_comments + ")";
+                        } else {
+                            commentsText = "Comments (" + posts[i].nr_of_comments + ")";
                         }
+
+                        newItem.find(".user a").attr("href", "/profile/author/" + posts[i].user.username);
+                        newItem.find(".post_preview_wrapper").html(posts[i].content.replace(/<img[^>]+>(<\/img>)?|<iframe.+?<\/iframe>|<video[^>]+>(<\/video>)?/g, ''));
+                        newItem.find(".post-heading h2 a").attr("href", "/post/" + posts[i].slug);
+                        newItem.find(".user a").html(posts[i].user.name);
+                        newItem.find(".post-heading h2 a").html(posts[i].title);
+                        newItem.find(".comments-listings a").text(commentsText);
+                        newItem.find(".comments-listings a").attr("href", "/post/" + posts[i].slug + "#comments");
+                        newItem.find(".text-listing-entries a.read-more").attr("href", "/post/" + posts[i].slug);
+                        newItem.find(".date").text(posts[i].created_date_human);
+
+                        if (posts[i].post_categories) {
+                            var categoryItem = newItem.find('.category-item.hidden');
+                            for (var j = 0; j < posts[i].post_categories.length; j++) {
+                                var newCategoryItem = categoryItem.clone();
+
+                                newCategoryItem.find('a').text(posts[i].post_categories[j].category.name);
+                                newCategoryItem.find('a').attr('href', '/posts/category/' + posts[i].post_categories[j].category.slug);
+
+                                newCategoryItem.removeClass('hidden');
+                                newCategoryItem.insertAfter(newItem.find('.category-item').last());
+                            }
+                        }
+
+                        newItem.insertBefore($(".loading-posts"));
                     }
-
-                    newItem.insertBefore($(".loading-posts"));
                 }
-            }
 
-            $(".truncate").dotdotdot({
-                ellipsis  : '... ',
+                $(".truncate").dotdotdot({
+                    ellipsis  : '... ',
+                });
+
+                $('.progressloader').hide();
+                button.attr("data-page-number", pageNumber);
+
+                $(".truncate").dotdotdot({
+                    ellipsis  : '... ',
+                });
             });
-
-            $('.progressloader').hide();
-            button.attr("data-page-number", pageNumber);
-
-            $(".truncate").dotdotdot({
-                ellipsis  : '... ',
-            });
-        });
     });
+
+
+    //
 
     if ($(".blog.blogs .no-posts").length > 0) {
         $(".blog.blogs .no-more-posts").hide();
@@ -366,4 +369,39 @@ $(document).ready(function() {
         var content = $(this).contents();
         $(this).replaceWith(content);
     });
+
+//    modal-load-more-authors
+    $('#author-modal .modal-load-more').on('click', function(e){
+        e.preventDefault();
+        var button = $(this),
+            url = button.attr('href'),
+            pageNumber = +(button.attr('data-page-number')) + 1;
+
+        $.ajax({
+            url: url + '/page/' + pageNumber + '?format=JSON',
+            method: "GET"
+        })
+            .done(function(response) {
+                var data = JSON.parse(response),
+                    authors = data.authors;
+                if(pageNumber == data.total_pages) {
+                    button.addClass('hidden');
+                }
+                button.attr('data-page-number', pageNumber);
+
+                for (var i = 0; i < authors.length; i++) {
+                    var authorItem = $("#author-modal .row:last"),
+                        newItem = authorItem.clone();
+
+                    newItem.find("img.author-image ").attr("src", authors[i].avatar_path);
+                    newItem.find(".author-info").html(authors[i].name);
+                    newItem.find(".author-info").attr("href", url + authors[i].username + '/page/' + pageNumber);
+                    newItem.find(".biography").html(authors[i].biography);
+                    newItem.find(".go-to-profile").attr("href",  "/profile/author/" + authors[i].username);
+
+                    newItem.insertAfter(authorItem);
+                }
+            });
+    });
+
 });

@@ -36,22 +36,25 @@ $(document).ready(function(){
 
                 var posts = JSON.parse(data).posts;
                 if (posts.length === 0) {
-                    $(".view-more").addClass("cut");
+                    $("#tab-content1 .view-more").addClass("cut");
                     if (pageNumber == 0) {
                         //$('.tabs .loading-posts').css('margin-bottom', '0');
                         $('.no-posts').show();
+                    } else {
+                        $('#display_msg_posts1').removeClass('hidden');
                     }
                 } else {
                     if(posts.length < 10){
-                        $(".view-more").addClass("cut");
+                        $("#tab-content1 .view-more").addClass("cut");
+                        $('#display_msg_posts1').removeClass('hidden');
                     } else{
-                        $(".view-more").removeClass("cut");
+                        $("#tab-content1 .view-more").removeClass("cut");
                     }
                     $('.no-posts').hide();
 
                     //  textbox with that result.
                     for (var i = 0; i < posts.length; i++) {
-                        var entryItem = $(".entry").get(0),
+                        var entryItem = $("#tab-content1 .entry").get(0),
                             newItem = $(entryItem).clone(),
                             commentsText,
                             avatarPath;
@@ -72,8 +75,10 @@ $(document).ready(function(){
                         }
 
                         newItem.find(".bubble img.user-image").attr("src", avatarPath);
-                        newItem.find(".user a").html(posts[i].user.name);
-                        newItem.find(".user a").attr("href", "/profile/author/" + posts[i].user.username);
+                        newItem.find(".user a.user-name").html(posts[i].user.name);
+                        newItem.find(".user a.user-name").attr("href", "/profile/author/" + posts[i].user.username);
+                        newItem.find(".user a.blog-name").html(posts[i].blog.name);
+                        newItem.find(".user a.blog-name").attr('href', '/blogs/user/' + posts[i].user.username + '/slug/' +  posts[i].blog.slug);
                         newItem.find(".post_preview_wrapper").html(posts[i].content.replace(/<img[^>]+>(<\/img>)?|<iframe.+?<\/iframe>|<video[^>]+>(<\/video>)?/g, ''));
                         newItem.find(".post-heading h2 a").attr("href", "/post/" + posts[i].slug);
                         newItem.find(".post-heading h2 a").html(posts[i].title);
@@ -83,7 +88,7 @@ $(document).ready(function(){
                         newItem.find(".date").text(posts[i].created_date_human);
 
 
-                        newItem.insertBefore($(".loading-posts"));
+                        newItem.insertBefore($("#tab-content1 .loading-posts"));
                         newItem.removeClass('hidden');
                     }
                 }
@@ -216,6 +221,104 @@ $(document).ready(function(){
             });
     }
 
+//    tab4 - BLOGS
+    function getBlogs(searchTerm, pageNumber, removeExistingPosts) {
+        if (true === removeExistingPosts) {
+            $('#tab-content4 .progressloader-holder').show();
+        }
+        var themeinitial = $('#cmn-toggle-4').is(':checked');
+
+        $('.progressloader').show();
+        $.ajax({
+            // Assuming an endpoint here that responds to GETs with a response.
+            url: '/search/blogs/' + searchTerm + "/" + pageNumber,
+            type: 'GET'
+        })
+            .done(function (data) {
+
+                if (true === removeExistingPosts) {
+                    $('#tab-content4 .entry:not(.hidden)').remove();
+                }
+
+                var posts = JSON.parse(data).blogs;
+                if (posts.length === 0) {
+
+                    $("#tab-content4 .view-more").addClass("cut");
+                    if (pageNumber == 0) {
+                        //$('.tabs .loading-posts').css('margin-bottom', '0');
+                        $('.no-posts').show();
+                    } else {
+                        $('#display_msg_posts4').removeClass('hidden');
+                    }
+                } else {
+                    if(posts.length < 10){
+                        $("#tab-content4 .view-more").addClass("cut");
+                        $('#display_msg_posts4').removeClass('hidden');
+                    } else{
+                        $("#tab-content4 .view-more").removeClass("cut");
+                    }
+                    $('.no-posts').hide();
+
+                    //  textbox with that result.
+                    for (var i = 0; i < posts.length; i++) {
+                        var entryItem = $("#tab-content4 .entry").get(0),
+                            newItem = $(entryItem).clone(),
+                            commentsText,
+                            avatarPath;
+
+                        if (posts[i].nr_of_comments == 1) {
+                            commentsText = "Comment (" + posts[i].nr_of_comments + ")";
+                        } else {
+                            commentsText = "Comments (" + posts[i].nr_of_comments + ")";
+                        }
+
+
+                        //if (posts[i].user.avatar) {
+                        //    avatarPath = posts[i].avatar_path;
+                        //} else if ( themeinitial === false) {
+                        //    avatarPath = "/blog/img/male-user.png";
+                        //} else if ( themeinitial === true) {
+                        //    avatarPath = "/blog/img/male-user-light.png";
+                        //}
+
+                        //newItem.find(".bubble img.user-image").attr("src", avatarPath);
+                        newItem.find(".blog-part a.blog-name").html(posts[i].name);
+                        newItem.find(".blog-part a.blog-name").attr('href', '/blogs/user/' + posts[i].user_info.username + '/slug/' +  posts[i].slug);
+                        newItem.find(".info-blog li.information-blog").html(posts[i].description);
+                        newItem.find(".info-blog li span.entries-count").html(posts[i].counts.entries);
+                        newItem.find(".info-blog li span.authors-count").html(posts[i].counts.contributors);
+                        newItem.find(".info-blog a.blog-slug").attr('href', '/blogs/user/' + posts[i].user_info.username + '/slug/' +  posts[i].slug);
+                        newItem.find(".date").text(posts[i].created_date_human);
+
+
+                        newItem.removeClass('hidden');
+                        $("#tab-content4 .posts.listings").append(newItem);
+                    }
+                }
+                $('#tab-content4 .progressloader').hide();
+                $('#search-more-blogs').attr("data-page-number", pageNumber);
+
+                $(".truncate").dotdotdot({
+                    ellipsis  : '... ',
+                });
+
+                if ($(".search-page .tabs .no-posts.no-posts-found1").css("display") == "block") {
+                    $(".search-page .tabs .loading-posts").css("margin-bottom", "0");
+                }
+
+            })
+            .fail(function () {
+                $('#tab-content1 .entry:not(.hidden)').remove();
+                $('.no-posts').show();
+            })
+            .always(function () {
+                //close search input
+                $(".search-input").addClass("cut");
+                $('#tab-content1 .progressloader-holder').hide();
+            });
+    }
+
+
 //search - for first tab : posts
     $('input[name=search_term]').focus();
 
@@ -242,8 +345,10 @@ $(document).ready(function(){
             getUserPosts(searchTerm, 0, true);
         } else if (activeTabId == 'tab2') {
             getPeople(searchTerm);
-        } else {
+        } else if(activeTabId == 'tab3'){
             getTags(searchTerm);
+        } else{
+            getBlogs(searchTerm, 0, true);
         }
 
     });
@@ -260,8 +365,10 @@ $(document).ready(function(){
                 getUserPosts(searchTerm, 0, true);
             } else if (activeTabId == 'tab2') {
                 getPeople(searchTerm);
-            } else {
+            } else if(activeTabId == 'tab3'){
                 getTags(searchTerm);
+            } else{
+                getBlogs(searchTerm, 0, true);
             }
         }
     });
@@ -276,4 +383,14 @@ $(document).ready(function(){
         $('#tab-content1 .progressloader').show();
         getUserPosts(searchTerm, pageNumber, false);
     });
+    //more fot #tab-content4
+    $('#search-more-blogs').click(function () {
+        var button = $(this),
+            searchTerm = $('input[name=search_term]').val(),
+            pageNumber = +(button.attr("data-page-number")) + 1;
+
+        $('#tab-content4 .progressloader').show();
+        getBlogs(searchTerm, pageNumber, false);
+    });
+
 });

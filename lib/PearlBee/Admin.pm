@@ -8,5 +8,6 @@ use PearlBee::Admin::Post;
 use PearlBee::Admin::Comment;
 use PearlBee::Admin::User;
 use PearlBee::Admin::Settings;
+use PearlBee::Admin::Blog;
 
 1;

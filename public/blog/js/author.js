@@ -36,7 +36,7 @@ $(document).ready(function(){
 
     });
 
-    function getAuthorEntries (button) {
+    function getAuthorEntries(button) {
         var authorURL =
             $('.author-description .author-name>a').attr('href').split('/');
         var author = authorURL[3];
@@ -77,10 +77,12 @@ $(document).ready(function(){
                             commentsText = "Comments (" + posts[i].nr_of_comments + ")";
                         }
 
-                        newItem.find(".user a").attr("href", "/profile/author/" + posts[i].user.username);
                         newItem.find(".post_preview_wrapper").html(posts[i].content.replace(/<img[^>]+>(<\/img>)?|<iframe.+?<\/iframe>|<video[^>]+>(<\/video>)?/g, ''));
                         newItem.find(".post-heading h2 a").attr("href", "/post/" + posts[i].title);
-                        newItem.find(".user a").html(posts[i].user.name);
+                        newItem.find(".user a.user-name").html(posts[i].user.name);
+                        newItem.find(".user a.user-name").attr("href", "/profile/author/" + posts[i].user.username);
+                        newItem.find(".user a.blog-name").html(posts[i].blog.name);
+                        newItem.find(".user a.blog-name").attr('href', '/blogs/user/' + posts[i].user.username + '/slug/' +  posts[i].blog.slug);
                         newItem.find(".post-heading h2 a").html(posts[i].title);
                         newItem.find(".post-heading h2 a").attr("href", "/post/" + posts[i].slug)
                         newItem.find(".comments-listings a").text(commentsText);

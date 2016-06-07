@@ -1,0 +1,173 @@
+package PearlBee::Author::Category;
+
+use Try::Tiny;
+use Dancer2;
+
+use Dancer2::Plugin::DBIC;
+use PearlBee::Dancer2::Plugin::Admin;
+use Data::Dumper;
+
+use PearlBee::Helpers::Util qw(string_to_slug);
+
+=head2 /author/categories
+
+List only those categories in the blogs in which the user is the owner or is contributing to.
+
+=cut
+
+get '/author/categories' => sub { 
+  my $user       = resultset('Users')->find_by_session(session);
+  my @blog_owners = resultset('BlogOwner')->search({ user_id => $user->id });
+  my @blog_posts;
+  my @categories;
+  my @post_categories;
+  for my $blog_owner ( @blog_owners ) {
+  push @blog_posts, 
+                   resultset('BlogPost')->search({ blog_id => $blog_owner->blog_id });
+
+  }
+
+  for my $blog (@blog_posts){
+    push @post_categories, 
+                     resultset('PostCategory')->search({ post_id => $blog->post_id });
+
+  }
+
+  for my $category (@post_categories){
+    push @categories, 
+                     resultset('Category')->search({ name => { '!=' => 'Uncategorized'}, id => $category->category_id });
+  }              
+
+  template 'admin/categories/list', { categories => \@categories }, { layout => 'admin' };
+};
+
+=head2 /author/categories/add
+
+create method
+
+=cut
+
+post '/author/categories/add' => sub {
+
+  my @categories;
+  my $name   = params->{name};
+  my $slug   = params->{slug};
+  my $params = {};
+
+  $slug = string_to_slug($slug);
+
+  my $found_slug_or_name = resultset('Category')->search({ -or => [ slug => $slug, name => $name ] })->first;
+
+  if ( $found_slug_or_name ) {
+    @categories = resultset('Category')->search({ name => { '!=' => 'Uncategorized'} });
+
+    $params->{warning} = "The category name or slug already exists";
+  }
+  else {
+    try {
+      my $user     = session('user');
+      my $category = resultset('Category')->create({
+          name    => $name,
+          slug    => $slug,
+          user_id => $user->{id}
+      });
+    }
+    catch {
+      error "Could not create category '$name'";
+    };
+
+    $params->{success} = "The category was successfully added.";
+  }
+
+  @categories = resultset('Category')->search({ name => { '!=' => 'Uncategorized'} });
+  $params->{categories} = \@categories;
+
+  template 'admin/categories/list', $params, { layout => 'admin' };
+
+};
+
+=head2 /author/categories/delete/:id
+
+delete method
+
+=cut
+
+get '/author/categories/delete/:id' => sub {
+
+  my $id = params->{id};
+
+  try {
+    my $category = resultset('Category')->find( $id );
+
+    $category->safe_cascade_delete();
+  }
+  catch {
+    error $_;
+    my @categories = resultset('Category')->search({ name => { '!=' => 'Uncategorized'} });
+
+    template 'admin/categories/list', { categories => \@categories, warning => "Something went wrong." }, { layout => 'admin' };
+  };
+
+  redirect "/author/categories";
+
+};
+
+=head2 /author/categories/edit/:id
+
+edit method
+
+=cut
+
+any '/author/categories/edit/:id' => sub {
+
+  my $category_id = params->{id};
+  my $name        = params->{name};
+  my $slug        = params->{slug};
+  my $category    = resultset('Category')->find( $category_id );
+  my @categories;
+  my $params = {};
+
+  # Check if the form was submited
+  if ( $name && $slug ) {
+
+    $slug = string_to_slug($slug);
+
+    my $found_slug = resultset('Category')->search({ id => { '!=' => $category->id }, slug => $slug })->first;
+    my $found_name = resultset('Category')->search({ id => { '!=' => $category->id }, name => $name })->first;
+
+    # Check if the user entered an existing slug
+    if ( $found_slug ) {
+
+      $params->{warning} = 'The category slug already exists';
+
+    }
+    # Check if the user entered an existing name
+    elsif ( $found_name ) {
+
+      $params->{warning} = 'The category name already exists';
+
+    }
+    else {
+      eval {
+        $category->update({
+            name => $name,
+            slug => $slug
+          });
+      };
+
+      $params->{success} = 'The category was updated successfully'
+    }
+  }
+
+  @categories = resultset('Category')->search({ name => { '!=' => 'Uncategorized'} });
+
+  $params->{category}   = $category;
+  $params->{categories} = \@categories;
+  
+  # If the form wasn't submited just list the categories
+  template 'admin/categories/list', $params, { layout => 'admin' };
+
+
+};
+
+1;

@@ -24,8 +24,17 @@ sub create_with_slug {
   $schema->resultset('Blog')->create({
     name        => $args->{name},
     description => $args->{description},
+    timezone    => $args->{timezone},
     slug        => $slug,
   });
+}
+
+sub search_lc {
+  my ($self, $tag) = @_;
+  my $schema = $self->result_source->schema;
+  my $lc_tag = lc $tag; 
+  return $schema->resultset('Blog')->
+                  search( \[ "lower(name) like '\%$lc_tag\%'" ] );
 }
 
 1;
