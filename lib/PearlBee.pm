@@ -15,6 +15,7 @@ use Digest::SHA;
 use PearlBee::Blogs;
 
 use PearlBee::Routes::Avatar;
+use PearlBee::Routes::Notification;
 use PearlBee::Routes::Profile;
 use PearlBee::Routes::Post;
 use PearlBee::Routes::Pages;

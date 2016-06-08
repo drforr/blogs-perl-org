@@ -30,9 +30,11 @@ get '/admin/notification' => sub {
     );
   my @invitation_notifications =
     resultset('Notification')->search(
-      { user_id  => $res_user->id,
-        name     => 'invitation',
-      { order_by => { -desc => 'created_date' } }}
+
+      { user_id => $res_user->id,
+        name     => 'invitation' },
+      { order_by => { -desc => 'created_date' } }
+
     );
 
   template '/admin/notification/notification',
