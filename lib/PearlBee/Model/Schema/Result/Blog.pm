@@ -223,11 +223,11 @@ sub as_hashref {
     nr_of_posts        => $self->nr_of_posts,
     nr_of_contributors => $self->nr_of_contributors,
     nr_of_comments     => $self->nr_of_comments,
-    blog_creator       => $self->blog_creator->as_hashref_sanitized,
-  };          
-              
+    #blog_creator       => $self->blog_creator->as_hashref_sanitized,
+  };
+
   return $blog_as_href;
-}             
+}
 
 =head2 as_hashref_sanitized
 
@@ -244,7 +244,7 @@ sub as_hashref_sanitized {
 }
 
 =head2
-  
+
   Return the number of posts for each blog.
 
 =cut
@@ -252,15 +252,15 @@ sub as_hashref_sanitized {
 sub nr_of_posts {
   my ($self)    = @_;
   my $schema    = $self->result_source->schema;
-  
+
   my $nr_of_posts = $schema->resultset('BlogPost')->
                     search({ blog_id => $self->id })->count;
- 
+
   return $nr_of_posts;
 }
 
 =head2
-  
+
   Return the number of contributors for each blog.
 
 =cut
@@ -268,15 +268,15 @@ sub nr_of_posts {
 sub nr_of_contributors {
   my ($self)    = @_;
   my $schema    = $self->result_source->schema;
-  
+
   my $nr_of_contributors = $schema->resultset('BlogOwner')->
                     search({ blog_id => $self->id })->count;
- 
+
   return $nr_of_contributors;
 }
 
 =head2
-  
+
   Return the number of comments from all the posts for each blog.
 
 =cut
@@ -288,7 +288,7 @@ sub nr_of_comments {
   my $nr_of_comments;
   my @posts = $schema->resultset('BlogPost')->
                     search({ blog_id => $self->id });
-  
+
   if (scalar @posts == 0){
     $nr_of_comments = 0;
   }
@@ -301,23 +301,23 @@ sub nr_of_comments {
   return $nr_of_comments;
 }
 
-sub blog_creator {
-  my ($self)    = @_;
-  my $schema    = $self->result_source->schema;
-  my $id = $self->id;
-  my $blog_owner;
-   $blog_owner   = resultset('BlogOwner')->
-                    find({ 
-                      blog_id => $id
-                      } ,
-                      {
-                        order_by  => { -asc => "created_date" }
-                      }
-                    );
-
-   my $blog_creator = $schema->resultset('Users')->find({id => $blog_owner->user_id});
-   
-   return $blog_creator; 
-}
+# sub blog_creator {
+#   my ($self)    = @_;
+#   my $schema    = $self->result_source->schema;
+#   my $id = $self->id;
+#   my $blog_owner;
+#    $blog_owner   = resultset('BlogOwner')->
+#                     find({
+#                       blog_id => $id
+#                       } ,
+#                       {
+#                         order_by  => { -asc => "created_date" }
+#                       }
+#                     );
+#
+#    my $blog_creator = $schema->resultset('Users')->find({id => $blog_owner->user_id});
+#
+#    return $blog_creator;
+# }
 
 1;
