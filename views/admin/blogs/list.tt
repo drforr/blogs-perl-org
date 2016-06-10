@@ -42,7 +42,7 @@
 
 							<tr>
 								<td width="20%">
-									<b><a href="/blogs/user/[% user.username %]">[% blog.name %]</a></b>
+									<b><a href="/blogs/user/[% blog.blog_creator.username %]/slug/[%blog.slug%]">[% blog.name %]</a></b>
 								</td>
 
 								<td width="25%">
@@ -62,7 +62,7 @@
 								</td>
 
 								<td width="11%">
-									<a href="/post/[% post.slug %]">
+									<a href="/blogs/user/[% blog.blog_creator.username %]/slug/[%blog.slug%]">
 										<button class="btn btn-xs btn-success"><i class="icon-eye-open"></i> </button>
 									</a>
 									<a href="/[% role %]/posts/edit/[% post.slug %]">

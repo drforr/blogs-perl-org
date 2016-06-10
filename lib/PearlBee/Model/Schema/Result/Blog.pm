@@ -303,23 +303,24 @@ sub nr_of_comments {
   return $nr_of_comments;
 }
 
-# sub blog_creator {
-#   my ($self)    = @_;
-#   my $schema    = $self->result_source->schema;
-#   my $id = $self->id;
-#   my $blog_owner;
-#    $blog_owner   = resultset('BlogOwner')->
-#                     find({
-#                       blog_id => $id
-#                       } ,
-#                       {
-#                         order_by  => { -asc => "created_date" }
-#                       }
-#                     );
-#
-#    my $blog_creator = $schema->resultset('Users')->find({id => $blog_owner->user_id});
-#
-#    return $blog_creator;
-# }
+sub blog_creator {
+  my ($self)    = @_;
+  my $schema    = $self->result_source->schema;
+  my $id = $self->id;
+  my $blog_owner;
+   $blog_owner   = $schema->resultset('BlogOwner')->
+                    find({
+                      blog_id => $id
+                      } ,
+                      {
+                        order_by  => { -asc => "created_date" }
+                      }
+                    );
+
+   my $blog_creator = $schema->resultset('Users')->find({id => $blog_owner->user_id});
+
+   return $blog_creator;
+}
+
 
 1;

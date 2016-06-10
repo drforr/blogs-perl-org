@@ -212,6 +212,17 @@ post '/create-blog' => sub{
   });
 };
 
+=head2 /create-blog
+
+  Getter for blog-creation
+
+=cut
+
+get '/create-blog' => sub{
+      template 'admin/blogs/add',{}, { layout => 'admin' };
+};
+
+
 =head2 /add-contributor
  
   Add a contributor, making her/him an admin or a simple author.

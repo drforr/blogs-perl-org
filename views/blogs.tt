@@ -30,7 +30,7 @@
                                         <div class="info-blog">
                                             <p class="entry-name">[% blogs.0.name %]</p>
                                             <ul class="info-blog">
-                                                <li><a data-toggle="modal" class="number-authors" href="#author-modal">[% nr_of_authors %] author[% IF nr_of_authors > 1 %]s[% END %]<a></li>
+                                                <li><a data-toggle="modal" class="number-authors" href="#author-modal">[% blogs.0.nr_of_contributors %]  author[% IF blogs.0.nr_of_contributors > 1 %]s[% END %]<a></li>
 
                                                 <li class="information-blog"> [% blogs.0.description %] </li>
                                                 <a href="/feed/author/[% user.username  %]/blog/[%blogs.0.slug%]" target="_blank">
