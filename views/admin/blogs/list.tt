@@ -1,0 +1,94 @@
+<div class="mainy">
+	<!-- Page title -->
+	<div class="page-title">
+		<h2><i class="icon-file color"></i> Blogs <small>Manage blog posts</small></h2>
+		<hr />
+	</div>
+	<!-- Page title -->
+
+	<div class="row">
+		<div class="col-md-12">
+
+			<div class="awidget">
+				<div class="awidget-head">
+					[% IF status %]
+					<h3>All [% status %] blogs</h3> [% ELSE %]
+					<h3>All blogs</h3> [% END %]
+				</div>
+				<div class="awidget-body">
+
+					[% SET role = ( session.user.is_admin ) ? "admin" : "author" %]
+					<a href="/admin/blogs"> All </a>([% all %]) |
+					<!--
+              <a href="/admin/blogs/published/page/1"> Published </a>([% publish %]) | 
+              <a href="/admin/blogs/draft/page/1"> Draft </a>([% draft %]) | 
+              <a href="/admin/blogs/trash/page/1"> Trash </a>([% trash %])
+-->
+
+					<table class="table table-hover table-bordered ">
+						<thead>
+							<tr>
+								<th> Blog Name </th>
+								<th> Posts </th>
+								<th> Contributors </th>
+								<th> Comments </th>
+								<th> Role </th>
+								<th> Actions </th>
+							</tr>
+						</thead>
+						<tbody>
+
+							[% FOREACH blog in blogs %]
+
+							<tr>
+								<td width="20%">
+									<b><a href="/blogs/user/[% user.username %]">[% blog.name %]</a></b>
+								</td>
+
+								<td width="25%">
+									[% blog.nr_of_posts %]
+								</td>
+
+								<td>
+									[% blog.nr_of_contributors %]
+								</td>
+
+								<td>
+									[% blog.nr_of_comments %]
+								</td>
+
+								<td>
+									Super Admin
+								</td>
+
+								<td width="11%">
+									<a href="/post/[% post.slug %]">
+										<button class="btn btn-xs btn-success"><i class="icon-eye-open"></i> </button>
+									</a>
+									<a href="/[% role %]/posts/edit/[% post.slug %]">
+										<button class="btn btn-xs btn-warning"><i class="icon-pencil"></i> </button>
+									</a>
+									<a href="/admin/categories/delete/[% category.id %]">
+										<button class="btn btn-xs btn-danger"><i class="icon-remove"></i> </button>
+									</a>
+								</td>
+							</tr>
+
+							[% END %]
+
+						</tbody>
+					</table>
+
+					<ul class="pagination pull-right">
+						[% INCLUDE components/pagination.tt %]
+					</ul>
+
+					<div class="clearfix"></div>
+
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+</div>

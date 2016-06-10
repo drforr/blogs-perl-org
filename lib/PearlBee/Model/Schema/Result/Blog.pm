@@ -289,9 +289,11 @@ sub nr_of_comments {
   my @posts = $schema->resultset('BlogPost')->
                     search({ blog_id => $self->id });
 
+
   if (scalar @posts == 0){
     $nr_of_comments = 0;
   }
+
 
   for my $iterator (@posts){
     my $total =  $schema -> resultset('Comment')->search({post_id => $iterator->post_id})->count;

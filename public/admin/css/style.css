@@ -1266,3 +1266,13 @@ footer .copy{
    color: #0fa6bc;
    border: 1px solid #0fa6bc;
 }
+
+/*Make post style - Paul*/
+.make-post .awidget-body select {
+	min-width: 90px;
+}
+/*Manage tags style -Paul*/
+.manage-tags td.long-input {
+	word-break: break-all;
+/*	width: 15% !important;*/
+}

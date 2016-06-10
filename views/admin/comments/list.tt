@@ -1,4 +1,4 @@
-<div class="mainy">
+<div class="mainy manage-comments">
    <!-- Page title -->
     <div class="page-title">
        <h2><i class="icon-comment color"></i> Comments <small>Manage comments</small></h2>
@@ -10,7 +10,45 @@
 	        <div class="awidget-head">
 	           <h3>All comments</h3>
 	        </div>
-	        <div class="awidget-body">          
+	        
+
+	        <div class="awidget-body">  
+						<div class="comments-filter clearfix">
+						
+							<div class="form-group pull-left">
+								<label class="control-label">Blog</label>
+								<div class="options-drop">
+									<select name="timezone" class="chosen-select">
+										<option value=""> All </option>
+										<option value=""> 1 </option>
+										<option value=""> 2 </option>
+										<option value=""> 3 </option>
+										[% FOREACH timezone IN timezones %] [% SET selected = timezone == setting.timezone ? "selected" : "" %]
+										<option [% selected %] value="[% timezone %]"> [% timezone %] </option>
+										[% END %]
+									</select>
+								</div>
+							</div>
+							<div class="form-group pull-left">
+								<label class="control-label">Status</label>
+								<div class="options-drop">
+									<select name="timezone" class="chosen-select">
+										<option value=""> All </option>
+										<option value=""> Approved </option>
+										<option value=""> Pending </option>
+										<option value=""> Trashed </option>
+										<option value=""> Spam </option>
+										[% FOREACH timezone IN timezones %] [% SET selected = timezone == setting.timezone ? "selected" : "" %]
+										<option [% selected %] value="[% timezone %]"> [% timezone %] </option>
+										[% END %]
+									</select>
+								</div>
+							</div>
+							<div class="form-group pull-right">
+								<button type="submit" class="btn btn-default">Apply</button>
+								<button type="button" class="btn btn-danger">Reset</button>
+							</div>
+						</div>
 
 	        	[% SET role = ( session.user.is_admin ) ? "admin" : "author" %]
 	        	<a href="/[% role %]/comments"> 	All </a>([% all %]) | 

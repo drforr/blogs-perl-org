@@ -4,7 +4,19 @@
         <ul class="nav">
             <!-- Main menu -->
 
-            [% SET role = ( session.user.is_admin ) ? "admin" : "author" %]
+            [% SET role = ( session.user.is_admin ) ? "admin" : "author" %]  
+            <li class="has_submenu">
+                 <a href="#">
+                    <i class="icon-th"></i> Blogs
+                    <span class="caret pull-right"></span>
+                 </a>
+                 <!-- Sub menu -->
+                 <ul>
+                    <li><a href="/admin/blogs">All</a></li>
+                    <li><a href="/create-blog">New Blog</a></li>
+                </ul>
+            </li>            
+            
             <li class="has_submenu">
                  <a href="#">
                     <i class="icon-file"></i> Posts
@@ -40,7 +52,7 @@
 
                 <li class="has_submenu">
                     <a href="#">
-                       <i class="icon-file"></i> Settings
+                       <i class="icon-cog"></i> Settings
                        <span class="caret pull-right"></span>
                     </a>
                     <!-- Sub menu -->

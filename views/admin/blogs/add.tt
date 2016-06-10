@@ -1,0 +1,198 @@
+<!--
+<link href="/blog/css/profile.css" rel="stylesheet">
+<link href="/blog/css/style.css" rel="stylesheet">
+<link href="/blog/css/croppie.css" rel="stylesheet">
+<script src="/js/croppie.js"></script>
+<script src="public/blog/js/profile.js"></script>
+<script src="public/blog/js/app.js"></script>
+-->
+
+	
+
+	
+	<div class="profile-modal">
+
+	<!-- Modal -->
+	<div class="modal fade" id="changeImg" tabindex="-1" role="dialog" aria-labelledby="changeImgLabel">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title" id="changeImgLabel">Change Photo</h4>
+				</div>
+				<div class="modal-body clearfix">
+					<div class="col-xs-12 col-sm-6 profile-pic">
+						<div class="bubble text-center">
+
+							[% IF session.user.avatar_path %]
+							<img id="image_upload_preview" class="user-image" src="/avatar/[% session.user.username %]" /> [% ELSE %]
+							<img id="image_upload_preview" class="user-image defaultAvatar" src="/avatar/[% session.user.username %]" /> [% END %]
+							<div id="croppie-avatars">
+							</div>
+
+
+						</div>
+					</div>
+					<div class="col-xs-12 col-sm-6 picture-btn">
+						<form action="/profile-image" enctype="multipart/form-data" method="post" id="upload-img">
+							<span class="file-input btn btn-file light-button buttons-group change-pic">
+					<p>Choose picture</p> <!-- <input type="file" name="file"> -->
+					<input type="file" id="file-upload" class="form-control" name="file">
+					<input type="text" class="form-control hidden" name="width">
+					<input type="text" class="form-control hidden" name="height">
+					<input type="text" class="form-control hidden" name="top">
+					<input type="text" class="form-control hidden" name="left">
+					<input type="text" class="form-control hidden" name="zoom">
+                    <input type="text" class="form-control hidden" name="action_form">
+				</span>
+						</form>
+						<label class="error_file">We only allows file types of PNG, JPG, GIF and BMP.</label>
+					</div>
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="save-img btn btn-primary">Save</button>
+					<button type="button" class="cancel-img btn btn-default">Undo</button>
+					<button type="button" class="delete-img btn">Delete Photo</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<div class="mainy">
+	<!-- Page title -->
+	<div class="page-title">
+		<h2><i class="icon-file color"></i> Create Blog <small>Blog add panel</small></h2>
+		<hr />
+	</div>
+	<!-- Page title -->
+
+	<div class="row">
+		<div class="col-md-12">
+
+			<div class="awidget clearfix">
+
+				<div class="awidget-head">
+					<h3>Add</h3>
+				</div>
+				<div class="awidget-body">
+
+					[% INCLUDE components/alerts.tt %]
+
+					<form class="form-horizontal" role="form" method="post" action>
+						<div class="col-lg-9">
+							<div class="form-group">
+								<label class="col-lg-4 control-label">Blog Name</label>
+								<div class="col-lg-8">
+									<input type="text" class="form-control" name="blog_name" placeholder="Blog Name" required>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="col-lg-4 control-label">Blog URL</label>
+								<div class="col-lg-8">
+									<input type="text" class="form-control" name="blog_url" placeholder="Slug" required>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="col-lg-4 control-label">Blog Description</label>
+								<div class="col-lg-8">
+									<textarea type="text" rows="10" class="form-control" name="blog_description" placeholder="Blog Description" required></textarea>
+								</div>
+							</div>
+
+							<hr />
+
+							<div class="form-group">
+								<label class="col-lg-4 control-label">Social media buttons</label>
+								<div class="col-lg-8">
+									<div class="make-switch" data-on="success" data-off="danger">
+										[% IF setting.social_media %]
+										<input id="newblog_social_media_check" name="newblog_social_media" type="checkbox" checked> [% ELSE %]
+										<input id="newblog_social_media_check" name="newblog_social_media" type="checkbox"> [% END %]
+									</div>
+									<input id="newblog_social_media_state" type="hidden" value="[% setting.social_media %]" />
+								</div>
+							</div>
+
+							<hr />
+
+							<div class="form-group">
+								<label class="col-lg-4 control-label">Multiuser</label>
+								<div class="col-lg-8">
+									<div class="make-switch" data-on="success" data-off="danger">
+										[% IF setting.social_media %]
+										<!--									trebe schimbat pt user conditia-->
+										<input id="newblog_multiuser_check" name="newblog_multiuser" type="checkbox" checked> [% ELSE %]
+										<input id="newblog_multiuser_check" name="newblog_multiuser" type="checkbox"> [% END %]
+									</div>
+									<input id="newblog_multiuser_state" type="hidden" value="[% setting.social_media %]" />
+								</div>
+							</div>
+
+							<hr />
+
+							<div class="form-group">
+								<label class="col-lg-4 control-label">Accepting comments</label>
+								<div class="col-lg-8">
+									<div class="make-switch" data-on="success" data-off="danger">
+										[% IF setting.social_media %]
+										<!--trebe scghimbat pt comentarii-->
+										<input id="newblog_comments_check" name="newblog_comments" type="checkbox" checked> [% ELSE %]
+										<input id="newblog_comments_check" name="newblog_comments" type="checkbox"> [% END %]
+									</div>
+									<input id="newblog_comments_state" type="hidden" value="[% setting.social_media %]" />
+								</div>
+							</div>
+
+							<hr />
+
+							<div class="form-group">
+								<label class="col-lg-3 control-label">Timezone</label>
+								<div class="col-lg-6">
+									<select name="timezone" class="chosen-select">
+										<option value=""> Select time zone </option>
+										[% FOREACH timezone IN timezones %] [% SET selected = timezone == setting.timezone ? "selected" : "" %]
+										<option [% selected %] value="[% timezone %]"> [% timezone %] </option>
+										[% END %]
+									</select>
+								</div>
+							</div>
+
+							<hr />
+
+							<div class="form-group">
+								<div class=" col-lg-10">
+									<button type="submit" class="btn btn-default">Save</button>
+									<button type="button" class="btn btn-danger">Cancel</button>
+								</div>
+							</div>
+						</div>
+
+<!--
+						<div class="col-lg-3 profile-pic">
+							<div class="bubble">
+								[% IF session.user.avatar_path %]
+								<img id="image_upload_preview" class="user-image" src="/avatar/[% session.user.username %]" /> [% ELSE %]
+								<img id="image_upload_preview" class="user-image defaultAvatar" src="/avatar/[% session.user.username %]" /> [% END %]
+							</div>
+							<div>
+								<button type="button" class="btn change-pic" data-toggle="modal" data-target="#changeImg">Change photo
+								</button>
+							</div>
+						</div>
+-->
+					</form>
+
+				</div>
+
+			</div>
+
+		</div>
+	</div>
+
+</div>

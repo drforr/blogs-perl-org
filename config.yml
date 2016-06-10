@@ -19,6 +19,7 @@ charset: "UTF-8"
 # simple: default and very basic template engine
 # template_toolkit: TT
 
+
 session: Memcached
 
 #Logging
@@ -26,11 +27,17 @@ session: Memcached
 #log: "error"
 template: "template_toolkit"
 engines:
+  template:
+    template_toolkit:
+      encoding: 'utf8'
+      start_tag: '[%'
+      end_tag:   '%]'
   session:
     Memcached:
       memcached_servers: localhost:11211
 
 mail_server:
+
   user:     'jobs@builtinperl.com'
   password: '4guFG0s8mDl@z'
   host:     'mail.evozon.com'
@@ -59,16 +66,6 @@ plugins:
       type:  'image'
       size:  'normal'
 
-# Avatars
-avatar:
-  path:    'userpics/userpics/'
-  format:  'userpic-%d-100x100.png'
-  bounds:
-    height: 140
-    width:  140
-  default:
-    dark:  'blog/img/male-user.png'
-    light: 'blog/img/male-user-light.png'
 
 # Constants
 covers_folder:   'public/uploads/covers/'
@@ -78,6 +75,7 @@ images_path:     '/uploads/images'
 
 app_url:         'http://localhost:5051'
 email_templates: 'views/emails/'
+
 
 # Images from MovableType
 movable_type_url: 'http://blogs.perl.org'
