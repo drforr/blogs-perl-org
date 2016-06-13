@@ -9,7 +9,7 @@ use PearlBee::Helpers::Pagination qw(get_total_pages get_previous_next_link gene
 
 =head2 /admin/blogs ; /admin/blogs/page/:page
 
-List all the blogs of an author.
+List all the blogs of the admin.
 
 =cut
 
@@ -27,7 +27,7 @@ get '/admin/blogs/page/:page' => sub {
 
   # Calculate the next and previous page link
   my $total_pages                 = get_total_pages($all, $nr_of_rows);
-  my ($previous_link, $next_link) = get_previous_next_link($page, $total_pages, '/author/blogs');
+  my ($previous_link, $next_link) = get_previous_next_link($page, $total_pages, '/admin/blogs');
 
   # Generating the pagination navigation
   my $total_blogs    = $all;
@@ -97,6 +97,5 @@ List all blogs grouped by status. Maybe they will be needed.
 #       { layout => 'admin' };
 
 # };
-
 
 1;

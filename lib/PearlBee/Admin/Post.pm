@@ -181,6 +181,7 @@ any '/admin/posts/add' => sub {
 
     my @categories = resultset('Category')->all();
     my $post;
+    my @blogs      = resultset('Blog')->all();
 
     try {
         if ( params->{post} ) {
@@ -246,7 +247,7 @@ any '/admin/posts/add' => sub {
       redirect '/admin/posts/edit/' . $post->slug;
     }
     else {
-      template 'admin/posts/add', { categories => \@categories }, { layout => 'admin' };
+      template 'admin/posts/add', { categories => \@categories, blogs => \@blogs }, { layout => 'admin' };
     }
 
 };

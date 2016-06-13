@@ -108,7 +108,7 @@ get '/author/comments/:status/page/:page' => sub {
 
 =head2 /author/comments/blog/:blog/page/:page
 
-List all comments grouped by status
+List all comments grouped by blog.
 
 =cut
 
@@ -117,8 +117,14 @@ get '/author/comments/blog/:blog/page/:page' => sub {
   my $nr_of_rows = 5; # Number of posts per page
   my $page       = params->{page} || 1;
   my $blog       = params->{blog};
+  my $blog_ref   =resultset('Blog')->find({name => params->{blog}});
   my $user       = resultset('Users')->find_by_session(session);
-  my @comments    = resultset('Comment')->search({ uid => $user->id});
+  my @blog_posts = resultset('BlogPost')->search({ blog_id => $blog_ref->get_column('id')});
+  my @comments;
+  foreach my $blog_post (@blog_posts){
+    push @comments, map { $_->as_hashref }
+              resultset('Comment')->search({post_id => $blog_post->post_id});
+  }
   my $all        = scalar @comments;
 
   # Calculate the next and previous page link

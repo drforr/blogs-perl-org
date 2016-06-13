@@ -178,7 +178,7 @@ add method
 
 =cut
 
-post '/author/posts/add' => sub {
+any '/author/posts/add' => sub {
 
   my $user             = session('user');
   my $user_obj         = resultset('Users')->find_by_session(session);
@@ -214,6 +214,7 @@ post '/author/posts/add' => sub {
   my $params = {
     title   => params->{title},
     slug    => $slug,
+    blogs   => \@blogs,
     content => params->{post},
     user_id => $user_obj->id,
     status  => params->{status},
