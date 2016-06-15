@@ -37,7 +37,7 @@ get '/admin/notification' => sub {
 
     );
 
-  template '/admin/notification/notification',
+  template 'admin/notification/notification',
     {
       comments   => \@comment_notifications,
       invitation => \@invitation_notifications,

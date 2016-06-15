@@ -1,3 +1,130 @@
-<p>
-  dfsadasd
-</p>
+<div class="page-content blocky">
+   <div class="container">
+
+      [% IF session.user %]
+          [% INCLUDE layouts/admin.tt %]
+      [% END %]
+
+      <div class="mainy">
+      	<!-- Page title -->
+      	<div class="page-title">
+      		<h2> &nbsp; <i class="fa fa-flag" aria-hidden="true"></i> Notifications</h2>
+      		<hr />
+      	</div>
+
+
+      <div class="row">
+        <div class="col-md-12">
+      		<div class="card-design">
+      			<div class="awidget-head">
+      				<h3>&nbsp;<b><i class="fa fa-commenting" aria-hidden="true"></i> {number} New Comments</b></h3>
+      			</div>
+            <div class="awidget-body">
+              <a href="#">Go to comments Administration</a>
+              <a href="#" class="pull-right"><i class="fa fa-arrow-circle-right custom-fonts" aria-hidden="true"></i></a>
+            </div>
+      		</div>
+      	</div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card-design">
+            <div class="awidget-head">
+              <h3>&nbsp;<b> <i class="fa fa-user-plus" aria-hidden="true"></i> {number} New Invitation(s) to Join the Blog(s)</b></h3>
+            </div>
+            <div class="awidget-body">
+                <div class="notification-text">
+                  <a href="#">{username}</a> added you as an <a href="#">{role}</a> to the <a href="#">{blogname}</a> blog.
+                  <a href="#" data-toggle="modal" data-target="#invitation_modal" class="pull-right">View Invitation</a>
+                </div>
+                <div class="notification-text">
+                  <a href="#">{username}</a> added you as an <a href="#">{role}</a> to the <a href="#">{blogname}</a> blog.
+                  <a href="#" data-toggle="modal" data-target="#invitation_modal" class="pull-right">View Invitation</a>
+                </div>
+                <div class="notification-text">
+                  <a href="#">{username}</a> added you as an <a href="#">{role}</a> to the <a href="#">{blogname}</a> blog.
+                  <a href="#" data-toggle="modal" data-target="#invitation_modal" class="pull-right">View Invitation</a>
+                </div>
+                <br>
+                <div class="text-center">
+                  <i class="fa fa-arrow-circle-o-down custom-fonts" aria-hidden="true"></i>
+                </div>
+
+              <div class="modal fade" id="invitation_modal" aria-labelledby="invitation_modal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title">Hi {username},</h4>
+                        </div>
+
+                        <div class="modal-body">
+                            <p>I would like to invite you to join my blog {blogname}</p>
+                            <p>You can accept the invitation by clicking below. Until you take an action, you will be marked as pending.</p>
+                            <p>Hope you'll join my blog!</p>
+                            <div class="pull-right">
+                              <p> All the best, </p>
+                              <p> {username} </p>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-primary btn-ok" data-dismiss="modal">OK</button>
+                          <button type="button" class="btn btn-default" data-dismiss="modal">Reject</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <div class="row">
+        <div class="col-md-12">
+      		<div class="card-design">
+      			<div class="awidget-head">
+      				<h3>&nbsp;<b><i class="fa fa-reply-all" aria-hidden="true"></i> {number} New Responses to Your Invitations</b></h3>
+      			</div>
+            <div class="awidget-body">
+              <div class="notification-text">
+                <i class="fa fa-plus-circle custom-fonts" aria-hidden="true"></i>
+                <a href="#">{username}</a> <a href="#">{accepted}</a> your invitation to join
+                <a href="#">{blogname}</a> blog.
+                <a href="#" class="pull-right">View Users</a>
+              </div>
+              <div class="notification-text">
+                <i class="fa fa-times-circle custom-fonts" aria-hidden="true"></i><a href="#">{username}</a> <a href="#">{rejected}</a> your invitation to join <a href="#">{blogname}</a> blog.
+                <a href="#" class="pull-right">View Users</a>
+              </div>
+              <br>
+              <div class="text-center">
+                <i class="fa fa-arrow-circle-o-down custom-fonts" aria-hidden="true"></i>
+              </div>
+            </div>
+      		</div>
+      	</div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card-design">
+            <div class="awidget-head">
+              <h3>&nbsp;<b><i class="fa fa-map-signs custom-fonts" aria-hidden="true"></i> Other Notifications</b></h3>
+            </div>
+            <div class="awidget-body">
+              <div class="notification-text">
+                Your role on <a href="#">{blogname}</a> blog has been changed from <a href="#">{oldrole}</a> to <a href="#">{newrole}</a>.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      </div>
+
+   </div>
+</div>
