@@ -13,7 +13,7 @@ Get an array with all tags
 =cut
 
 get '/api/tags.:format' => sub {  
-	my $user = session('user');
+	my $user  = resultset('Users')->find_by_session(session);
 
 	if ($user) {
 		my @tags = resultset('Tag')->all;
@@ -31,7 +31,7 @@ Get an array with all categories
 
 get '/api/categories.:format' => sub {
   
-	my $user = session('user');
+	my $user         = resultset('Users')->find_by_session(session);
 
 	if ($user) {
 		my @categories = resultset('Category')->all;

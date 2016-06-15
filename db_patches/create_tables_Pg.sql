@@ -108,6 +108,7 @@ CREATE TABLE blog (
 CREATE TABLE blog_owners (
   user_id integer NOT NULL REFERENCES users (id),
   blog_id integer NOT NULL REFERENCES blog (id),
+  is_admin boolean NOT NULL DEFAULT false,
   created_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   status active_state NOT NULL DEFAULT 'inactive',
   activation_key varchar(100) DEFAULT NULL,

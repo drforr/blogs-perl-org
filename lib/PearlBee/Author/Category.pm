@@ -8,14 +8,25 @@ use PearlBee::Dancer2::Plugin::Admin;
 use Data::Dumper;
 
 use PearlBee::Helpers::Util qw(string_to_slug);
+use PearlBee::Helpers::Pagination qw(get_total_pages get_previous_next_link generate_pagination_numbering);
 
-=head2 /author/categories
 
-List only those categories in the blogs in which the user is the owner or is contributing to.
+=head2 /author/categories/page/:page
+
+List only those categories in the blogs 
+in which the user is the owner or is contributing to.
+List with 5 entries per page.
 
 =cut
 
-get '/author/categories' => sub { 
+get '/author/categories' => sub{
+  redirect '/author/categories/page/1';
+};
+
+get '/author/categories/page/:page' => sub { 
+
+  my $nr_of_rows = 5; # Number of posts per page
+  my $page       = params->{page};
   my $user       = resultset('Users')->find_by_session(session);
   my @blog_owners = resultset('BlogOwner')->search({ user_id => $user->id });
   my @blog_posts;
@@ -36,11 +47,31 @@ get '/author/categories' => sub {
   for my $category (@post_categories){
     push @categories, 
                      resultset('Category')->search({ name => { '!=' => 'Uncategorized'}, id => $category->category_id });
-  }              
+  }   
+  my $all                = scalar (@categories);
+  my @actual_categories  = splice(@categories,($page-1)*$nr_of_rows,$nr_of_rows);
 
-  template 'admin/categories/list', { categories => \@categories }, { layout => 'admin' };
+  
+  my $total_pages                 = get_total_pages($all, $nr_of_rows);
+  my ($previous_link, $next_link) = get_previous_next_link($page, $total_pages, '/author/categories');
+  my $total_posts     = $all;
+  my $posts_per_page  = $nr_of_rows;
+  my $current_page    = $page;
+  my $pages_per_set   = 5;
+  my $pagination      = generate_pagination_numbering($total_posts, $posts_per_page, $current_page, $pages_per_set);           
+
+    template 'admin/categories/list',
+    {
+     all           => $all, 
+     page          => $page,
+     next_link     => $next_link,
+     previous_link => $previous_link,
+     action_url    => 'author/categories/page',
+     pages         => $pagination->pages_in_set,
+     categories          => \@actual_categories 
+    }, 
+    { layout => 'admin' };
 };
-
 =head2 /author/categories/add
 
 create method

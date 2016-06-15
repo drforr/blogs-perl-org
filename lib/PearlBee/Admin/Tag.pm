@@ -5,20 +5,49 @@ use Dancer2;
 use Dancer2::Plugin::DBIC;
 
 use PearlBee::Dancer2::Plugin::Admin;
+use PearlBee::Helpers::Pagination qw(get_total_pages get_previous_next_link generate_pagination_numbering);
 
 use PearlBee::Helpers::Util qw(string_to_slug);
 
-=head2 /admin/tags
+=head2 /admin/tags/page/:page
 
-List all tags
+List all tags in groups of 5.
 
 =cut
 
 get '/admin/tags' => sub {
 
-  my @tags = resultset('Tag')->all;
+  redirect '/admin/tags/page/1';
+};
 
-  template 'admin/tags/list', { tags => \@tags }, { layout => 'admin' };
+get '/admin/tags/page/:page' => sub {
+
+  my $nr_of_rows = 5; # Number of posts per page
+  my $page       = params->{page};
+  my @tags = resultset('Tag')->search( {}, { rows => $nr_of_rows, page => $page } );
+  my $all  = resultset('Tag')->count;
+ 
+  my $total_pages                 = get_total_pages($all, $nr_of_rows);
+  my ($previous_link, $next_link) = get_previous_next_link($page, $total_pages, '/admin/tags');
+  
+  my $total_posts     = $all;
+  my $posts_per_page  = $nr_of_rows;
+  my $current_page    = $page;
+  my $pages_per_set   = 7;
+  my $pagination      = generate_pagination_numbering($total_posts, $posts_per_page, $current_page, $pages_per_set);
+
+
+  template 'admin/tags/list',
+    {
+     all           => $all, 
+     page          => $page,
+     next_link     => $next_link,
+     previous_link => $previous_link,
+     action_url    => 'admin/tags/page',
+     pages         => $pagination->pages_in_set,
+     tags          => \@tags 
+    }, 
+    { layout => 'admin' };
 
 };
 

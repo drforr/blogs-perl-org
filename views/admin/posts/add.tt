@@ -17,7 +17,7 @@
                            </div>
 
                            <div class="awidget-body">
-                             <select name="type">
+                             <select name="blog_name">
                                <option name="option1">option1</option>
                                <option name="option2">option2</option>
 <!-- Keep these other options for later

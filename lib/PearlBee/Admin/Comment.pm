@@ -29,6 +29,7 @@ get '/admin/comments/page/:page' => sub {
   my $page       = params->{page} || 1;
   my @comments   = resultset('Comment')->search({}, { order_by => { -desc => "comment_date" }, rows => $nr_of_rows, page => $page });
   my $count      = resultset('View::Count::StatusComment')->first;
+  my @blogs      = resultset('Blog')->all(); 
 
   my ($all, $approved, $trash, $spam, $pending) = $count->get_all_status_counts;
 
@@ -46,6 +47,7 @@ get '/admin/comments/page/:page' => sub {
   template 'admin/comments/list',
       {
         comments      => \@comments,
+        blogs         => \@blogs,
         all           => $all,
         approved      => $approved,
         spam          => $spam,

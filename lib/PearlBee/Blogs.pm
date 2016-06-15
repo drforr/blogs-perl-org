@@ -9,8 +9,9 @@ Blog routes
 use Dancer2 0.163000;
 use Dancer2::Plugin::DBIC;
 use PearlBee::Helpers::Util qw(map_posts);
+use PearlBee::Helpers::Notification_Email;
 use PearlBee::Helpers::Pagination qw(get_total_pages get_previous_next_link);
-use Try::Tiny;
+
 our $VERSION = '0.1';
 
 =head2 /blogs/user/:username/slug/:slug ; /users/:username
@@ -241,87 +242,50 @@ get 'author/create-blog' => sub{
       template 'admin/blogs/add',{blogs => \@blogs}, { layout => 'admin' };
 };
 
-=head2 /add-contributor
+=head2 /add-contributor/user/:username
  
   Add a contributor, making her/him an admin or a simple author.
 
 =cut
 
-post '/add-contributor' => sub {
-  my $params   = body_parameters;
-  my $message;
-  #my $date   = DateTime->now();
-  #my $token  = generate_hash( $params->{'email'} . $date );
-  my $user   = resultset('Users')->find_by_session(session);
-  my $role   = $params->{role};
-  #my $blog   = resultset('Blog')->find({name => params->{blog}});
-  my $blog;
+post '/add-contributor/blog/:slug/email/:email/role/:role' => sub {
+    my $user    = resultset('Users')->find_by_session(session);
+    my $slug    = route_parameters->{'slug'};
+    my $email   = route_parameters->{'email'};
+    my $role    = route_parameters->{'role'};
+    my $invitee = resultseet('User')->find({ email => $email });
+    my $blog    = resultseet('Blog')->find({ slug => $slug });
 
-  my @blog_owners = resultset('BlogOwner')->search({ user_id => user->id, is_admin => '1' });
-  for my $blog_owner ( @blog_owners ) {
-  $blog = resultset('Blog')->search({ id => $blog_owner->blog_id, name => $params->{blog} });
-  }
-  my $contributor = resultset('Users')->find({email => params->{email}});
-  if ($blog) { # i.e. the session_user is an admin and can add contributors
-      try {
-      PearlBee::Helpers::Email::send_email_complete({
-        template => 'Admin.tt',
-        from     => config->{'default_email_sender'},
-        to       => $user,
-        subject  => 'You have a new contributor on your blog',
+    if ( $blog ) {
+        my $date    = DateTime->now();
+        my $token   = generate_hash( $email . $date );
+        my $blog_id = $blog->id;
+        my $user_id = $user->id;
 
-        template_params => {
-          config     => config,
-          name       => $user->name,
-          username   => $user->username,
-          email      => $user->email,
-          added_user => $contributor ->name
-          #signature => config->{'email_signature'}
-        }
-      });
- 
-      PearlBee::Helpers::Email::send_email_complete({
-        template => 'contributor.tt',
-        from     => config->{'default_email_sender'},
-        to       => $params->{email},
-        subject  => "You have been added as a contributor",
+        my $blog_owner = resultset('BlogOwners')->create({
+            user_id        => $user_id,
+            blog_id        => $blog_id,
+            is_admin       => $role eq 'admin' ? 1 : 0,
+            status         => 'inactive', #
+            # created_date defaults cleanly
+            activation_key => $token,
+        });
+	my $notification = resultset('Notification')->create_invitation({
+            blog_id => $blog_id,
+            user_id => $user_id
+        });
 
-        template_params => {
-          config    => config,
-          name      => $contributor->name,
-          username  => $contributor->username,
-          #mail_body => "/activation?token=$token",
-        }
-      });
+        PearlBee::Helpers::Notification_Email->announce_contributor(
+            user => $user,
+            invitee => $invitee,
+            config => config
+        );
     }
-    catch {
-      error $_;
-    };
-      if ($role eq 'admin'){
-            resultset('BlogOwner')->create({
-            blog_id  => $blog->id,
-            user_id  => $contributor->id,
-            is_admin =>"true",
-          });
-      }
-      else {
-            resultset('BlogOwner')->create({
-            blog_id  => $blog->id,
-            user_id  => $contributor->id,
-            is_admin =>"false",
-          });
-      }
-      $message = 'A new contributor was added';
-      template 'blog-profile', {
-      success => $message
-    };
-  }
-  else {
-      $message = 'You do not have the rights to add a contributor';
-      template 'blog-profile', {
-      warning => $message
-    };
-  }
+    else {
+        template 'blog-profile', {
+            warning => 'Could not find chosen blog'
+        }
+    }
 };
 
 1;

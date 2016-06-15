@@ -21,7 +21,7 @@ get '/author/blogs/page/:page' => sub {
   my $user       = resultset('Users')->find_by_session(session);
   my @blogs      = resultset('View::UserBlogs')->search({}, { bind => [ $user->id ], order_by => \"created_date DESC", rows => $nr_of_rows, page => $page });
   my $count      = resultset('View::Count::StatusBlogAuthor')->search({}, { bind => [ $user->id ] })->first;
-
+  my @actual_blogs;
   my ($all, $inactive, $active) = $count->get_all_status_counts;
 
   # Calculate the next and previous page link
@@ -34,10 +34,14 @@ get '/author/blogs/page/:page' => sub {
   my $current_page   = $page;
   my $pages_per_set  = 7;
   my $pagination     = generate_pagination_numbering($total_blogs, $posts_per_page, $current_page, $pages_per_set);
-  map { $_->as_hashref } @blogs ;
+  foreach my $blog (@blogs){
+  push @actual_blogs, 
+                  resultset('Blog')->search({ id => $blog->id});
+  }
+  map { $_->as_hashref } @actual_blogs ;
   template 'admin/blogs/list',
       {
-        blogs         => \@blogs,
+        blogs         => \@actual_blogs,
         all           => $all,
         active        => $active,
         inactive      => $inactive,

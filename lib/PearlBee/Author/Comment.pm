@@ -121,12 +121,13 @@ get '/author/comments/blog/:blog/page/:page' => sub {
   my $user       = resultset('Users')->find_by_session(session);
   my @blog_posts = resultset('BlogPost')->search({ blog_id => $blog_ref->get_column('id')});
   my @comments;
+  my @actual_comments
   foreach my $blog_post (@blog_posts){
     push @comments, map { $_->as_hashref }
               resultset('Comment')->search({post_id => $blog_post->post_id});
   }
-  my $all        = scalar @comments;
-
+  my $all          = scalar @comments;
+  @actual_comments = splice(@comments,($page-1)*$nr_of_rows,$nr_of_rows);
   # Calculate the next and previous page link
   my $total_pages                 = get_total_pages($all, $nr_of_rows);
   my ($previous_link, $next_link) = get_previous_next_link($page, $total_pages, '/author/comments/' . $blog);
@@ -140,7 +141,7 @@ get '/author/comments/blog/:blog/page/:page' => sub {
 
   template 'admin/comments/list',
       {
-        comments      => \@comments,
+        comments      => \@actual_comments,
         all           => $all,
         page          => $page,
         next_link     => $next_link,

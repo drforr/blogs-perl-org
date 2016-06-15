@@ -12,19 +12,50 @@ use Dancer2;
 
 use Dancer2::Plugin::DBIC;
 use PearlBee::Dancer2::Plugin::Admin;
+use PearlBee::Helpers::Pagination qw(get_total_pages get_previous_next_link generate_pagination_numbering);
+
 
 use PearlBee::Helpers::Util qw(string_to_slug);
 
-=head2 /admin/categories
+=head2 /admin/categories/page/:page
 
-list all categories
+list all categories in pages.
 
 =cut
 
 get '/admin/categories' => sub {
-  my @categories = resultset('Category')->search({ name => { '!=' => 'Uncategorized'} });
+  redirect '/admin/categories/page/1';
+};
 
-  template 'admin/categories/list', { categories => \@categories }, { layout => 'admin' };
+get '/admin/categories/page/:page' => sub {
+
+  my $nr_of_rows = 5; # Number of posts per page
+  my $page       = params->{page};
+  my @categories = resultset('Category')->search( { name => {'!=' => 'Uncategorized'} }, { rows => $nr_of_rows, page => $page } );
+  my $all        = resultset('Category')->count;
+  
+  my $total_pages                 = get_total_pages($all, $nr_of_rows);
+  my ($previous_link, $next_link) = get_previous_next_link($page, $total_pages, '/admin/categories');
+  
+  my $total_posts     = $all;
+  my $posts_per_page  = $nr_of_rows;
+  my $current_page    = $page;
+  my $pages_per_set   = 7;
+  my $pagination      = generate_pagination_numbering($total_posts, $posts_per_page, $current_page, $pages_per_set);
+
+
+  template 'admin/categories/list',
+    {
+     all           => $all, 
+     page          => $page,
+     next_link     => $next_link,
+     previous_link => $previous_link,
+     action_url    => 'admin/categories/page',
+     pages         => $pagination->pages_in_set,
+     categories    => \@categories 
+    }, 
+    { layout => 'admin' };
+
 };
 
 =head2 /admin/categories/add

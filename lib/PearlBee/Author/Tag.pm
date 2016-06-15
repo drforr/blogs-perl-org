@@ -7,18 +7,28 @@ use Dancer2::Plugin::DBIC;
 use PearlBee::Dancer2::Plugin::Admin;
 
 use PearlBee::Helpers::Util qw(string_to_slug);
+use PearlBee::Helpers::Pagination qw(get_total_pages get_previous_next_link generate_pagination_numbering);
 
-=head2 /author/tags
+
+=head2 /author/tags/page/:page
 
 List the tags which occur in the blogs in which the user is an owner or is contributing to.
+Only 5 entries per page.
 
 =cut
 
-get '/author/tags' => sub { 
+get '/author/tags' => sub{
+  redirect '/author/tags/page/1';
+};
+get '/author/tags/page/:page' => sub { 
+  
+  my $nr_of_rows = 5; # Number of posts per page
+  my $page       = params->{page};
   my $user       = resultset('Users')->find_by_session(session);
   my @blog_owners = resultset('BlogOwner')->search({ user_id => $user->id });
   my @blog_posts;
   my @tags;
+  my @aux_tags;
   my @post_tags;
   for my $blog_owner ( @blog_owners ) {
   push @blog_posts, 
@@ -33,11 +43,34 @@ get '/author/tags' => sub {
   }
 
   for my $tag (@post_tags){
-    push @tags, 
-                     resultset('Tag')->search({ id => $tag->tag_id });
-  }              
+    push @aux_tags, 
+                     resultset('Tag')->search({ id => $tag->tag_id});
+  } 
+  my $all         = scalar (@aux_tags);
+  @tags           = splice(@aux_tags,($page-1)*$nr_of_rows,$nr_of_rows);
 
-  template 'admin/tags/list', { tags => \@tags }, { layout => 'admin' };
+  
+  my $total_pages                 = get_total_pages($all, $nr_of_rows);
+  my ($previous_link, $next_link) = get_previous_next_link($page, $total_pages, '/author/tags');
+  
+  my $total_posts     = $all;
+  my $posts_per_page  = $nr_of_rows;
+  my $current_page    = $page;
+  my $pages_per_set   = 5;
+  my $pagination      = generate_pagination_numbering($total_posts, $posts_per_page, $current_page, $pages_per_set);
+
+
+    template 'admin/tags/list',
+    {
+     all           => $all, 
+     page          => $page,
+     next_link     => $next_link,
+     previous_link => $previous_link,
+     action_url    => 'author/tags/page',
+     pages         => $pagination->pages_in_set,
+     tags          => \@tags 
+    }, 
+    { layout => 'admin' };
 };
 
 =head2 /author/tags/add

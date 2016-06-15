@@ -178,7 +178,7 @@ add method
 
 =cut
 
-any '/author/posts/add' => sub {
+post '/author/posts/add' => sub {
 
   my $user             = session('user');
   my $user_obj         = resultset('Users')->find_by_session(session);

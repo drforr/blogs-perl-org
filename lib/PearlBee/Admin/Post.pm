@@ -177,23 +177,22 @@ get '/admin/posts/trash/:id' => sub {
 
 =cut
 
-any '/admin/posts/add' => sub {
+post '/admin/posts/add' => sub {
 
     my @categories = resultset('Category')->all();
     my $post;
     my @blogs      = resultset('Blog')->all();
-
+    
     try {
-        if ( params->{post} ) {
+        
           
           # Set the proper timezone
           #
           my $user              = session('user');
-          my $user_obj         = resultset('Users')->find_by_session(session);
-          my ($slug, $changed)  = resultset('Post')->check_slug( params->{slug} );
-          my $post;             
+          my $user_obj          = resultset('Users')->find_by_session(session);
+          my ($slug, $changed)  = resultset('Post')->check_slug( params->{slug} );             
           my $cover_filename;
-          my @blog_owners = resultset('BlogOwner')->search({ user_id => $user_obj->id});
+          my @blog_owners       = resultset('BlogOwner')->search({ user_id => $user_obj->id});
           my @blogs; 
           my $blog;
           for my $blog_owner ( @blog_owners ) {
@@ -232,7 +231,6 @@ any '/admin/posts/add' => sub {
 
           # Connect and update the tags table
           resultset('PostTag')->connect_tags( params->{tags}, $post->id );
-        }
     }
     catch {
       info $_;
@@ -252,6 +250,20 @@ any '/admin/posts/add' => sub {
 
 };
 
+=head2 
+
+  Getter for admin/posts/add
+
+=cut 
+
+get '/admin/posts/add' => sub {
+
+  my @categories = resultset('Category')->all();
+
+  template 'admin/posts/add',
+           { categories => \@categories },
+           { layout => 'admin' };
+};
 =head2 edit method
 
 =cut
