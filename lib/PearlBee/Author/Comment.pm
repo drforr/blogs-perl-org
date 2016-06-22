@@ -121,7 +121,7 @@ get '/author/comments/blog/:blog/page/:page' => sub {
   my $user       = resultset('Users')->find_by_session(session);
   my @blog_posts = resultset('BlogPost')->search({ blog_id => $blog_ref->get_column('id')});
   my @comments;
-  my @actual_comments
+  my @actual_comments;
   foreach my $blog_post (@blog_posts){
     push @comments, map { $_->as_hashref }
               resultset('Comment')->search({post_id => $blog_post->post_id});
