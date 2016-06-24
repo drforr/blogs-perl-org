@@ -84,6 +84,12 @@ post '/author/tags/add' => sub {
   my @tags;
   my $name = params->{name};
   my $slug = string_to_slug( params->{slug} );
+  my $user = resultset('Users')->find_by_session(session);
+  unless ( $user and $user->can_do( 'create tag' ) ) {
+    return template 'admin/tags/list', {
+      warning => "You are not allowed to create a tag",
+    }, { layout => 'admin' };
+  }
 
   my $found_slug_or_name = resultset('Tag')->search({ -or => [ slug => $slug, name => $name ] })->first;
 

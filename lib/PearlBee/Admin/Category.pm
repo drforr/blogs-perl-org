@@ -66,6 +66,12 @@ create method
 
 post '/admin/categories/add' => sub {
 
+  my $temp_user = resultset('Users')->find_by_session(session);
+  unless ( $temp_user and $temp_user->can_do( 'create category' ) ) {
+    return template 'admin/categories/list', {
+      warning => "You are not allowed to create posts.",
+    }, { layout => 'admin' };
+  }
   my @categories;
   my $name   = params->{name};
   my $slug   = params->{slug};

@@ -28,8 +28,12 @@ get '/author/posts/page/:page' => sub {
 
   my $nr_of_rows  = 5; # Number of posts per page
   my $page        = params->{page};
-  my $user        = session('user');
   my $user_obj    = resultset('Users')->find_by_session(session);
+  unless ( $user_obj ) {
+    return template 'index', {
+      warning => "Please log in before viewing your posts"
+    }
+  }
   my @posts       = resultset('Post')->search({ user_id => $user_obj->id }, { order_by => \'created_date DESC', rows => $nr_of_rows, page => $page });
   my $count       = resultset('View::Count::StatusPostAuthor')->search({}, { bind => [ $user_obj->id ] })->first;
 
@@ -74,8 +78,12 @@ get '/author/posts/:status/page/:page' => sub {
   my $nr_of_rows  = 5; # Number of posts per page
   my $page        = params->{page};
   my $status      = params->{status};
-  my $user        = session('user');
   my $user_obj    = resultset('Users')->find_by_session(session);
+  unless ( $user_obj ) {
+    return template 'index', {
+      warning => "Please log in before viewing your posts"
+    }
+  }
   my @posts       = resultset('Post')->search({ user_id => $user_obj->id, status => $status }, { order_by => \'created_date DESC' });
   my $count       = resultset('View::Count::StatusPostAuthor')->search({}, { bind => [ $user_obj->id ] })->first;
 
@@ -183,6 +191,12 @@ post '/author/posts/add' => sub {
   my $user             = session('user');
   my $user_obj         = resultset('Users')->find_by_session(session);
   my @categories       = resultset('Category')->all();
+  unless ( $user_obj and $user_obj->can_do( 'create post' ) ) {
+    return template 'admin/posts/add', {
+      categories => \@categories,
+      warning => "You are not allowed to create posts.",
+    }, { layout => 'admin' };
+  }
   my ($slug, $changed) = resultset('Post')->check_slug( params->{slug} );
   my $post;
   my $cover_filename;
@@ -336,6 +350,10 @@ update method
 
 post '/author/posts/update/:id' => sub {
 
+  my $temp_user = resultset('Users')->find_by_session(session);
+  unless ( $temp_user and $temp_user->can_do( 'update post' ) ) {
+    redirect '/author/posts/edit/';
+  }
   my $post_id   = params->{id};
   my $post      = resultset('Post')->find({ id => $post_id });
   my $title     = params->{title};

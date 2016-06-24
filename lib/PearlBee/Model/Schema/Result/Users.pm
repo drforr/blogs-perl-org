@@ -462,4 +462,21 @@ sub validate {
   return $self->password eq $hashed;
 }
 
+=head2 can_do
+
+Can this user perform the requested task?
+
+=cut
+
+sub can_do {
+  my ($self, $ability) = @_;
+  my $schema  = $self->result_source->schema;
+  my $acl = $schema->resultset('Acl')->find({
+    name    => $self->role,
+    ability => $ability
+  });
+
+  return $acl ? 1 : undef
+}
+
 1;

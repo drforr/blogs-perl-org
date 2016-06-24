@@ -63,6 +63,7 @@ get '/author/users/page/:page' => sub {
   template 'admin/users/list',
     {
       users         => \@users,
+      blogs         => \@blogs,
       all           => $all, 
       active        => $active,
       inactive      => $inactive,
@@ -90,7 +91,7 @@ get '/author/users/:status/page/:page' => sub {
   my $page       = params->{page} || 1;
   my $status     = params->{status};
   my $user_obj    = resultset('Users')->find_by_session(session);
-    my @blogs;
+  my @blogs;
   my @blogs2;
   my @users;
   my @blog_owners = resultset('BlogOwner')->search({user_id => $user_obj->id});
@@ -137,6 +138,7 @@ get '/author/users/:status/page/:page' => sub {
   template 'admin/users/list',
     {
       users         => \@users,
+      blogs         => \@blogs,
       all           => $all, 
       active        => $active,
       inactive      => $inactive,
@@ -208,6 +210,7 @@ get '/author/users/role/:role/page/:page' => sub {
   template 'admin/users/list',
     {
       users         => \@users,
+      blogs         => \@blogs,
       all           => $all, 
       page          => $page,
       next_link     => $next_link,
@@ -220,30 +223,53 @@ get '/author/users/role/:role/page/:page' => sub {
 
 };
 
-=head2 /author/users/blog/:blog/page/:page
+=head2 /author/users/blog/:blog/:status/:role/page/:page
 
-List all users grouped by blog's name.
+List all users grouped by blog's name, role and status.
 
 =cut
 
-get '/author/users/blog/:blog/page/:page' => sub {
+get '/author/users/blog/:blog/:status/:role/page/:page' => sub {
+
 
   my $nr_of_rows = 5; # Number of posts per page
   my $page       = params->{page} || 1;
-  my $blog       = params->{blog};
-  my $user_obj    = resultset('Users')->find_by_session(session);
+  my $blog       = resultset('Blog')->find({ name => params->{blog} });
+  my $status     = params->{status};
+  my $role       = params->{role};
+  my $flag;
+  if ($role eq 'admin') {
+    $flag = 1;
+  }
+    else {
+     $flag = 0; 
+  }
+  my $user_obj   = resultset('Users')->find_by_session(session);
   my @blogs;
   my @blogs2;
   my @users;
   my @blog_owners = resultset('BlogOwner')->search({user_id => $user_obj->id});
   for my $blog_owner (@blog_owners){
     push @blogs, 
-                  resultset('Blog')->search({ id => $blog_owner->get_column('blog_id'), name => $blog});
+                  resultset('Blog')->search({ id => $blog_owner->get_column('blog_id'), name => params->{blog}});
   }
 
-  for my $blog (@blogs){
-    push @blogs2,
-    resultset('BlogOwner')->search ({ blog_id => $blog->get_column('id') });
+   map { $_->as_hashref } @blogs;
+  if ($role ne 'all' && $status ne 'all'){
+  push @blogs2,
+  resultset('BlogOwner')->search ({ blog_id => $blogs[0]->get_column('id'), status=>$status, is_admin=>$flag });
+  }
+  elsif ($role eq 'all' && $status ne 'all'){
+       push @blogs2,
+  resultset('BlogOwner')->search ({ blog_id => $blogs[0]->get_column('id'), status=>$status });
+  }
+  elsif ($role ne 'all' && $status eq 'all'){
+       push @blogs2,
+  resultset('BlogOwner')->search ({ blog_id => $blogs[0]->get_column('id'), is_admin=>$flag });
+  }
+  else {
+       push @blogs2,
+  resultset('BlogOwner')->search ({ blog_id => $blogs[0]->get_column('id') });
   }
 
   for my $blog (@blogs2){
@@ -265,15 +291,17 @@ get '/author/users/blog/:blog/page/:page' => sub {
   my $current_page    = $page;
   my $pages_per_set   = 7;
   my $pagination      = generate_pagination_numbering($total_users, $posts_per_page, $current_page, $pages_per_set);
+  my @actual_users    = splice(@users,($page-1)*$nr_of_rows,$nr_of_rows);
 
   template 'admin/users/list',
     {
-      users         => \@users,
+      users         => \@actual_users,
+      blogs         => \@blogs,
       all           => $all, 
       page          => $page,
       next_link     => $next_link,
       previous_link => $previous_link,
-      action_url    => 'author/users/blog/' . $blog . '/page',
+      action_url    => 'author/users/blog/' . params->{blog} . '/page',
       pages         => $pagination->pages_in_set,
       blog          => $blog->name
     },

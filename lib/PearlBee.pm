@@ -143,6 +143,14 @@ post '/comments' => sub {
   my $comment_text = $parameters->{comment};
   my $post         = resultset('Post')->find({ slug => $post_slug });
   my $user         = resultset('Users')->find_by_session(session);
+  unless ( $user and $user->can_do( 'create post' ) ) {
+    return (
+      message    => "You are not allowed to create comments, please create an account",
+      success    => 0,
+      approved   => 0,
+      email_sent => 0,
+    );
+  }
   my $username     = $user->username;
 
   $parameters->{id}  = $post->id;
@@ -266,6 +274,9 @@ get '/sign-up' => sub {
 
 post '/sign-up' => sub {
 
+  if ( resultset('Users')->find_by_session(session) ) {
+    error "Cannot sign up while already signed in as a user";
+  }
   my $params          = body_parameters;
   my $redirect        = body_parameters->{'redirect'};
   my $template_params = {

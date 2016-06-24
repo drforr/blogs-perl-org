@@ -61,18 +61,23 @@ get '/blogs/user/:username/slug/:slug' => sub {
   my @blog_owners = resultset('BlogOwner')->search({ user_id => $user->id });
   my @blogs;
   for my $blog_owner ( @blog_owners ) {
-    push @blogs, map { $_->as_hashref_sanitized }
+    push @blogs, 
                  resultset('Blog')->find({ id => $blog_owner->blog_id });
   }
   
+  my $blog;
+  for my $iterator (@blogs){
+  $blog = resultset('Blog')->find({slug => $slug, id=> $iterator->id});
+  }
+  my $searched_blog = resultset('BlogOwner')->find ({blog_id => $blog->id});
+  my @aux_authors = resultset('BlogOwner')->search({ blog_id => $searched_blog->get_column('blog_id') });
 
-  my $blog = resultset('Blog')->find ({slug =>$slug});
-  my $nr_of_authors = resultset('BlogOwner')->search ({blog_id => $blog->id})->count;
 
-  for my $blog_owner (@blog_owners){
+  foreach my $iterator (@aux_authors){
     push @authors, map { $_->as_hashref_sanitized } 
-                   resultset('Users')->search({ id => $blog_owner->get_column('user_id') });
-   }
+                   resultset('Users')->search({ id => $iterator->get_column('user_id') });
+  }
+  map { $_->as_hashref_sanitized } @blogs;
   # Extract all posts with the wanted category
 
 
@@ -88,7 +93,6 @@ get '/blogs/user/:username/slug/:slug' => sub {
         posts_for_user => $username,
         blogs          => \@blogs,
         user           => $user,
-        nr_of_authors  => $nr_of_authors,
         authors        => \@authors
     };
 };
@@ -201,12 +205,18 @@ get '/blogs/authors/slug/:slug/page/:page' => sub {
 post '/create-blog' => sub{
   my $params   = body_parameters;
   my $user     = resultset('Users')->find_by_session(session);
+  unless ( $user and $user->can_do( 'create blog' ) ) {
+    my $id = $user->id;
+    log "User ID $user tried to create a blog";
+    return;
+  }
   my $blog     = resultset('Blog')->create_with_slug({
-  name         => $params->{name},
-  description  => $params->{description},
-  timezone     => $params->{timezone},
+    name         => $params->{name},
+    description  => $params->{description},
+    timezone     => $params->{timezone},
   });
-    resultset('BlogOwner')->create({
+
+  resultset('BlogOwner')->create({
     blog_id   => $blog->id,
     user_id   => $user->id,
     is_admin  =>"true",
@@ -250,6 +260,11 @@ get 'author/create-blog' => sub{
 
 post '/add-contributor/blog/:slug/email/:email/role/:role' => sub {
     my $user    = resultset('Users')->find_by_session(session);
+    unless ( $user and $user->can_do('create blog_owner') ) {
+      return template 'blog-profile', {
+        warning => "You are not allowed to add a contributor to this blog",
+      }, { layout => 'admin' };
+    }
     my $slug    = route_parameters->{'slug'};
     my $email   = route_parameters->{'email'};
     my $role    = route_parameters->{'role'};

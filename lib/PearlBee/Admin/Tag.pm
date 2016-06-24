@@ -59,6 +59,12 @@ Add a new tag
 
 post '/admin/tags/add' => sub {
 
+  my $temp_user = resultset('Users')->find_by_session(session);
+  unless ( $temp_user and $temp_user->can_do( 'create tag' ) ) {
+    return template 'admin/tags/list', {
+      warning => "You are not allowed to create tags",
+    }, { layout => 'admin' };
+  }
   my @tags;
   my $name = params->{name};
   my $slug = string_to_slug( params->{slug} );

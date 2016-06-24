@@ -87,10 +87,16 @@ get '/author/comments/:status/page/:page' => sub {
   my $current_page    = $page;
   my $pages_per_set   = 7;
   my $pagination      = generate_pagination_numbering($total_comments, $posts_per_page, $current_page, $pages_per_set);
-
+  my @blogs;
+  my @blog_owners = resultset('BlogOwner')->search({ user_id => $user->id });
+  for my $blog_owner ( @blog_owners ) {
+      push @blogs, map { $_->as_hashref }
+                   resultset('Blog')->search({ id => $blog_owner->blog_id });
+  }
   template 'admin/comments/list',
       {
         comments      => \@comments,
+        blogs         => \@blogs,
         all           => $all,
         approved      => $approved,
         spam          => $spam,
@@ -106,28 +112,38 @@ get '/author/comments/:status/page/:page' => sub {
 
 };
 
-=head2 /author/comments/blog/:blog/page/:page
+=head2 /author/comments/blog/:blog/:status/page/:page
 
 List all comments grouped by blog.
 
 =cut
 
-get '/author/comments/blog/:blog/page/:page' => sub {
+get '/author/comments/blog/:blog/:status/page/:page' => sub {
 
   my $nr_of_rows = 5; # Number of posts per page
   my $page       = params->{page} || 1;
   my $blog       = params->{blog};
+  my $status     = params->{status};
   my $blog_ref   =resultset('Blog')->find({name => params->{blog}});
   my $user       = resultset('Users')->find_by_session(session);
   my @blog_posts = resultset('BlogPost')->search({ blog_id => $blog_ref->get_column('id')});
   my @comments;
   my @actual_comments;
-  foreach my $blog_post (@blog_posts){
-    push @comments, map { $_->as_hashref }
+
+  if ($status eq ('all') ){
+    foreach my $blog_post (@blog_posts){
+      push @comments, map { $_->as_hashref }
               resultset('Comment')->search({post_id => $blog_post->post_id});
+    }
+  }
+  else{
+    foreach my $blog_post (@blog_posts){
+      push @comments, map { $_->as_hashref }
+              resultset('Comment')->search({post_id => $blog_post->post_id, status => $status});
+    }
   }
   my $all          = scalar @comments;
-  @actual_comments = splice(@comments,($page-1)*$nr_of_rows,$nr_of_rows);
+
   # Calculate the next and previous page link
   my $total_pages                 = get_total_pages($all, $nr_of_rows);
   my ($previous_link, $next_link) = get_previous_next_link($page, $total_pages, '/author/comments/' . $blog);
@@ -139,14 +155,23 @@ get '/author/comments/blog/:blog/page/:page' => sub {
   my $pages_per_set   = 7;
   my $pagination      = generate_pagination_numbering($total_comments, $posts_per_page, $current_page, $pages_per_set);
 
+  my @blogs;
+  my @blog_owners = resultset('BlogOwner')->search({ user_id => $user->id });
+  for my $blog_owner ( @blog_owners ) {
+      push @blogs, map { $_->as_hashref }
+                   resultset('Blog')->search({ id => $blog_owner->blog_id });
+  }
+  my @actual_comments = splice(@comments,($page-1)*$nr_of_rows,$nr_of_rows);
+
   template 'admin/comments/list',
       {
         comments      => \@actual_comments,
+        blogs         => \@blogs,
         all           => $all,
         page          => $page,
         next_link     => $next_link,
         previous_link => $previous_link,
-        action_url    => 'author/comments/blog/' . $blog . '/page',
+        action_url    => 'author/comments/blog/' . $blog . '/' . $status . '/page',
         pages         => $pagination->pages_in_set
       },
       { layout => 'admin' };

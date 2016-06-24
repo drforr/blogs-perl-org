@@ -30,6 +30,7 @@ get '/admin/users/page/:page' => sub {
   my $nr_of_rows = 5; # Number of posts per page
   my $page       = params->{page} || 1;
   my @users;
+  my @blogs      = resultset('Blog')->all();
   if (session('multiuser')) {
     @users = resultset('Users')->search({}, { order_by => { -desc => "register_date" }, rows => $nr_of_rows, page => $page });
   } else {
@@ -60,6 +61,7 @@ get '/admin/users/page/:page' => sub {
   template 'admin/users/list',
     {
       users         => \@users,
+      blogs         => \@blogs,
       all           => $all, 
       active        => $active,
       inactive      => $inactive,
@@ -88,7 +90,8 @@ get '/admin/users/:status/page/:page' => sub {
   my $status     = params->{status};
   my @users      = resultset('Users')->search({ status => $status }, { order_by => { -desc => "register_date" }, rows => $nr_of_rows, page => $page });
   my $count      = resultset('View::Count::StatusUser')->first;
-  
+  my @blogs      = resultset('Blog')->all();
+
   my ($all, $active, $inactive, $suspended, $pending) =
     $count->get_all_status_counts;
   my $status_count =
@@ -114,6 +117,7 @@ get '/admin/users/:status/page/:page' => sub {
   template 'admin/users/list',
     {
       users         => \@users,
+      blogs         => \@blogs,
       all           => $all, 
       active        => $active,
       inactive      => $inactive,
@@ -125,6 +129,156 @@ get '/admin/users/:status/page/:page' => sub {
       action_url    => 'admin/users/' . $status . '/page',
       pages         => $pagination->pages_in_set,
       status        => $status
+    },
+    { layout => 'admin' };
+
+};
+
+=head2 /admin/users/role/:role/page/:page
+
+List all users grouped by role
+
+=cut
+
+get '/admin/users/role/:role/page/:page' => sub {
+
+  my $nr_of_rows = 5; # Number of posts per page
+  my $page       = params->{page} || 1;
+  my $role      = params->{role};
+  my $flag;
+  if ($role eq 'admin') {
+    $flag = 1;
+  }
+    else {
+     $flag = 0; 
+  }
+
+  my @blogs = resultset ('Blog')->all();
+  my @blog_owners;
+  my @users;
+
+  for my $blog (@blogs){
+    push @blog_owners,
+    resultset('BlogOwner')->search ({ blog_id => $blog->get_column('id'), is_admin => $flag  });
+  }
+
+  for my $blog (@blog_owners){
+    my @tmp_users = map {$_->as_hashref_sanitized}
+              resultset('Users')->search({ id => $blog->get_column('user_id') });      
+    $_->{role_in_blog} = $blog->is_admin for @tmp_users;
+    push @users, @tmp_users;
+  }
+  my $all = scalar @users;
+
+  # Calculate the next and previous page link
+  my $total_pages                 = get_total_pages($all, $nr_of_rows);
+  my ($previous_link, $next_link) = get_previous_next_link($page, $total_pages, '/author/users/role/' . $role);
+
+  # Generating the pagination navigation
+  my $total_users     = $all;
+  my $posts_per_page  = $nr_of_rows;
+  my $current_page    = $page;
+  my $pages_per_set   = 7;
+  my $pagination      = generate_pagination_numbering($total_users, $posts_per_page, $current_page, $pages_per_set);
+  my @actual_users    = splice(@users,($page-1)*$nr_of_rows,$nr_of_rows);
+  
+  template 'admin/users/list',
+    {
+      users         => \@actual_users,
+      all           => $all, 
+      page          => $page,
+      next_link     => $next_link,
+      previous_link => $previous_link,
+      action_url    => 'admin/users/role/' . $role . '/page',
+      pages         => $pagination->pages_in_set,
+      role          => $role
+    },
+    { layout => 'admin' };
+
+};
+
+=head2 /admin/users/blog/:blog/:status/:role/page/:page
+
+List all users grouped by blogs name, role and status.
+
+=cut
+
+get '/admin/users/blog/:blog/:status/:role/:page/:page' => sub {
+  
+  my $nr_of_rows = 5; # Number of posts per page
+  my $page       = params->{page} || 1;
+  my $status     = params->{status};
+  my $role       = params->{role};
+  my $flag;
+  if ($role eq 'admin') {
+    $flag = 1;
+  }
+    else {
+     $flag = 0; 
+  }
+
+  my $blog       = resultset('Blog')->find({ name => params->{blog} });
+  #my $user_obj   = resultset('Users')->find_by_session(session);
+  my @blogs;
+  my @blogs2;
+  my @users;
+  my @blog_owners = resultset('BlogOwner')->all();
+  for my $blog_owner (@blog_owners){
+    push @blogs, 
+                  resultset('Blog')->search({ id => $blog_owner->get_column('blog_id'), name => params->{blog}});
+  }
+   map { $_->as_hashref } @blogs;
+
+  if ($role ne 'all' && $status ne 'all'){
+  push @blogs2,
+  resultset('BlogOwner')->search ({ blog_id => $blogs[0]->get_column('id'), status=>$status, is_admin=>$flag });
+  }
+  elsif ($role eq 'all' && $status ne 'all'){
+       push @blogs2,
+  resultset('BlogOwner')->search ({ blog_id => $blogs[0]->get_column('id'), status=>$status });
+  }
+  elsif ($role ne 'all' && $status eq 'all'){
+       push @blogs2,
+  resultset('BlogOwner')->search ({ blog_id => $blogs[0]->get_column('id'), is_admin=>$flag });
+  }
+  else {
+       push @blogs2,
+  resultset('BlogOwner')->search ({ blog_id => $blogs[0]->get_column('id') });
+  }
+
+
+  for my $blog (@blogs2){
+    my @tmp_users = map {$_->as_hashref_sanitized}
+              resultset('Users')->search({ id => $blog->get_column('user_id') });      
+    $_->{role_in_blog} = $blog->is_admin for @tmp_users;
+    push @users, @tmp_users;
+  }
+
+  my $all = scalar @users;
+
+  # Calculate the next and previous page link
+  my $total_pages                 = get_total_pages($all, $nr_of_rows);
+  my ($previous_link, $next_link) = get_previous_next_link($page, $total_pages, '/admin/users/blog/' . $blog);
+
+  # Generating the pagination navigation
+  my $total_users     = $all;
+  my $posts_per_page  = $nr_of_rows;
+  my $current_page    = $page;
+  my $pages_per_set   = 7;
+  my $pagination      = generate_pagination_numbering($total_users, $posts_per_page, $current_page, $pages_per_set);
+  my @actual_users    = splice(@users,($page-1)*$nr_of_rows,$nr_of_rows);
+ 
+  template 'admin/users/list',
+    {
+      users         => \@actual_users,
+      blogs         => \@blogs,
+      all           => $all, 
+      page          => $page,
+      next_link     => $next_link,
+      previous_link => $previous_link,
+      action_url    => 'admin/users/blog/' . params->{blog}. '/page',
+      pages         => $pagination->pages_in_set,
+      blog          => $blog->name
     },
     { layout => 'admin' };
 

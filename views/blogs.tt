@@ -62,7 +62,7 @@
                                                                     <li class="biography">[% author.biography %]</li>
                                                                 </ul>
                                                             </div>
-                                                            <div class="col-sm-3">
+                                                            <div class="col-sm-3 link-for-author">
                                                                 <a class="go-to-profile" href="/profile/author/[% author.username %]">go to profile</a>
                                                             </div>
                                                         </div>

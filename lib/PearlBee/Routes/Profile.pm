@@ -112,6 +112,11 @@ post '/profile' => sub {
 
   my $params      = body_parameters;
   my $user        = session('user');
+  unless ( $user and $user->can_do( 'update user' ) ) {
+    return template 'profile', {
+      warning => "You are not allowed to update this user"
+    }, { layout => 'admin' };
+  }
   my $res_user    = resultset('Users')->find_by_session(session);
   my $new_columns = { };
   my @message;
@@ -182,6 +187,11 @@ post '/profile-image' => sub {
   my $params   = params;
   my $file     = $params->{file};
   my $user     = session('user');
+  unless ( $user and $user->can_do( 'update user' ) ) {
+    return template 'profile', {
+      warning => "You are not allowed to update this user"
+    }, { layout => 'admin' };
+  }
   my $res_user = resultset('Users')->find_by_session(session);
   my $message;
 
@@ -246,6 +256,11 @@ post '/blog-image/:slug' => sub {
   my $params      = params;
   my $file        = $params->{file};
   my $user        = session('user');
+  unless ( $user and $user->can_do( 'update blog' ) ) {
+    return template 'blog-profile', {
+      warning => "You are not allowed to update this blog image",
+    }, { layout => 'admin' };
+  }
   my $res_user    = resultset('Users')->find_by_session(session);
   my $upload_dir  = "/" . config->{'avatar'}{'path'};
   my $folder_path = config->{user_pics};
@@ -326,6 +341,11 @@ post '/blog-image/:slug' => sub {
 post '/profile_password' => sub {
   my $params   = body_parameters;
   my $user     = session('user');
+  unless ( $user and $user->can_do( 'update user' ) ) {
+    return template 'profile', {
+      warning => "You are not allowed to update this user",
+    }, { layout => 'admin' };
+  }
   my $res_user = resultset('Users')->find_by_session(session);
   my $template_data;
 

@@ -53,7 +53,7 @@ post '/recover-password' => sub {
   if ($existing_users == 0) {
     template 'password_recovery', {
       warning => "The email does not exist in the database."
-    }; 
+    };
   }
   else {
 
@@ -84,7 +84,7 @@ post '/recover-password' => sub {
           signature => config->{'email_signature'}
         }
       });
- 
+
       PearlBee::Helpers::Email::send_email_complete({
         template => 'forgot-password.tt',
         from     => config->{'default_email_sender'},
@@ -134,9 +134,9 @@ post '/register_success' => sub {
   };
 
   unless ( $params->{'username'} ) {
-    return 
+    return
     template 'register', {
-      error => "Please provide a username",  
+      error => "Please provide a username",
       email => $params->{'email'},
       recaptcha => $rc->html(config->{plugins}{reCAPTCHA}{site_key} || $ENV{bpo_recaptcha_site_key})
     };
@@ -144,23 +144,23 @@ post '/register_success' => sub {
 
   unless ( $result->{success} || $ENV{CAPTCHA_BYPASS} ) {
     # The user entered the correct secret code
-    return 
+    return
     template 'register', {
-      error => "Make sure you introduced the captcha",  
+      error => "Make sure you introduced the captcha",
       email => $params->{'email'},
       username => $params->{'username'},
       name => $params->{'name'},
       recaptcha => $rc->html(config->{plugins}{reCAPTCHA}{site_key} || $ENV{bpo_recaptcha_site_key})
-    }; 
+    };
   }
 
   my $existing_users =
     resultset('Users')->search({ email => $params->{'email'} })->count;
   if ($existing_users > 0) {
-    return 
+    return
     template 'register', {
       warning => "An user with this email address already exists.",
-      email => $params->{'email'},  
+      email => $params->{'email'},
       username => $params->{'username'},
       name => $params->{'name'},
       recaptcha => $rc->html(config->{plugins}{reCAPTCHA}{site_key} || $ENV{bpo_recaptcha_site_key})
@@ -171,9 +171,9 @@ post '/register_success' => sub {
     resultset('Users')->search( \[ 'lower(username) = ?' =>
                                    $params->{username} ] )->count;
   if ($existing_users > 0) {
-    return 
+    return
     template 'register', {
-      warning => "The provided username is already in use.",  
+      warning => "The provided username is already in use.",
       email => $params->{'email'},
       name => $params->{'name'},
       recaptcha => $rc->html(config->{plugins}{reCAPTCHA}{site_key} || $ENV{bpo_recaptcha_site_key})
@@ -254,29 +254,32 @@ post '/register_success' => sub {
 
 # =cut
 
-# post '/oauth/:username/service/:service/service_id/:service_id' => sub {
-#   my $username   = route_parameters->{'username'};
-#   my $service    = route_parameters->{'service'};
-#   my $service_id = route_parameters->{'service_id'};
-#   my $user       = resultset('Users')->find(
-#     \[ 'lower(username) = ?' => $username ] );
-#   error "No username specified to attach a service to"
-#     unless $username;
-#   error "No service name specified to attach a service to"
-#     unless $service;
-#   error "No service ID specified to attach a service to"
-#     unless $service_id;
-#   try {
-#     my $user_oauth = resultset("Useroauth")->create(
-#       user_id    => $user->{id},
-#       service    => $service,
-#       service_id => $service_id
-#     );
-#   }
-#   catch {
-#     error "Could not assign $service ID";
-#   };
-# };
+post '/oauth/:username/service/:service/service_id/:service_id' => sub {
+  my $username   = route_parameters->{'username'};
+  my $service    = route_parameters->{'service'};
+  my $service_id = route_parameters->{'service_id'};
+  my $user       = resultset('Users')->find(
+    \[ 'lower(username) = ?' => $username ] );
+  unless ( $user and $user->can_do( 'create user_oauth' ) ) {
+    error "You are not allowed to add OpenAuth to this user";
+  }
+  error "No username specified to attach a service to"
+    unless $username;
+  error "No service name specified to attach a service to"
+    unless $service;
+  error "No service ID specified to attach a service to"
+    unless $service_id;
+  try {
+    my $user_oauth = resultset("Useroauth")->create(
+      user_id    => $user->{id},
+      service    => $service,
+      service_id => $service_id
+    );
+  }
+  catch {
+    error "Could not assign $service ID";
+  };
+};
 
 # =head2 /oauth/:service/service_id/:service_id
 
@@ -301,7 +304,7 @@ post '/register_success' => sub {
 #   catch {
 #     return to_json({ username => undef });
 #   };
-  
+
 #   return to_json({ username => $user->{username} });
 # };
 
@@ -330,11 +333,11 @@ post '/login' => sub {
     "lower(username) = ? AND (status = 'active' or status = 'inactive')",
     $username ]
   )->first;
-  
+
   if ( defined $user ) {
 
     if ( $user->validate($password) ) {
-      
+
       session user    => $user->as_hashref;
       session user_id => $user->id;
       setConnectedAccountsOntoSession();

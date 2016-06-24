@@ -179,9 +179,15 @@ get '/admin/posts/trash/:id' => sub {
 
 post '/admin/posts/add' => sub {
 
+    my $temp_user = resultset('Users')->find_by_session(session);
+    unless ( $temp_user and $temp_user->can_do( 'create post' ) ) {
+      return template 'admin/posts/add', {
+        warning => "You cannot create posts",
+      }, { layout => 'admin' };
+    }
     my @categories = resultset('Category')->all();
-    my $post;
     my @blogs      = resultset('Blog')->all();
+    my $post;
     
     try {
         
@@ -259,9 +265,13 @@ post '/admin/posts/add' => sub {
 get '/admin/posts/add' => sub {
 
   my @categories = resultset('Category')->all();
+  my @blogs = resultset('Blog')->all();
 
   template 'admin/posts/add',
-           { categories => \@categories },
+           {
+               categories => \@categories,
+               blogs      => \@blogs
+           },
            { layout => 'admin' };
 };
 =head2 edit method
@@ -322,6 +332,12 @@ get '/admin/posts/edit/:slug' => sub {
 
 post '/admin/posts/update/:id' => sub {
 
+    my $temp_user = resultset('Users')->find_by_session(session);
+    unless ( $temp_user and $temp_user->can_do( 'update post' ) ) {
+      session warning => "You cannot update a post";
+
+      redirect '/admin/posts/edit/';
+    }
     my $post_id = params->{id};
     my $post    = resultset('Post')->find({ id => $post_id });
     my $title   = params->{title};

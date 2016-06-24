@@ -17,7 +17,8 @@
         <div class="col-md-12">
       		<div class="card-design">
       			<div class="awidget-head">
-      				<h3>&nbsp;<b><i class="fa fa-commenting" aria-hidden="true"></i> {number} New Comments</b></h3>
+
+      				<h3>&nbsp;<b><i class="fa fa-commenting" aria-hidden="true"></i> [% comments.size %] New Comments</b></h3>
       			</div>
             <div class="awidget-body">
               <a href="#">Go to comments Administration</a>
@@ -31,11 +32,11 @@
         <div class="col-md-12">
           <div class="card-design">
             <div class="awidget-head">
-              <h3>&nbsp;<b> <i class="fa fa-user-plus" aria-hidden="true"></i> {number} New Invitation(s) to Join the Blog(s)</b></h3>
+              <h3>&nbsp;<b> <i class="fa fa-user-plus" aria-hidden="true"></i> [% invitation.size %] New Invitation(s) to Join the Blog(s)</b></h3>
             </div>
             <div class="awidget-body">
                 <div class="notification-text">
-                  <a href="#">{username}</a> added you as an <a href="#">{role}</a> to the <a href="#">{blogname}</a> blog.
+                  <a href="#">[% session.user.name %]</a> added you as an <a href="#">{role}</a> to the <a href="#">{blogname}</a> blog.
                   <a href="#" data-toggle="modal" data-target="#invitation_modal" class="pull-right">View Invitation</a>
                 </div>
                 <div class="notification-text">

@@ -128,45 +128,32 @@
                                     <div class="bubble">
                                         <img class="user-image" src="">
                                     </div>
-                                    [% FOREACH blog in blogs %]
                                     <div class="info-entry">
                                         <div class="user">
                                             <a class="user-name" href=""></a>
                                             <span> in </span>
                                             <a class="blog-name" href=""></a>
                                         </div>
-                                    [% END %]
                                         <div class="date">
                                         </div>
-                                        [% FOREACH category in post.post_categories %]
-                                        <div class="block_elements">
-                                            <i class="icon-list"></i> <a href=""></a>
-                                        </div>
-                                        [% END %]
                                     </div>
                                     <div class="post-heading">
                                         <h2><a href=""></a></h2>
                                     </div>
 
                                     <!-- Post cover -->
-                                    [% INCLUDE cover.tt %]
 
                                     <!-- Post content -->
                                     <div class="post_preview truncate"> 
                                         <div class="post_preview_wrapper">
-                                            <p>
-                                                [% post.content %]
-                                                [% post.content_more %]
-                                            </p>
                                         </div>
                                     </div>
 
                                     <!-- Read more -->
-                                    [% SET nr_of_comments = post.nr_of_comments %]
                                     <div class="block_elements comments-listings">
-                                        <a href="/post/[% post.slug %]#comments"> [% IF nr_of_comments == 1 %] Comment [% ELSE %] Comments [% END %] ([% nr_of_comments %])</a>
+                                        <a href=""></a>
                                     </div>
-                                    <a href="/post/[% post.slug %]" class="read-more">Read More...</a>
+                                    <a href="" class="read-more">Read More...</a>
                                 </div>
                             </div>
                         </div>

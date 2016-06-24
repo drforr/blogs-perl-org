@@ -1,247 +1,261 @@
-
-
--- default admin login user : admin
--- default admin login pass : password
-
-
+-- When a *web* user wants to perform an action, we should check whether
+-- their user class has that particular ability.
+--
+-- This has nothing to do with whether the application is allowed to write
+-- to a given table. For instance, while we have 'create tag', there is no
+-- equivalent 'create post_tag' entry. If a user is allowed to change
+-- a tag, then changing the post_tag reference is just one of the tasks that
+-- should be done.
+--
 INSERT INTO ability
-       VALUES('create blog'), ('view blog'  ),
-             ('update blog'), ('delete blog'),
-             ('create blog_category'), ('view blog_category'  ),
-             ('update blog_category'), ('delete blog_category'),
-             ('create blog_tag'), ('view blog_tag'  ),
-             ('update blog_tag'), ('delete blog_tag'),
+       VALUES -- Users should not be allowed to add their own role types.
+              -- While the ability to do this coudd come in handy, it's too
+              -- fraught with danger, especially .. say, accidentally removing
+              -- the 'superadmin' user type.
+              --
+              -- And besides, the constraints in place shouldn't allow that
+              -- to happen.
+              -- 
+              -- ('create role'), ('view role'),
+              -- ('update role'), ('delete role'),
 
-             ('create category'), ('view category'  ),
+             -- Adding a theme to what's essentially a binary selection in
+             -- the application means more changes than just adding a row.
+             --
+             -- ('create theme'), ('view theme'),
+             -- ('update theme'), ('delete theme'),
+
+             ('create users'), ('view users'),
+             ('update users'), ('delete users'),
+
+             -- ('create oauth'), ('view oauth'),
+             -- ('update oauth'), ('delete oauth'),
+
+             ('create user_oauth'), ('view user_oauth'),
+             ('update user_oauth'), ('delete user_oauth'),
+
+             -- It might be useful to let admins and superadmins see what
+             -- permissions are available, but that's a long-term feature.
+             --
+             -- ('create ability'), ('view ability'),
+             -- ('update ability'), ('delete ability'),
+             --
+             -- ('create acl'), ('view acl'),
+             -- ('update acl'), ('delete acl'),
+
+             ('create blog'), ('view blog'),
+             ('update blog'), ('delete blog'),
+
+             ('create blog_owners'), ('view blog_owners'),
+             ('update blog_owners'), ('delete blog_owners'),
+
+             ('create category'), ('view category'),
              ('update category'), ('delete category'),
 
-             ('create comment'), ('view comment'  ),
-             ('update comment'), ('delete comment'),
+             -- If a user updates a category, the application is responsible
+             -- for updating the rest of the database, not the user.
+             --
+             -- ('create blog_categories'), ('view blog_categories'),
+             -- ('update blog_categories'), ('delete blog_categories'),
 
-             ('create page'), ('view page'  ),
-             ('update page'), ('delete page'),
-             ('create page_category'), ('view page_category'  ),
-             ('update page_category'), ('delete page_category'),
-             ('create page_tag'), ('view page_tag'  ),
-             ('update page_tag'), ('delete page_tag'),
+             -- Adding a post format is more complex than updating a table,
+             -- and is something that the application maintainer has to do.
+             -- Users shouldn't be manipulating this table at all.
+             --
+             -- ('create post_format'), ('view post_format'),
+             -- ('update post_format'), ('delete post_format'),
 
-             ('create post'), ('view post'  ),
+             ('create post'), ('view post'),
              ('update post'), ('delete post'),
-             ('create post_category'), ('view post_category'  ),
-             ('update post_category'), ('delete post_category'),
-             ('create post_tag'), ('view post_tag'  ),
-             ('update post_tag'), ('delete post_tag'),
 
-             ('create profile'), ('view profile'  ),
-             ('update profile'), ('delete profile'),
+             ('create page'), ('view page'),
+             ('update page'), ('delete page'),
 
-             ('create tag'), ('view tag'  ),
+             -- Not sure where this is getting used, it may be removed.
+             --
+             ('create asset'), ('view asset'),
+             ('update asset'), ('delete asset'),
+
+             -- If a user changes a category, the application is responsible
+             -- for updating the rest of the database, not the user.
+             --
+             -- ('create post_category'), ('view post_category'),
+             -- ('update post_category'), ('delete post_category'),
+             --
+             -- ('create page_category'), ('view page_category'),
+             -- ('update page_category'), ('delete page_category'),
+
+             ('create tag'), ('view tag'),
              ('update tag'), ('delete tag'),
 
-             ('create user'), ('view user'  ),
-             ('update user'), ('delete user')
+             -- If a user changes a tag, the application is responsible
+             -- for updating the rest of the database, not the user.
+             --
+             -- ('create post_tag'), ('view post_tag'),
+             -- ('update post_tag'), ('delete post_tag'),
+             --
+             -- ('create page_tag'), ('view page_tag'),
+             -- ('update page_tag'), ('delete page_tag'),
+
+             ('create comment'), ('view comment'),
+             ('update comment'), ('delete comment'),
+
+             -- Adding a notification type is more complex than updating this
+             -- table, and is something that the application maintainer has to
+             -- do.
+             -- ('create notification_type'), ('view notification_type'),
+             -- ('update notification_type'), ('delete notification_type'),
+
+             -- Notifications are created by the application, not by the
+             -- individual user. While they can mark a notification as being
+             -- read, it's the application's responsibility to update the
+             -- actual data.
+             --
+             -- ('create notification'), ('view notification'),
+             -- ('update notification'), ('delete notification'),
+
+             ('create settings'), ('view settings'),
+             ('update settings'), ('delete settings'),
 ;
 
 
-INSERT INTO role VALUES('admin'),
+-- Users with the 'superadmin' role have the ability to do anything on the
+-- site.
+--
+-- Admins have the ability to administrate their own blog(s), edit posts,
+-- clean up spam comments and such.
+--
+-- Authors have the ability to edit their own blogs, posts and comments.
+--
+-- Visitors can view contents, but not edit anything
+--
+INSERT INTO role VALUES('superadmin'),
+                       ('admin'),
                        ('author'),
                        ('visitor');
 
 
+-- The ACL table details exactly the rights each class of user has.
+-- We could make this hierarchical, but there's really no need to make this
+-- that complicated.
+--
 INSERT INTO acl VALUES
-       ('admin','create blog'),
-       ('admin','view blog'  ),
-       ('admin','update blog'),
-       ('admin','delete blog'),
-       ('admin','create blog_category'),
-       ('admin','view blog_category'  ),
-       ('admin','update blog_category'),
-       ('admin','delete blog_category'),
-       ('admin','create blog_tag'),
-       ('admin','view blog_tag'  ),
-       ('admin','update blog_tag'),
-       ('admin','delete blog_tag'),
+             -- Superadmins should have the power to do everything.
+             --
+             ('superadmin','create users'), ('superadmin','view users'),
+             ('superadmin','update users'), ('superadmin','delete users'),
 
-       ('admin','create category'),
-       ('admin','view category'  ),
-       ('admin','update category'),
-       ('admin','delete category'),
+             ('superadmin','create oauth'), ('superadmin','view oauth'),
+             ('superadmin','update oauth'), ('superadmin','delete oauth'),
 
-       ('admin','create comment'),
-       ('admin','view comment'  ),
-       ('admin','update comment'),
-       ('admin','delete comment'),
+             ('superadmin','create user_oauth'), ('superadmin','view user_oauth'),
+             ('superadmin','update user_oauth'), ('superadmin','delete user_oauth'),
 
-       ('admin','create page'),
-       ('admin','view page'  ),
-       ('admin','update page'),
-       ('admin','delete page'),
-       ('admin','create page_category'),
-       ('admin','view page_category'  ),
-       ('admin','update page_category'),
-       ('admin','delete page_category'),
-       ('admin','create page_tag'),
-       ('admin','view page_tag'  ),
-       ('admin','update page_tag'),
-       ('admin','delete page_tag'),
+             ('superadmin','create blog'), ('superadmin','view blog'),
+             ('superadmin','update blog'), ('superadmin','delete blog'),
 
-       ('admin','create post'),
-       ('admin','view post'  ),
-       ('admin','update post'),
-       ('admin','delete post'),
-       ('admin','create post_category'),
-       ('admin','view post_category'  ),
-       ('admin','update post_category'),
-       ('admin','delete post_category'),
-       ('admin','create post_tag'),
-       ('admin','view post_tag'  ),
-       ('admin','update post_tag'),
-       ('admin','delete post_tag'),
+             ('superadmin','create blog_owners'), ('superadmin','view blog_owners'),
+             ('superadmin','update blog_owners'), ('superadmin','delete blog_owners'),
 
-       ('admin','create profile'),
-       ('admin','view profile'  ),
-       ('admin','update profile'),
-       ('admin','delete profile'),
+             ('superadmin','create category'), ('superadmin','view category'),
+             ('superadmin','update category'), ('superadmin','delete category'),
 
-       ('admin','create tag'),
-       ('admin','view tag'  ),
-       ('admin','update tag'),
-       ('admin','delete tag'),
+             ('superadmin','create post'), ('superadmin','view post'),
+             ('superadmin','update post'), ('superadmin','delete post'),
 
-       ('admin','create user'),
-       ('admin','view user'  ),
-       ('admin','update user'),
-       ('admin','delete user'),
+             ('superadmin','create page'), ('superadmin','view page'),
+             ('superadmin','update page'), ('superadmin','delete page'),
 
+             -- Not sure where this is getting used, it may be removed.
+             --
+             ('superadmin','create asset'), ('superadmin','view asset'),
+             ('superadmin','update asset'), ('superadmin','delete asset'),
 
-       ('author','create blog'),
-       ('author','view blog'  ),
-       ('author','update blog'),
-       ('author','delete blog'),
-       ('author','create blog_category'),
-       ('author','view blog_category'  ),
-       ('author','update blog_category'),
-       ('author','delete blog_category'),
-       ('author','create blog_tag'),
-       ('author','view blog_tag'  ),
-       ('author','update blog_tag'),
-       ('author','delete blog_tag'),
+             ('superadmin','create tag'), ('superadmin','view tag'),
+             ('superadmin','update tag'), ('superadmin','delete tag'),
 
-       ('author','create category'),
-       ('author','view category'  ),
-       ('author','update category'),
-       ('author','delete category'),
+             ('superadmin','create comment'), ('superadmin','view comment'),
+             ('superadmin','update comment'), ('superadmin','delete comment'),
 
-       ('author','create comment'),
-       ('author','view comment'  ),
-       ('author','update comment'),
-       ('author','delete comment'),
+             ('superadmin','create settings'), ('superadmin','view settings'),
+             ('superadmin','update settings'), ('superadmin','delete settings'),
 
-       ('author','create page'),
-       ('author','view page'  ),
-       ('author','update page'),
-       ('author','delete page'),
-       ('author','create page_category'),
-       ('author','view page_category'  ),
-       ('author','update page_category'),
-       ('author','delete page_category'),
-       ('author','create page_tag'),
-       ('author','view page_tag'  ),
-       ('author','update page_tag'),
-       ('author','delete page_tag'),
+             -- Admins have the rights to do almost everything on the site.
+             --
+             ('admin','create blog'), ('admin','view blog'),
+             ('admin','update blog'), ('admin','delete blog'),
 
-       ('author','create post'),
-       ('author','view post'  ),
-       ('author','update post'),
-       ('author','delete post'),
-       ('author','create post_category'),
-       ('author','view post_category'  ),
-       ('author','update post_category'),
-       ('author','delete post_category'),
-       ('author','create post_tag'),
-       ('author','view post_tag'  ),
-       ('author','update post_tag'),
-       ('author','delete post_tag'),
+             ('admin','create blog_owners'), ('admin','view blog_owners'),
+             ('admin','update blog_owners'), ('admin','delete blog_owners'),
 
-       ('author','create profile'),
-       ('author','view profile'  ),
-       ('author','update profile'),
-       ('author','delete profile'),
+             ('admin','create category'), ('admin','view category'),
+             ('admin','update category'), ('admin','delete category'),
 
-       ('author','create tag'),
-       ('author','view tag'  ),
-       ('author','update tag'),
-       ('author','delete tag'),
+             ('admin','create post'), ('admin','view post'),
+             ('admin','update post'), ('admin','delete post'),
 
-       -- ('author','create user'),
-       -- ('author','view user'  ),
-       -- ('author','update user'),
-       -- ('author','delete user'),
+             ('admin','create page'), ('admin','view page'),
+             ('admin','update page'), ('admin','delete page'),
 
+             -- Not sure where this is getting used, it may be removed.
+             --
+             ('admin','create asset'), ('admin','view asset'),
+             ('admin','update asset'), ('admin','delete asset'),
 
-       -- ('visitor','create blog'),
-       ('visitor','view blog'  ),
-       -- ('visitor','update blog'),
-       -- ('visitor','delete blog'),
-       -- ('visitor','create blog_category'),
-       ('visitor','view blog_category'  ),
-       -- ('visitor','update blog_category'),
-       -- ('visitor','delete blog_category'),
-       -- ('visitor','create blog_tag'),
-       ('visitor','view blog_tag'  ),
-       -- ('visitor','update blog_tag'),
-       -- ('visitor','delete blog_tag'),
+             ('admin','create tag'), ('admin','view tag'),
+             ('admin','update tag'), ('admin','delete tag'),
 
-       -- ('visitor','create category'),
-       ('visitor','view category'  ),
-       -- ('visitor','update category'),
-       -- ('visitor','delete category'),
+             ('admin','create comment'), ('admin','view comment'),
+             ('admin','update comment'), ('admin','delete comment'),
 
-       -- ('visitor','create comment'),
-       ('visitor','view comment'  ),
-       -- ('visitor','update comment'),
-       -- ('visitor','delete comment'),
+             -- Authors also have the rights to do almost everything on the
+             -- site.
+             --
+             ('author','create blog'), ('author','view blog'),
+             ('author','update blog'), ('author','delete blog'),
 
-       -- ('visitor','create page'),
-       ('visitor','view page'  ),
-       -- ('visitor','update page'),
-       -- ('visitor','delete page'),
-       -- ('visitor','create page_category'),
-       ('visitor','view page_category'  ),
-       -- ('visitor','update page_category'),
-       -- ('visitor','delete page_category'),
-       -- ('visitor','create page_tag'),
-       ('visitor','view page_tag'  ),
-       -- ('visitor','update page_tag'),
-       -- ('visitor','delete page_tag'),
+             -- Except add or remove authors on the blog, only admins are
+             -- allowed.
+             --
+             ('author','view blog_owners'),
 
-       -- ('visitor','create post'),
-       ('visitor','view post'  ),
-       -- ('visitor','update post'),
-       -- ('visitor','delete post'),
-       -- ('visitor','create post_category'),
-       ('visitor','view post_category'  ),
-       -- ('visitor','update post_category'),
-       -- ('visitor','delete post_category'),
-       -- ('visitor','create post_tag'),
-       ('visitor','view post_tag'  ),
-       -- ('visitor','update post_tag'),
-       -- ('visitor','delete post_tag'),
+             ('author','create category'), ('author','view category'),
+             ('author','update category'), ('author','delete category'),
 
-       -- ('visitor','create profile'),
-       ('visitor','view profile'  ),
-       -- ('visitor','update profile'),
-       -- ('visitor','delete profile'),
+             ('author','create post'), ('author','view post'),
+             ('author','update post'), ('author','delete post'),
 
-       -- ('visitor','create tag'),
-       ('visitor','view tag'  ),
-       -- ('visitor','update tag'),
-       -- ('visitor','delete tag'),
+             ('author','create page'), ('author','view page'),
+             ('author','update page'), ('author','delete page'),
 
-       -- ('visitor','create user'),
-       ('visitor','view user'  )
-       -- ('visitor','update user'),
-       -- ('visitor','delete user')
+             -- Not sure where this is getting used, it may be removed.
+             --
+             ('author','create asset'), ('author','view asset'),
+             ('author','update asset'), ('author','delete asset'),
+
+             ('author','create tag'), ('author','view tag'),
+             ('author','update tag'), ('author','delete tag'),
+
+             ('author','create comment'), ('author','view comment'),
+             ('author','update comment'), ('author','delete comment'),
+
+             -- Visitors have the rights to view content, but not edit it.
+             --
+             ('visitor','view blog'),
+
+             ('visitor','view category'),
+
+             ('visitor','view post'),
+
+             ('visitor','view page'),
+
+             -- Not sure where this is getting used, it may be removed.
+             --
+             ('visitor','view asset'),
+
+             ('visitor','view tag'),
+
+             ('visitor','view comment')
 ;
 
 
@@ -265,17 +279,18 @@ INSERT INTO theme VALUES('light'),
 ;
 
 
-INSERT INTO oauth VALUES('LinekdIn'),
+INSERT INTO oauth VALUES('LinkedIn'),
                         ('Facebook'),
                         ('GitHub'),
-                        ('Twitter')
+                        ('Twitter'),
+                        ('Google')
 ;
 
+-- The administrator user should be created using the scripts/mkpasswd tool,
+-- this way the default configuration doesn't leave the application open to
+-- exploits because of a plaintext user/password.
 --
--- Administrator users are created during the import
---
-
--- INSERT INTO users VALUES (1,'Admin','admin','ddd8f33fbc8fd3ff70ea1d3768e7c5c151292d3a8c0972','2015-02-18 15:27:54','admin@admin.com',NULL,NULL,'admin',NULL,'active');
+-- INSERT INTO users VALUES (1,'Admin','admin','XXX','2015-02-18 15:27:54','admin@admin.com',NULL,NULL,'admin',NULL,'active');
 	
 -- INSERT INTO category VALUES (1,'Uncategorized','uncategorized',1);
 

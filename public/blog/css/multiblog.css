@@ -56,8 +56,6 @@
 }
 #author-modal .row{
     margin-bottom: 35px;
-    border-bottom: 1px solid red;
-    border-top: 1px solid red;
 }
 #author-modal ul li a.author-info{
     text-transform: uppercase;
@@ -70,4 +68,17 @@
     -webkit-border-radius: 50%;
     -moz-border-radius: 50%;
     border-radius: 50%;
+}
+#author-modal li.biography{
+    list-style: none;
+    max-height: 70px;
+    overflow-y: auto;
+    line-height: 25px;
+}
+#author-modal .link-for-author{
+    height: 40px;
+    line-height: 80px;
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bold;
 }

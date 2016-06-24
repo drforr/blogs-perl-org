@@ -36,7 +36,6 @@ get '/admin/notification' => sub {
       { order_by => { -desc => 'created_date' } }
 
     );
-
   template 'admin/notification/notification',
     {
       comments   => \@comment_notifications,
