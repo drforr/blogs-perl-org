@@ -11,6 +11,7 @@ use Dancer2::Plugin::DBIC;
 use PearlBee::Helpers::Util qw(map_posts);
 use PearlBee::Helpers::Notification_Email;
 use PearlBee::Helpers::Pagination qw(get_total_pages get_previous_next_link);
+use DateTime::TimeZone;
 
 our $VERSION = '0.1';
 
@@ -33,17 +34,22 @@ get '/users/:username' => sub {
 get '/blogs/user/:username/slug/:slug' => sub {
 
   my $num_user_posts = config->{blogs}{user_posts} || 10;
-  my $slug = route_parameters->{slug};
+  my $slug        = route_parameters->{'slug'};
   my $username    = route_parameters->{'username'};
   my ( $user )    = resultset('Users')->match_lc( $username );
   unless ($user) {
-    error "No such user '$username'";
+    return error "No such user '$username'";
   }
-  my @authors;
-  my @posts       = resultset('Post')->search_published({ 'user_id' => $user->id }, { order_by => { -desc => "created_date" }, rows => $num_user_posts });
-  my $nr_of_posts = resultset('Post')->search_published({ 'user_id' => $user->id })->count;
-  my @tags        = resultset('View::PublishedTags')->all();
-  my @categories  = resultset('View::PublishedCategories')->search({ name => { '!=' => 'Uncategorized'} });
+  my ( $searched_blog ) = resultset('Blog')->find_by_slug_uid({
+    slug => $slug, user_id => $user->id
+  });
+  my @posts       = resultset('Post')->search_published(
+    { 'user_id' => $user->id },
+    { order_by => { -desc => "created_date" }, rows => $num_user_posts }
+  );
+  my $nr_of_posts = resultset('Post')->search_published({
+    'user_id' => $user->id
+  })->count;
 
   # extract demo posts info
   my @mapped_posts = map_posts(@posts);
@@ -61,39 +67,26 @@ get '/blogs/user/:username/slug/:slug' => sub {
   my @blog_owners = resultset('BlogOwner')->search({ user_id => $user->id });
   my @blogs;
   for my $blog_owner ( @blog_owners ) {
-    push @blogs, 
-                 resultset('Blog')->find({ id => $blog_owner->blog_id });
+    push @blogs, resultset('Blog')->find({ id => $blog_owner->blog_id });
   }
   
-  my $blog;
-  for my $iterator (@blogs){
-  $blog = resultset('Blog')->find({slug => $slug, id=> $iterator->id});
-  }
-  my $searched_blog = resultset('BlogOwner')->find ({blog_id => $blog->id});
-  my @aux_authors = resultset('BlogOwner')->search({ blog_id => $searched_blog->get_column('blog_id') });
+  my @aux_authors = $searched_blog->contributors;
 
-
-  foreach my $iterator (@aux_authors){
-    push @authors, map { $_->as_hashref_sanitized } 
-                   resultset('Users')->search({ id => $iterator->get_column('user_id') });
-  }
-  map { $_->as_hashref_sanitized } @blogs;
-  # Extract all posts with the wanted category
-
+  $searched_blog = $searched_blog->as_hashref_sanitized if $searched_blog;
+  my @authors = map { $_->as_hashref_sanitized } @aux_authors;
 
   template 'blogs',
       {
         posts          => \@mapped_posts,
-        tags           => \@tags,
         page           => 1,
-        categories     => \@categories,
         total_pages    => $total_pages,
         next_link      => $next_link,
         previous_link  => $previous_link,
         posts_for_user => $username,
         blogs          => \@blogs,
         user           => $user,
-        authors        => \@authors
+        authors        => \@authors,
+        searched_blog  => $searched_blog
     };
 };
 
@@ -231,7 +224,13 @@ post '/create-blog' => sub{
 
 get 'admin/create-blog' => sub{
       my @blogs    = resultset('Blog')->all();
-      template 'admin/blogs/add',{blogs => \@blogs}, { layout => 'admin' };
+      my @timezones = DateTime::TimeZone->all_names;
+      template 'admin/blogs/add',
+      {
+        blogs => \@blogs,
+        timezones => \@timezones
+      },
+      { layout => 'admin' };
 };
 
 =head2 author/create-blog
@@ -285,7 +284,7 @@ post '/add-contributor/blog/:slug/email/:email/role/:role' => sub {
             # created_date defaults cleanly
             activation_key => $token,
         });
-	my $notification = resultset('Notification')->create_invitation({
+  my $notification = resultset('Notification')->create_invitation({
             blog_id => $blog_id,
             user_id => $user_id
         });

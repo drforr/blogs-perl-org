@@ -104,3 +104,9 @@ posts_on_page:         5
 blogs_on_page:         5
 search:
   user_posts: 10
+
+# API parameters
+api:  
+  notification:  
+    comment:
+      max_rows: 5 # Maximum number of rows to return at any time

@@ -172,10 +172,10 @@ Return a non-blessed version of a category database row
 sub as_hashref {
   my ($self)        = @_;
   my $category_href = {
-    id      => $self->id,
-    name    => $self->name,
-    slug    => $self->slug,
-    user_id => $self->user_id,
+    id            => $self->id,
+    name          => $self->name,
+    slug          => $self->slug,
+    user_id       => $self->user_id,
   };          
               
   return $category_href;

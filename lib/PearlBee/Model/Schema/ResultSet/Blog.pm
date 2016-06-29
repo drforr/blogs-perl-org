@@ -37,4 +37,31 @@ sub search_lc {
                   search( \[ "lower(name) like '\%$lc_tag\%'" ] );
 }
 
+=head2 find_by_slug_uid({ user_id => $user_id, slug => $slug_name })
+
+Search for a blog by slug and user ID. Multiple blogs can reuse the same slug
+name, and in fact most will, so really (slug, user_id) are the proper key to
+search on.
+
+=cut
+
+sub find_by_slug_uid {
+  my ($self, $args) = @_;
+  my $slug          = $args->{slug};
+  my $user_id       = $args->{user_id};
+
+  my $schema = $self->result_source->schema;
+  my %blog_ids = map {
+    $_->blog_id => 1
+  } $schema->resultset('BlogOwner')->search({ user_id => $user_id });
+
+  my @blogs = map { $schema->resultset('Blog')->find({ id => $_ }) }
+                  keys %blog_ids;
+  my @found_blogs = grep {
+    $_->slug eq $slug
+  } @blogs;
+
+  return @found_blogs;
+}
+
 1;

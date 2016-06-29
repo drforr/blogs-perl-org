@@ -128,7 +128,6 @@ get '/author/comments/blog/:blog/:status/page/:page' => sub {
   my $user       = resultset('Users')->find_by_session(session);
   my @blog_posts = resultset('BlogPost')->search({ blog_id => $blog_ref->get_column('id')});
   my @comments;
-  my @actual_comments;
 
   if ($status eq ('all') ){
     foreach my $blog_post (@blog_posts){
