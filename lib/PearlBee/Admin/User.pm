@@ -418,6 +418,13 @@ Add a new user
 
 any '/admin/users/add' => sub {
 
+  my $res_user = resultset('Users')->find_by_session(session);
+  unless ( $res_user and $res_user->can_do( 'create user' ) ) {
+    warn "***** Redirecting guest away from /admin/users/add";
+    return template 'admin/users/add', {
+       message => "You are not allowed to create users, please create an account",
+    }, { layout => 'admin' };
+  }
   if ( params->{username} ) {
 
     try {

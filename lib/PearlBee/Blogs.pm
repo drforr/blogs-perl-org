@@ -199,9 +199,12 @@ post '/create-blog' => sub{
   my $params   = body_parameters;
   my $user     = resultset('Users')->find_by_session(session);
   unless ( $user and $user->can_do( 'create blog' ) ) {
-    my $id = $user->id;
-    log "User ID $user tried to create a blog";
-    return;
+    if ( $user->id ) {
+      my $id = $user->id;
+      log "User ID $user tried to create a blog";
+    }
+    warn "***** Redirecting guest away from /create-blog";
+    redirect '/'
   }
   my $blog     = resultset('Blog')->create_with_slug({
     name         => $params->{name},
@@ -223,7 +226,7 @@ post '/create-blog' => sub{
 =cut
 
 get 'admin/create-blog' => sub{
-      my @blogs    = resultset('Blog')->all();
+      my @blogs     = resultset('Blog')->all();
       my @timezones = DateTime::TimeZone->all_names;
       template 'admin/blogs/add',
       {
@@ -260,6 +263,7 @@ get 'author/create-blog' => sub{
 post '/add-contributor/blog/:slug/email/:email/role/:role' => sub {
     my $user    = resultset('Users')->find_by_session(session);
     unless ( $user and $user->can_do('create blog_owner') ) {
+      warn "***** Redirecting guest away from /add-contributor/blog/:slug/email/:email/role/:role";
       return template 'blog-profile', {
         warning => "You are not allowed to add a contributor to this blog",
       }, { layout => 'admin' };
@@ -284,7 +288,7 @@ post '/add-contributor/blog/:slug/email/:email/role/:role' => sub {
             # created_date defaults cleanly
             activation_key => $token,
         });
-  my $notification = resultset('Notification')->create_invitation({
+	my $notification = resultset('Notification')->create_invitation({
             blog_id => $blog_id,
             user_id => $user_id
         });

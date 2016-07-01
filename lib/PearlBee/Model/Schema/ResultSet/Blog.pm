@@ -29,6 +29,39 @@ sub create_with_slug {
   });
 }
 
+=head2 search_by_user_id_and_slug({ user_id => 'drforr', slug => 'hi' })
+
+sub search_by_user_id_and_slug {
+  my ($self, $args) = @_;
+  my $slug    = $args->{slug};
+  my $user_id = $args->{user_id};
+  my $schema  = $self->result_source->schema;
+
+  my @matching_pairs = $schema->resultset('BlogOwners')->search({
+    user_id => $user_id
+  });
+  unless ( @matching_pairs ) {
+    warn "*** Could not find blog owner for user ID $user_id";
+    return;
+  }
+  my @matching_blogs = map {
+    $schema->resultset('Blog')->search({ id => $_->blog_id }) 
+  } @matching_pairs;
+  unless ( @matching_blogs ) {
+    warn "*** Could not find matching blog IDs for user ID $user_id";
+    return;
+  }
+  my $final_blog = grep {
+    $_->slug eq $slug
+  } @matching_blogs;
+  unless ( $final_blog ) {
+    warn "*** Could not find blog ID with slug '$slug' for user ID $user_id";
+    return;
+  }
+
+  return $final_blog;
+}
+
 sub search_lc {
   my ($self, $tag) = @_;
   my $schema = $self->result_source->schema;

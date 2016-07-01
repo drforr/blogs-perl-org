@@ -61,6 +61,7 @@ post '/admin/tags/add' => sub {
 
   my $temp_user = resultset('Users')->find_by_session(session);
   unless ( $temp_user and $temp_user->can_do( 'create tag' ) ) {
+    warn "***** Redirecting guest away from /admin/tags/add";
     return template 'admin/tags/list', {
       warning => "You are not allowed to create tags",
     }, { layout => 'admin' };
@@ -106,8 +107,14 @@ Delete method
 
 get '/admin/tags/delete/:id' => sub {
 
-  my $tag_id = params->{id};
-  my $tag    = resultset('Tag')->find( $tag_id );
+  my $tag_id   = params->{id};
+  my $tag      = resultset('Tag')->find( $tag_id );
+  my $res_user = resultset('Users')->find_by_session(session);
+  unless ( $res_user and $res_user->can_do( 'delete tag' ) ) {
+    warn "***** Redirecting guest away from /admin/tags/delete/:id";
+    info "You are not allowed to delete tags, please create an account";
+    redirect '/admin/tags';
+  }
 
   # Delete first all many to many dependecies for safly removal of the isolated tag
   try {
@@ -137,6 +144,17 @@ any '/admin/tags/edit/:id' => sub {
   my $tag_id = params->{id};
   my @tags   = resultset('Tag')->all;
   my $tag    = resultset('Tag')->find( $tag_id );
+  my $res_user         = resultset('Users')->find_by_session(session);
+  unless ( $res_user and $res_user->can_do( 'update tag' ) ) {
+    warn "***** Redirecting guest away from /admin/tags/edit/:id";
+    template 'admin/tags/list',
+      {
+      message => "You are not allowed to update tags, please create an account",
+      tag  => $tag,
+      tags => \@tags
+      },
+      { layout => 'admin' };
+  }
 
   my $name = params->{name};
   my $slug = string_to_slug( params->{slug} );

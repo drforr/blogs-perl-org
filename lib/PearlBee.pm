@@ -15,6 +15,7 @@ use Digest::SHA;
 use PearlBee::Blogs;
 
 use PearlBee::Routes::Avatar;
+use PearlBee::Routes::BlogAvatar;
 use PearlBee::Routes::Notification;
 use PearlBee::Routes::Profile;
 use PearlBee::Routes::Post;
@@ -47,6 +48,11 @@ use PearlBee::Helpers::Email qw(send_email_complete);
 use PearlBee::Helpers::Util qw(generate_crypted_filename map_posts create_password);
 use PearlBee::Helpers::Pagination qw(get_total_pages get_previous_next_link);
 use PearlBee::Password;
+
+# Instead of putting API references in the main package, just use this
+# API collection.
+#
+use PearlBee::API;
 
 our $VERSION = '0.1';
 use Data::Dumper;

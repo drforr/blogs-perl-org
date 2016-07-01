@@ -125,9 +125,14 @@ publish method
 
 get '/author/posts/publish/:id' => sub {
   
-  my $post_id = params->{id};
-  my $post    = resultset('Post')->find($post_id);
-  my $user    = session('user');
+  my $post_id  = params->{id};
+  my $post     = resultset('Post')->find($post_id);
+  my $user     = session('user');
+  my $user_obj = resultset('Users')->find_by_session(session);
+  unless ( $user_obj and $user_obj->can_do( 'update post' ) ) {
+    warn "***** Redirecting guest away from /author/posts/publish/:id";
+    return redirect '/author/posts';
+  }
 
   try {
     $post->publish($user);
@@ -148,9 +153,14 @@ draft method
 
 get '/author/posts/draft/:id' => sub {
 
-  my $post_id = params->{id};
-  my $post    = resultset('Post')->find($post_id);
-  my $user    = session('user');
+  my $post_id  = params->{id};
+  my $post     = resultset('Post')->find($post_id);
+  my $user     = session('user');
+  my $user_obj = resultset('Users')->find_by_session(session);
+  unless ( $user_obj and $user_obj->can_do( 'update post' ) ) {
+    warn "***** Redirecting guest away from /author/posts/draft/:id";
+    return redirect '/author/posts';
+  }
 
   try {
     $post->draft($user);
@@ -174,6 +184,11 @@ get '/author/posts/trash/:id' => sub {
   my $post_id = params->{id};
   my $post    = resultset('Post')->find($post_id);
   my $user    = session('user');
+  my $user_obj = resultset('Users')->find_by_session(session);
+  unless ( $user_obj and $user_obj->can_do( 'update post' ) ) {
+    warn "***** Redirecting guest away from /author/posts/trash/:id";
+    return redirect '/author/posts';
+  }
 
   eval { $post->trash($user); };
 
@@ -192,22 +207,20 @@ post '/author/posts/add' => sub {
   my $user_obj         = resultset('Users')->find_by_session(session);
   my @categories       = resultset('Category')->all();
   unless ( $user_obj and $user_obj->can_do( 'create post' ) ) {
-    return template 'admin/posts/add', {
-      categories => \@categories,
-      warning => "You are not allowed to create posts.",
-    }, { layout => 'admin' };
+    warn "***** Redirecting guest away from /author/posts/add";
+    redirect '/author/posts';
   }
   my ($slug, $changed) = resultset('Post')->check_slug( params->{slug} );
+  my @blog_owners      = resultset('BlogOwner')->search({ user_id => $user_obj->id });
   my $post;
   my $cover_filename;
   my @blogs;
   my $blog;
-  my @blog_owners = resultset('BlogOwner')->search({ user_id => $user_obj->id });
   
   for my $blog_owner ( @blog_owners ) {
-  push @blogs, map { $_->as_hashref }
-                   resultset('Blog')->search({ id => $blog_owner->blog_id });
-                 }
+    push @blogs, map { $_->as_hashref }
+                 resultset('Blog')->search({ id => $blog_owner->blog_id });
+  }
 
   $blog = $blogs[0];  
   session warning => 'The slug was already taken but we generated a similar slug for you! Feel free to change it as you wish.' if ($changed);
@@ -299,6 +312,10 @@ get '/author/posts/edit/:slug' => sub {
   # Check if the author has enough permissions for editing this post
   my $user     = session('user');
   my $user_obj = resultset('Users')->find_by_session(session);
+  unless ( $user and $user->can_do( 'update post' ) ) {
+    warn "***** Redirecting guest away from /author/posts/edit/:slug";
+    return redirect '/author/posts';
+  }
   $user->{id}  = $user_obj->id;
   redirect '/author/posts' if ( !$post->is_authorized( $user ) );
   
@@ -352,6 +369,7 @@ post '/author/posts/update/:id' => sub {
 
   my $temp_user = resultset('Users')->find_by_session(session);
   unless ( $temp_user and $temp_user->can_do( 'update post' ) ) {
+    warn "***** Redirecting guest away from /author/posts/update/:id";
     redirect '/author/posts/edit/';
   }
   my $post_id   = params->{id};
@@ -379,18 +397,16 @@ post '/author/posts/update/:id' => sub {
           $cover->copy_to( config->{covers_folder} . $crypted_filename . $ext );
       }
       
-      my $user              = session('user');
-
+      my $user   = session('user');
       my $status = params->{status};
-      $post->update(
-          {
+
+      $post->update({
               title   => $title,
               slug    => $slug,
               cover   => ($crypted_filename) ? $crypted_filename . $ext : $post->cover,
               status  => $status,
               content => $content,
-          }
-      );
+      });
 
       # Reconnect the categories with the new one and delete the old ones
         resultset('PostCategory')->connect_categories( params->{categories}, $post->id, $user->{id} );

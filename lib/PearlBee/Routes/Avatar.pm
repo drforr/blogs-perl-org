@@ -14,42 +14,6 @@ our $VERSION = '0.1';
 get '/avatar-light' => sub { config->{'avatar'}{'default'}{'light'} };
 get '/avatar-dark'  => sub { config->{'avatar'}{'default'}{'dark'}  };
 
-=head2 /avatar/blog/:slug
-
-Per-blog avatar
-
-=cut
-
-get '/avatar/blog/:username/slug/:slug' => sub {
-
-  my $username      = route_parameters->get('username');
-  my $slug          = route_parameters->get('slug');
-  my $theme         = session( 'theme' ) || 'dark';
-  my $user          = resultset('Users')->find({ username => $username });
-  my $avatar_config = config->{'avatar'};
-  my $avatar_path   = $avatar_config->{'default'}{'dark'};
-
-  if ( $user ) {
-    my $avatar_config = config->{'avatar'};
-    my @blog_owners =
-      resultset('BlogOwner')->search({ user_id => $user->id });
-    my ( $blog ) = grep { $_->slug eq $slug }
-                   map  { resultset('Blog')->find({ id => $_->blog_id }) }
-                        @blog_owners;
-
-    if ( $blog and $blog->avatar_path ne '' ) {
-      my $path = $blog->avatar_path;
-      $avatar_path = $path if -e "public/$path";
-    }
-
-    send_file $avatar_path;
-  }
-  elsif ( $theme and $theme eq 'light' ) {
-    $avatar_path = $avatar_config->{'default'}{'light'}
-  }
-
-};
-
 =head2 /avatar/:combo-breaker/:username
 
 Blog assets - XXX this should be managed by nginx or something.

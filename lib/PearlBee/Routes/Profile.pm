@@ -113,6 +113,7 @@ post '/profile' => sub {
   my $params      = body_parameters;
   my $user        = session('user');
   unless ( $user and $user->can_do( 'update user' ) ) {
+    warn "***** Redirecting guest away from /profile";
     return template 'profile', {
       warning => "You are not allowed to update this user"
     }, { layout => 'admin' };
@@ -188,6 +189,7 @@ post '/profile-image' => sub {
   my $file     = $params->{file};
   my $user     = session('user');
   unless ( $user and $user->can_do( 'update user' ) ) {
+    warn "***** Redirecting guest away from /profile-image";
     return template 'profile', {
       warning => "You are not allowed to update this user"
     }, { layout => 'admin' };
@@ -198,6 +200,10 @@ post '/profile-image' => sub {
   my $upload_dir  = "/" . config->{'avatar'}{'path'};
   my $folder_path = config->{user_pics};
   my $filename    = sprintf( config->{'avatar'}{'format'}, $res_user->id );
+  my $scale       = {
+    xpixels => config->{avatar}{bounds}{width},
+    ypixels => config->{avatar}{bounds}{height},
+  };
 
   if ( $params->{action_form} eq 'crop' ) {
     if ( $params->{width} > 0 ) {
@@ -206,7 +212,7 @@ post '/profile-image' => sub {
           request->uploads->{file}->tempname
         );
         try {
-          $logo->resize( $params, $folder_path, $filename );
+          $logo->resize( $params, $scale, $folder_path, $filename );
         } 
         catch {
           info 'There was an error resizing your avatar: ' . Dumper $_;
@@ -216,12 +222,7 @@ post '/profile-image' => sub {
         my $logo = PearlBee::Helpers::ProcessImage->new(
           $folder_path . '/' . $filename
         );
-#      try {
-        $logo->resize( $params, $folder_path, $filename );
-#      } 
-#      catch {
-#        info 'There was an error resizing your avatar: ' . Dumper $_;
-#      };
+        $logo->resize( $params, $scale, $folder_path, $filename );
       }
     }
 
@@ -244,38 +245,39 @@ post '/profile-image' => sub {
     };
 };
 
-=head2 /blog-image/:slug route
-
-Create/update/delete a blog
+=head2 /blog-image route
 
 =cut
 
-post '/blog-image/:slug' => sub {
+post '/blog-image/slug/:slug/user/:username' => sub {
 
   my $slug        = route_parameters->{'slug'};
+  my $username    = route_parameters->{'username'};
+  my $file        = params->{'file'};
+  my $upload_dir  = "/" . config->{'blog-avatar'}{'path'};
+  my $folder_path = config->{'blog_pics'};
+  my $user        = resultset('Users')->find_by_session(session);
   my $params      = params;
-  my $file        = $params->{file};
-  my $user        = session('user');
+
   unless ( $user and $user->can_do( 'update blog' ) ) {
-    return template 'blog-profile', {
-      warning => "You are not allowed to update this blog image",
+    warn "***** Redirecting guest away from /blog-image/slug/:slug/user/:username'";
+    return template 'blog', {
+      warning => "You are not allowed to update this user"
     }, { layout => 'admin' };
   }
-  my $res_user    = resultset('Users')->find_by_session(session);
-  my $upload_dir  = "/" . config->{'avatar'}{'path'};
-  my $folder_path = config->{user_pics};
-  #my $blog        = resultset('Blog')->find({ slug => $slug });
-  my @blog_owners = resultset('BlogOwner')->search({ user_id => $res_user->id, is_admin => '1' });
-  my $blog;
-  my $errorflag = 0;
-  for my $blog_owner ( @blog_owners ) {
-  $blog = resultset('Blog')->search({ id => $blog_owner->blog_id, slug => $slug });
-  }
-  my $message;
+
+  my $blog = resultset('Blog')->search_by_user_id_and_slug({
+    slug     => $slug,
+    username => $username
+  });
 
   if ( $blog ) {
-    my $filename = sprintf( config->{'avatar'}{'blog-format'},
-                            $blog->id, $res_user->id );
+    my $message  = "Your profile picture has been changed.";
+    my $filename = sprintf( config->{'blog-avatar'}{'format'}, $blog->id );
+    my $scale    = {
+      xpixels => config->{'blog-avatar'}{'bounds'}{'width'},
+      ypixels => config->{'blog-avatar'}{'bounds'}{'height'},
+    };
 
     if ( $params->{action_form} eq 'crop' ) {
       if ( $params->{width} > 0 ) {
@@ -284,7 +286,7 @@ post '/blog-image/:slug' => sub {
             request->uploads->{file}->tempname
           );
           try {
-            $logo->resize( $params, $folder_path, $filename );
+            $logo->resize( $params, $scale, $folder_path, $filename );
           } 
           catch {
             info 'There was an error resizing your avatar: ' . Dumper $_;
@@ -294,43 +296,29 @@ post '/blog-image/:slug' => sub {
           my $logo = PearlBee::Helpers::ProcessImage->new(
             $folder_path . '/' . $filename
           );
-#        try {
-          $logo->resize( $params, $folder_path, $filename );
-#        } 
-#        catch {
-#          info 'There was an error resizing your avatar: ' . Dumper $_;
-#        };
+          $logo->resize( $params, $scale, $folder_path, $filename );
         }
       }
-    
+ 
       $blog->update({ avatar_path => $upload_dir . $filename });
-      $message = "Your profile picture has been changed.";
+      $blog->{avatar_path} = $upload_dir . $filename;
     }
     elsif ( $params->{action_form} eq 'delete' ) {
       $blog->update({ avatar_path => '' });
-    
+ 
       $message = "Your picture has been deleted";
     }
-    else {
-    }
+ 
+    template 'profile',
+      {
+        success => $message
+      };
   }
   else {
-    $message="You do not have the rights to change the blog's picture";
-    $errorflag = 1;
-  }
-
-  session( 'user', $res_user->as_hashref_sanitized );
-  if ($errorflag == 0){
-  template 'blog-profile',
-    {
-      success => $message
-    };
-  }
-  else {
-    template 'blog-profile',
-    {
-      warning => $message
-    };
+    template 'blog',
+      {
+        warning => "Could not find a blog for slug '$slug' and username '$username'"
+      };
   }
 };
 
@@ -342,6 +330,7 @@ post '/profile_password' => sub {
   my $params   = body_parameters;
   my $user     = session('user');
   unless ( $user and $user->can_do( 'update user' ) ) {
+    warn "***** Redirecting guest away from /profile_password";
     return template 'profile', {
       warning => "You are not allowed to update this user",
     }, { layout => 'admin' };

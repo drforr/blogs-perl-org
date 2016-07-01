@@ -142,11 +142,13 @@ get '/author/categories/delete/:id' => sub {
     error $_;
     my @categories = resultset('Category')->search({ name => { '!=' => 'Uncategorized'} });
 
-    template 'admin/categories/list', { categories => \@categories, warning => "Something went wrong." }, { layout => 'admin' };
+    template 'admin/categories/list', {
+      categories => \@categories,
+      warning => "Something went wrong."
+    }, { layout => 'admin' };
   };
 
   redirect "/author/categories";
-
 };
 
 =head2 /author/categories/edit/:id
@@ -161,6 +163,12 @@ any '/author/categories/edit/:id' => sub {
   my $name        = params->{name};
   my $slug        = params->{slug};
   my $category    = resultset('Category')->find( $category_id );
+  my $user        = resultset('Users')->find_by_session(session);
+  unless ( $user and $user->can_do( 'update category' ) ) {
+    template 'admin/categories/list', {
+      message    => "You are not allowed to create comments, please create an account",
+    }, { layout => 'admin' };
+  }
   my @categories;
   my $params = {};
 
@@ -185,12 +193,10 @@ any '/author/categories/edit/:id' => sub {
 
     }
     else {
-      eval {
-        $category->update({
-            name => $name,
-            slug => $slug
-          });
-      };
+      $category->update({
+        name => $name,
+        slug => $slug
+      });
 
       $params->{success} = 'The category was updated successfully'
     }
@@ -203,7 +209,6 @@ any '/author/categories/edit/:id' => sub {
   
   # If the form wasn't submited just list the categories
   template 'admin/categories/list', $params, { layout => 'admin' };
-
 
 };
 

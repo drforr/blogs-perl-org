@@ -13,7 +13,10 @@ Check if the user has authorization for this part of the web site
 hook 'before' => sub {
   my $user = session('user');
 
-  redirect session('app_url') . '/'  if ( !$user );
+  unless ( $user ) {
+    warn "***** Hook redirecting guest away from /dashboard";
+    redirect '/';
+  }
 };
 
 =head2 /dashboard route
@@ -25,6 +28,13 @@ Dashboard index
 any '/dashboard' => sub {
 
   my $user = resultset('Users')->find_by_session(session);
+  unless ( $user and $user->can_do( 'update users' ) ) {
+    warn "***** Redirecting guest away from /dashboard";
+    return template 'admin/index', {
+      message => "You are not allowed to update users, please create an account",
+      user    => $user,
+    }, { layout => 'admin' };
+  }
 
   if ( $user->status eq 'inactive' ) {
 
@@ -65,6 +75,13 @@ Edit profile
 any '/profile' => sub {
 
   my $user  = resultset('Users')->find_by_session(session);
+  unless ( $user and $user->can_do( 'update users' ) ) {
+    warn "***** Redirecting guest away from /profile";
+    return template 'admin/index', {
+      message => "You are not allowed to update users, please create an account",
+      user    => $user,
+    }, { layout => 'admin' };
+  }
   my $name  = params->{name};
   my $email = params->{email};
 

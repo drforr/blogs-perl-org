@@ -23,10 +23,14 @@ get '/author/users/page/:page' => sub {
 
   my $nr_of_rows = 5; # Number of posts per page
   my $page       = params->{page} || 1;
+  my $user_obj   = resultset('Users')->find_by_session(session);
+  unless ( $user_obj and $user_obj->id ) {
+    warn "***** Redirecting guest away from /author/users/page/:page";
+    redirect '/'
+  }
   my @users;
   my @blogs;
   my @blogs2;
-  my $user_obj    = resultset('Users')->find_by_session(session);
   my @blog_owners = resultset('BlogOwner')->search({user_id => $user_obj->id});
   for my $blog_owner (@blog_owners){
     push @blogs, 
@@ -399,6 +403,11 @@ any '/author/users/allow/:id' => sub {
 
   my $user_id = params->{id};
   my $user    = resultset('Users')->find( $user_id );
+  my $res_user = resultset('Users')->find_by_session(session);
+  unless ( $res_user and $res_user->can_do( 'update users' ) ) {
+    warn "***** Redirecting unauthorized user away from /author/users/page/:page";
+    redirect '/';
+  }
   
   if ($user) {
     try {
@@ -442,6 +451,12 @@ Add a new user
 =cut
 
 any '/author/users/add' => sub {
+
+  my $res_user     = resultset('Users')->find_by_session(session);
+  unless ( $res_user and $res_user->can_do( 'create users' ) ) {
+    warn "***** Redirecting unauthorized user away from /author/users/add";
+    redirect '/'
+  }
 
   if ( params->{username} ) {
 

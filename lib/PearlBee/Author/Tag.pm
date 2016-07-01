@@ -86,6 +86,7 @@ post '/author/tags/add' => sub {
   my $slug = string_to_slug( params->{slug} );
   my $user = resultset('Users')->find_by_session(session);
   unless ( $user and $user->can_do( 'create tag' ) ) {
+    warn "***** Redirecting guest away from /author/tags/add";
     return template 'admin/tags/list', {
       warning => "You are not allowed to create a tag",
     }, { layout => 'admin' };
@@ -130,6 +131,12 @@ get '/author/tags/delete/:id' => sub {
 
   my $tag_id = params->{id};
   my $tag    = resultset('Tag')->find( $tag_id );
+  my $res_user   = resultset('Users')->find_by_session(session);
+  unless ( $res_user and $res_user->can_do( 'delete tag' ) ) {
+    warn "***** Redirecting guest away from /author/tags/delete/:id";
+    info "You are not allowed to delete tags, please create an account";
+    redirect '/author/tags';
+  }
 
   # Delete first all many to many dependecies for safly removal of the isolated tag
   try {

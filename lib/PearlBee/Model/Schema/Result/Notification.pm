@@ -73,6 +73,11 @@ __PACKAGE__->table("notification");
   data_type: 'integer'
   is_nullable: 0
 
+=head2 generic_id
+
+  data_type: 'integer'
+  is_nullable: 1
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -93,6 +98,8 @@ __PACKAGE__->add_columns(
   },
   "user_id",
   { data_type => "integer", is_auto_increment => 0, is_nullable => 0 },
+  "generic_id",
+  { data_type => "integer", is_auto_increment => 0, is_nullable => 1 },
 );
 
 =head1 PRIMARY KEY
@@ -121,6 +128,8 @@ Return a non-blessed version of a notification database row
 
 sub as_hashref {
   my ($self)       = @_;
+  my $schema = $self->result_source->schema;
+
   my $blog_as_href = {
     id           => $self->id,
     name         => $self->name,
@@ -128,7 +137,20 @@ sub as_hashref {
     viewed       => $self->viewed,
     created_date => $self->created_date,
     user_id      => $self->user_id,
+    generic_id   => $self->generic_id,
   };          
+
+  if ( $self->name eq 'comment' ) {
+    my $comment = $schema->resultset('Comment')->find({
+      id => $self->generic_id
+    });
+    my $user = $comment->uid;
+    my $c    = $comment->as_hashref_sanitized;
+    my $u    = $user->as_hashref_sanitized;
+
+    $blog_as_href->{comment} = $c;
+    $blog_as_href->{comment}{user} = $u;
+  }
               
   return $blog_as_href;
 }             

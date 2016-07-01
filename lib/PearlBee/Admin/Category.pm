@@ -68,6 +68,7 @@ post '/admin/categories/add' => sub {
 
   my $temp_user = resultset('Users')->find_by_session(session);
   unless ( $temp_user and $temp_user->can_do( 'create category' ) ) {
+    warn "***** Redirecting guest away from /admin/categories/add";
     return template 'admin/categories/list', {
       warning => "You are not allowed to create posts.",
     }, { layout => 'admin' };
@@ -88,11 +89,10 @@ post '/admin/categories/add' => sub {
   }
   else {
     try {
-      my $user     = session('user');
       my $category = resultset('Category')->create({
           name    => $name,
           slug    => $slug,
-          user_id => $user->{id}
+          user_id => $temp_user->id
       });
     }
     catch {
@@ -171,12 +171,10 @@ any '/admin/categories/edit/:id' => sub {
 
     }
     else {
-      eval {
-        $category->update({
-            name => $name,
-            slug => $slug
-          });
-      };
+      $category->update({
+        name => $name,
+        slug => $slug
+      });
 
       $params->{success} = 'The category was updated successfully'
     }

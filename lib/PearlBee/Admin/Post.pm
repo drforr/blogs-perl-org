@@ -181,6 +181,7 @@ post '/admin/posts/add' => sub {
 
     my $temp_user = resultset('Users')->find_by_session(session);
     unless ( $temp_user and $temp_user->can_do( 'create post' ) ) {
+      warn "***** Redirecting guest away from /admin/posts/add";
       return template 'admin/posts/add', {
         warning => "You cannot create posts",
       }, { layout => 'admin' };
@@ -194,17 +195,17 @@ post '/admin/posts/add' => sub {
           
           # Set the proper timezone
           #
-          my $user              = session('user');
-          my $user_obj          = resultset('Users')->find_by_session(session);
-          my ($slug, $changed)  = resultset('Post')->check_slug( params->{slug} );             
+          my $user             = session('user');
+          my $user_obj         = resultset('Users')->find_by_session(session);
+          my ($slug, $changed) = resultset('Post')->check_slug( params->{slug} );             
           my $cover_filename;
-          my @blog_owners       = resultset('BlogOwner')->search({ user_id => $user_obj->id});
+          my @blog_owners      = resultset('BlogOwner')->search({ user_id => $user_obj->id});
           my @blogs; 
           my $blog;
           for my $blog_owner ( @blog_owners ) {
-          push @blogs, map { $_->as_hashref }
+		  push @blogs, map { $_->as_hashref }
                    resultset('Blog')->search({ id => $blog_owner->blog_id });
-                 }
+	 }
           $blog = $blogs[0];     
           session warning => 'The slug was already taken but we generated a similar slug for you! Feel free to change it as you wish.' if ($changed);
 
@@ -334,6 +335,7 @@ post '/admin/posts/update/:id' => sub {
 
     my $temp_user = resultset('Users')->find_by_session(session);
     unless ( $temp_user and $temp_user->can_do( 'update post' ) ) {
+      warn "***** Redirecting guest away from /admin/posts/update/:id";
       session warning => "You cannot update a post";
 
       redirect '/admin/posts/edit/';

@@ -32,14 +32,14 @@ sub new {
     return $self;
 }
 
-=head2 resize
+=head2 resize( $bounding_box, $scale, $path, $name )
 
 Resize the image to a given bounding box, specifying the path and name.
 
 =cut
 
 sub resize {
-    my ( $self, $bounds, $save_path, $save_name ) = @_;
+    my ( $self, $bounds, $scale, $save_path, $save_name ) = @_;
 
     my @fields = qw( height width top left );
     for my $name ( @fields ) {
@@ -57,8 +57,8 @@ sub resize {
         width  => int( $bounds->{width}  ),
     );
     $pic = $pic->scale(
-        xpixels => config->{avatar}{bounds}{width},
-        ypixels => config->{avatar}{bounds}{height},
+        xpixels => int( $scale->{xpixels} ),
+        ypixels => int( $scale->{ypixels} ),
     );
 
     $pic->write( file => "$save_path/$save_name" );

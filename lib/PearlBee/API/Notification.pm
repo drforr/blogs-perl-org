@@ -45,7 +45,9 @@ get '/api/notification/comment/user/:username/page/:page' => sub {
   @notifications = map { $_->as_hashref_sanitized } @notifications;
 
   # Le sigh, something stuffed up the serializer plugin.  
-  my $json = JSON->new->allow_blessed(1)->convert_blessed(1);
+  my $json = JSON->new;
+  $json->allow_blessed(1);
+  $json->convert_blessed(1);
   return $json->encode( \@notifications )
 };
 
@@ -73,7 +75,9 @@ get '/api/notification/invitation/user/:username/page/:page' => sub {
   @notifications = map { $_->as_hashref_sanitized } @notifications;
 
   # Le sigh, something stuffed up the serializer plugin.  
-  my $json = JSON->new->allow_blessed(1)->convert_blessed(1);
+  my $json = JSON->new;
+  $json->allow_blessed(1);
+  $json->convert_blessed(1);
   return $json->encode( \@notifications )
 };
 

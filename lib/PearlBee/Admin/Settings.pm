@@ -48,13 +48,14 @@ post '/admin/settings/save' => sub {
 	
 	my $temp_user = resultset('Users')->find_by_session(session);
 	unless ( $temp_user and $temp_user->can_do( 'update settings' ) ) {
+		warn "***** Redirecting guest away from /admin/settings/save";
 		return template 'admin/settings/index.tt', {
 			warning => "You are not allowed to update settings",
 		}, { layout => 'admin' };
 	}
 	my $settings;
 	my @timezones 	 = DateTime::TimeZone->all_names;
-	my $path 	     = params->{path};
+	my $path         = params->{path};
 	my $social_media = (params->{social_media} ? 1 : 0); # If the social media checkbox isn't checked the value will be undef
 	my $timezone  	 = params->{timezone};
 	my $multiuser    = (params->{multiuser} ? 1 : 0); # If the multiuser checkbox isn't checked the value will be undef

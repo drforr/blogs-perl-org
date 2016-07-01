@@ -23,6 +23,12 @@ Activate your account
 
 get '/activation' => sub {
     my $token = params->{'token'};
+    my $res_user  = resultset('Users')->find_by_session(session);
+    unless ( $res_user and $res_user->can_do( 'update users' ) ) {
+      session error => 'Your user is not allowed to update users';
+      warn "***** Redirecting guest away from /activation";
+      return template 'login';
+    }
 
     my $user_reset_token =
          resultset('Users')->find({ activation_key => $token });
