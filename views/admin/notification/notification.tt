@@ -1,3 +1,4 @@
+[% SET global.template_name = 'notification' %]
 <div class="page-content blocky">
    <div class="container">
 
