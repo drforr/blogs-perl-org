@@ -32,6 +32,8 @@
         <script src="/blog/js/author.js"></script>
     [% ELSIF global.template_name == 'homepage' %]
         <script src="/blog/js/home.js"></script>
+    [% ELSIF global.template_name == 'notification' %]
+        <script src="/admin/js/notification.js"></script>
     [% END %]
 
 

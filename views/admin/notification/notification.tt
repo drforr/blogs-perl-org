@@ -12,7 +12,7 @@
       		<hr />
       	</div>
 
-
+    <form method="post" action="/admin/notification/notification">
       <div class="row">
         <div class="col-md-12">
       		<div class="card-design">
@@ -32,10 +32,14 @@
         <div class="col-md-12">
           <div class="card-design">
             <div class="awidget-head">
+
               <h3>&nbsp;<b> <i class="fa fa-user-plus" aria-hidden="true"></i> [% invitation.size %] New Invitation(s) to Join the Blog(s)</b></h3>
             </div>
             <div class="awidget-body">
                 <div class="notification-text">
+                  [% FOREACH Notification in notifications %]
+                  [% Notification.old_status %]
+                  [% END %]
                   <a href="#">[% session.user.name %]</a> added you as an <a href="#">{role}</a> to the <a href="#">{blogname}</a> blog.
                   <a href="#" data-toggle="modal" data-target="#invitation_modal" class="pull-right">View Invitation</a>
                 </div>
@@ -124,7 +128,7 @@
       </div>
 
 
-
+    </form>
       </div>
 
    </div>

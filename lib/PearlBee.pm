@@ -20,6 +20,7 @@ use PearlBee::Routes::Profile;
 use PearlBee::Routes::Post;
 use PearlBee::Routes::Pages;
 use PearlBee::Routes::Notification;
+use PearlBee::API::Notification;
 
 # Common controllers
 use PearlBee::Authentication;
