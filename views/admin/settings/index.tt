@@ -22,10 +22,10 @@
 							<div class="btn-group">
 								<!-- <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">Select time zone <span class="caret"></span></button> -->
 								<select name="timezone" class="chosen-select">
-									<option value=""> Select time zone </option>
-									[% FOREACH timezone IN timezones %] [% SET selected = timezone == setting.timezone ? "selected" : "" %]
-									<option [% selected %] value="[% timezone %]"> [% timezone %] </option>
-									[% END %]
+										[% FOREACH blog IN blogs %]
+										[% SET role = ( session.user.is_admin ) ? "admin" : "author" %]
+										<option [% selected %] value=""> [% blog.name %] </option>
+										[% END %]
 								</select>
 							</div>
 							<br/>

@@ -13,7 +13,7 @@
                  <!-- Sub menu -->
                  <ul>
                     <li><a href="/admin/blogs">All</a></li>
-                    <li><a href="/create-blog">New Blog</a></li>
+                    <li><a href="/admin/create-blog">New Blog</a></li>
                 </ul>
             </li>            
             

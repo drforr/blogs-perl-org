@@ -18,7 +18,7 @@
 				<div class="awidget-body">
 
 					[% SET role = ( session.user.is_admin ) ? "admin" : "author" %]
-					<a href="/admin/blogs"> All </a>([% all %]) |
+					All ([% all %]) |
 					<!--
               <a href="/admin/blogs/published/page/1"> Published </a>([% publish %]) | 
               <a href="/admin/blogs/draft/page/1"> Draft </a>([% draft %]) | 
@@ -62,13 +62,14 @@
 								</td>
 
 								<td width="11%">
+									[% SET role = ( session.user.is_admin ) ? "admin" : "author" %]
 									<a href="/blogs/user/[% blog.blog_creator.username %]/slug/[%blog.slug%]">
 										<button class="btn btn-xs btn-success"><i class="icon-eye-open"></i> </button>
 									</a>
 									<a href="/[% role %]/posts/edit/[% post.slug %]">
 										<button class="btn btn-xs btn-warning"><i class="icon-pencil"></i> </button>
 									</a>
-									<a href="/admin/categories/delete/[% category.id %]">
+									<a href="/[% role %]/blog/delete/[% post.slug %]">
 										<button class="btn btn-xs btn-danger"><i class="icon-remove"></i> </button>
 									</a>
 								</td>

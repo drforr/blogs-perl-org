@@ -42,13 +42,20 @@ get '/api/notification/comment/user/:username/page/:page' => sub {
         page     => $page,
         order_by => { -desc => 'created_date' } }
     );
+  my $count_comments = resultset('Notification')->search({
+  user_id => $user->id, name => 'comment'
+  })->count;
+  my %data;
   @notifications = map { $_->as_hashref_sanitized } @notifications;
+  $data{total}= $count_comments;
+  $data{notifications} = \@notifications;
 
   # Le sigh, something stuffed up the serializer plugin.  
   my $json = JSON->new;
   $json->allow_blessed(1);
   $json->convert_blessed(1);
-  return $json->encode( \@notifications )
+  return $json->encode( \%data);
+
 };
 
 
@@ -72,13 +79,89 @@ get '/api/notification/invitation/user/:username/page/:page' => sub {
         page     => $page,
         order_by => { -desc => 'created_date' } }
     );
+
+  my $count_invitations = resultset('Notification')->search({
+  user_id => $user->id, name => 'invitation'
+  })->count;
+  my %data;
   @notifications = map { $_->as_hashref_sanitized } @notifications;
+  $data{total}         = $count_invitations;
+  $data{notifications} = \@notifications;
 
   # Le sigh, something stuffed up the serializer plugin.  
   my $json = JSON->new;
   $json->allow_blessed(1);
   $json->convert_blessed(1);
-  return $json->encode( \@notifications )
+  return $json->encode( \%data);
 };
 
+=head2 /api/notification/response/user/:username/page/:page
+
+View page $page of response notifications for user $username
+
+=cut
+
+get '/api/notification/response/user/:username/page/:page' => sub {
+
+  my $username = route_parameters->{'username'};
+  my $page     = route_parameters->{'page'};
+  my ( $user ) = resultset('Users')->match_lc( $username );
+
+  my @notifications =
+    resultset('Notification')->search(
+      { sender_id  => $user->id,
+        name       => 'response' },
+      { num_rows   => config->{api}{notification}{comment}{max_rows},
+        page       => $page,
+        order_by   => { -desc => 'created_date' } }
+    );
+  my $count_responses = resultset('Notification')->search({
+  sender_id => $user->id, name => 'response'
+  })->count;
+  my %data;
+  @notifications       = map { $_->as_hashref_sanitized } @notifications;
+  $data{total}         = $count_responses;
+  $data{notifications} = \@notifications;
+
+  # Le sigh, something stuffed up the serializer plugin.  
+  my $json = JSON->new;
+  $json->allow_blessed(1);
+  $json->convert_blessed(1);
+  return $json->encode( \%data);
+};
+
+=head2 /api/notification/changed_role/user/:username/page/:page
+
+View page $page of chaged_role notifications for user $username
+
+=cut
+
+get '/api/notification/changed_role/user/:username/page/:page' => sub {
+
+  my $username = route_parameters->{'username'};
+  my $page     = route_parameters->{'page'};
+  my ( $user ) = resultset('Users')->match_lc( $username );
+
+  my @notifications =
+    resultset('Notification')->search(
+      { user_id  => $user->id,
+        name     => 'changed role' },
+      { num_rows => config->{api}{notification}{comment}{max_rows},
+        page     => $page,
+        order_by => { -desc => 'created_date' } }
+    );
+  my $count_notifications = resultset('Notification')->search({
+  user_id => $user->id, name => 'changed role'
+  })->count;
+  my %data;
+  @notifications = map { $_->as_hashref_sanitized } @notifications;
+  $data{total}         = $count_notifications;
+  $data{notifications} = \@notifications;
+
+  # Le sigh, something stuffed up the serializer plugin.  
+  my $json = JSON->new;
+  $json->allow_blessed(1);
+  $json->convert_blessed(1);
+  return $json->encode( \%data);
+};
 1;

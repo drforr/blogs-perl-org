@@ -17,14 +17,12 @@
                            </div>
 
                            <div class="awidget-body">
-                             <select name="blog_name">
-                               <option name="option1">option1</option>
-                               <option name="option2">option2</option>
-<!-- Keep these other options for later
-                               <option name="Markdown_With_Smartypants">Markdown with Smartypants</option>
-                               <option name="RichText">RichText</option>
-                               <option name="Textile2">Textile2</option>
--->
+
+                             <select name="posts_blog_options" onChange="window.location.href=this.value">
+                              [% FOREACH blog IN blogs %]
+                              [% SET role = ( session.user.is_admin ) ? "admin" : "author" %]
+                              <option [% selected %] > [% blog.name %] </option>
+                              [% END %]
                              </select>
                            </div>
                            

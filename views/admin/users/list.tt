@@ -23,13 +23,11 @@
 					<div class="form-group pull-left">
 						<label class="control-label">Blog</label>
 						<div class="options-drop">
-							<select name="timezone" class="chosen-select">
+							<select name="users_blogs_list" class="chosen-select" onChange="window.location.href=this.value">
 								<option value=""> All </option>
-								<option value=""> 1 </option>
-								<option value=""> 2 </option>
-								<option value=""> 3 </option>
-								[% FOREACH timezone IN timezones %] [% SET selected = timezone == setting.timezone ? "selected" : "" %]
-								<option [% selected %] value="[% timezone %]"> [% timezone %] </option>
+								[% FOREACH blog IN blogs %]
+								[% SET role = ( session.user.is_admin ) ? "admin" : "author" %]
+								<option [% selected %] value="/[% role %]/blog/[% blog.name %]/page/1"> [% blog.name %] </option>
 								[% END %]
 							</select>
 						</div>
@@ -41,42 +39,38 @@
 								<option value=""> All </option>
 								<option value=""> Admin </option>
 								<option value=""> Author </option>
-								[% FOREACH timezone IN timezones %] [% SET selected = timezone == setting.timezone ? "selected" : "" %]
-								<option [% selected %] value="[% timezone %]"> [% timezone %] </option>
-								[% END %]
 							</select>
 						</div>
 					</div>
 					<div class="form-group pull-left">
 						<label class="control-label">Status</label>
 						<div class="options-drop">
-							<select name="timezone" class="chosen-select">
-								<option value=""> All </option>
-								<option value=""> Pending </option>
-								<option value=""> Active </option>
-								<option value=""> Suspended </option>
-								<option value=""> Deleted </option>
-								[% FOREACH timezone IN timezones %] [% SET selected = timezone == setting.timezone ? "selected" : "" %]
-								<option [% selected %] value="[% timezone %]"> [% timezone %] </option>
-								[% END %]
+							<select name="timezone" class="chosen-select" onChange="window.location.href=this.value">
+								[% SET role = ( session.user.is_admin ) ? "admin" : "author" %]
+								<option value="/[% role %]/users/page/1"> All </option>
+								<option value="/[% role %]/users/active/page/1"> Active </option>
+								<option value="/[% role %]/users/pending/page/1"> Pending </option>
+								<option value="/[% role %]/users/inactive/page/1"> Inactive </option>
+								<option value="/[% role %]/users/suspended/page/1"> Suspended </option>
 							</select>
 						</div>
 					</div>
+<!--
 					<div class="form-group pull-right">
 						<button type="submit" class="btn btn-default">Apply</button>
 						<button type="button" class="btn btn-danger">Reset</button>
 					</div>
+-->
 				</div>
 
 
 
-				<a href="/admin/users/page/1"> 	All </a>([% all %]) |
-				<a href="/admin/users/inactive/page/1"> Inactive </a>([% inactive %]) |
-				<a href="/admin/users/active/page/1"> Active </a>([% active %]) | [% IF session.multiuser %]
-				<a href="/admin/users/suspended/page/1"> Suspended </a>([% suspended %]) |
-				<a href="/admin/users/pending/page/1"> Pending </a>([% pending %]) [% ELSE %]
-				<a href="/admin/users/suspended/page/1"> Suspended </a>([% suspended %]) [% END %]
-
+				All ([% all %]) |
+				Active ([% active %]) |
+				Pending ([% pending %]) |
+				Inactive ([% inactive %]) |
+				Suspended ([% suspended %]) 
+				
 				<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="example">
 					<thead>
 						<tr>

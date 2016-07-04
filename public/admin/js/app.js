@@ -78,3 +78,26 @@ $(document).ready(function() {
 	});
 	
 });
+
+
+function getBlog(gb) {
+	var location = gb;
+	var pageURL = location.split('/');
+	var blogName = pageURL[4];
+	sessionStorage.selectedBlog = blogName;
+}
+$(document).ready(function () {
+	var blogName = sessionStorage.selectedBlog;
+	$("#comments_blogs_chosen > .chosen-single.chosen-default > span").html(blogName);
+});
+
+function getStatus(gs) {
+	var location = gs;
+	var pageURL = location.split('/');
+	var statusName = pageURL[5];
+	sessionStorage.selectedStatus = statusName;
+}
+$(document).ready(function(){
+	var statusName = sessionStorage.selectedStatus;
+	$(".chosen-container-single-nosearch > a.chosen-single > span").html(statusName);
+});

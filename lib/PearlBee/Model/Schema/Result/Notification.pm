@@ -49,6 +49,12 @@ __PACKAGE__->table("notification");
   is_nullable: 0
   size: 255
 
+=head2 role
+
+  data_type: 'varchar'
+  is_nullable: 0
+  size: 255
+
 =head2 old_status
 
   data_type: 'varchar'
@@ -56,6 +62,12 @@ __PACKAGE__->table("notification");
   size: 255
 
 =head2 viewed
+
+  data_type: 'boolean'
+  is_nullable: 0
+  default: 0
+
+=head2 accepted
 
   data_type: 'boolean'
   is_nullable: 0
@@ -73,6 +85,11 @@ __PACKAGE__->table("notification");
   data_type: 'integer'
   is_nullable: 0
 
+=head2 sender_id
+
+  data_type: 'integer'
+  is_nullable: 0
+
 =head2 generic_id
 
   data_type: 'integer'
@@ -85,9 +102,13 @@ __PACKAGE__->add_columns(
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
   "name",
   { data_type => "varchar", is_nullable => 0, size => 255 },
+  "role",
+  { data_type => "varchar", is_nullable => 0, size => 255 },
   "old_status",
   { data_type => "varchar", is_nullable => 0, size => 255 },
   "viewed",
+  { data_type => "boolean", is_nullable => 0, size => 255 },
+  "accepted",
   { data_type => "boolean", is_nullable => 0, size => 255 },
   "created_date",
   {
@@ -97,6 +118,8 @@ __PACKAGE__->add_columns(
     is_nullable => 0,
   },
   "user_id",
+  { data_type => "integer", is_auto_increment => 0, is_nullable => 0 },
+  "sender_id",
   { data_type => "integer", is_auto_increment => 0, is_nullable => 0 },
   "generic_id",
   { data_type => "integer", is_auto_increment => 0, is_nullable => 1 },
@@ -130,13 +153,16 @@ sub as_hashref {
   my ($self)       = @_;
   my $schema = $self->result_source->schema;
 
-  my $blog_as_href = {
+  my $as_href = {
     id           => $self->id,
     name         => $self->name,
+    role         => $self->role,
     old_status   => $self->old_status,
     viewed       => $self->viewed,
+    accepted     => $self->accepted,
     created_date => $self->created_date,
     user_id      => $self->user_id,
+    sender_id    => $self->sender_id,
     generic_id   => $self->generic_id,
   };          
 
@@ -144,16 +170,61 @@ sub as_hashref {
     my $comment = $schema->resultset('Comment')->find({
       id => $self->generic_id
     });
-    my $user = $comment->uid;
+    my $user = $schema->resultset('Users')->find({
+      id => $self->sender_id
+    });
     my $c    = $comment->as_hashref_sanitized;
     my $u    = $user->as_hashref_sanitized;
 
-    $blog_as_href->{comment} = $c;
-    $blog_as_href->{comment}{user} = $u;
+    $as_href->{comment} = $c;
+    $as_href->{sender}  = $u;
+
   }
-              
-  return $blog_as_href;
-}             
+  elsif ( $self->name eq 'invitation' ) {
+    my $blog = $schema->resultset('Blog')->find({
+      id => $self->generic_id
+    });
+    my $user = $schema->resultset('Users')->find({
+      id => $self->sender_id
+    });
+
+    my $b = $blog->as_hashref_sanitized;
+    my $u = $user->as_hashref_sanitized;
+
+    $as_href->{blog}   = $b;
+    $as_href->{sender} = $u;
+  }
+  elsif ( $self->name eq 'response' ) {
+    my $blog = $schema->resultset('Blog')->find({
+      id => $self->generic_id
+    });
+    my $user = $schema->resultset('Users')->find({
+      id => $self->user_id
+    });
+
+    my $b = $blog->as_hashref_sanitized;
+    my $u = $user->as_hashref_sanitized;
+
+    $as_href->{blog}      = $b;
+    $as_href->{receiver}  = $u;
+    
+  }  
+  else{
+    my $blog = $schema->resultset('Blog')->find({
+      id => $self->generic_id
+    });
+    my $user = $schema->resultset('Users')->find({
+      id => $self->sender_id
+    });
+
+    my $b = $blog->as_hashref_sanitized;
+    my $u = $user->as_hashref_sanitized;
+
+    $as_href->{blog}   = $b;
+    $as_href->{sender} = $u;
+  }
+  return $as_href;
+}           
 
 =head2 as_hashref_sanitized
 

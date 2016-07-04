@@ -10,7 +10,7 @@ use PearlBee::Model::Schema;
 use base 'DBIx::Class::ResultSet';
 
 
-=head2 create_comment({ comment_id => 1, user_id => 1 })
+=head2 create_comment({ comment_id => 1, user_id => 1, sender_id => 1 })
 
 Create comment notification
 
@@ -23,6 +23,7 @@ sub create_comment {
   $schema->resultset('Notification')->create({
     name       => 'comment',
     generic_id => $args->{comment_id},
+    sender_id  => $args->{sender_id},
     user_id    => $args->{user_id}
   });
 }
@@ -50,7 +51,7 @@ sub read_comment {
 }
 
 
-=head2 create_invitation({ blog_id => 1, user_id => 1 })
+=head2 create_invitation({ blog_id => 1, role => 'author', user_id => 1, sender_id })
 
 Create invitation notification
 
@@ -63,6 +64,8 @@ sub create_invitation {
   $schema->resultset('Notification')->create({
     name       => 'invitation',
     generic_id => $args->{blog_id},
+    role       => $args->{role},
+    sender_id  => $args->{sender_id},
     user_id    => $args->{user_id}
   });
 }
@@ -90,7 +93,7 @@ sub read_invitation {
 }
 
 
-=head2 create_response({ blog_id => 1, user_id => 1 })
+=head2 create_response({ blog_id => 1, user_id => 1, sender_id => 1 })
 
 Create response notification
 
@@ -103,6 +106,7 @@ sub create_response {
   $schema->resultset('Notification')->create({
     name       => 'response',
     generic_id => $args->{blog_id},
+    sender_id  => $args->{sender_id},
     user_id    => $args->{user_id}
   });
 }
@@ -130,7 +134,7 @@ sub read_response {
 }
 
 
-=head2 create_changed_role({ old_role => 'author', user_id => 1 })
+=head2 create_changed_role({ old_role => 'author', user_id => 1, sender_id => 1 })
 
 Create changed_role notification
 
@@ -143,6 +147,7 @@ sub create_changed_role {
   $schema->resultset('Notification')->create({
     name       => 'changed_role',
     old_status => $args->{old_role},
+    sender_id  => $args->{sender_id},
     user_id    => $args->{user_id}
   });
 }
