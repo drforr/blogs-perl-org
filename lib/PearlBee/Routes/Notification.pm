@@ -23,7 +23,7 @@ get '/notification' => sub {
 
   my $res_user              = resultset('Users')->find_by_session(session);
 
-  template 'notification',
+  template 'admin/notification/notification',
     {
     };
 

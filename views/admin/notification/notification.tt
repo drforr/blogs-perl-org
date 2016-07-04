@@ -9,7 +9,7 @@
       <div class="mainy">
       	<!-- Page title -->
       	<div class="page-title">
-      		<h2> &nbsp; <i class="fa fa-flag" aria-hidden="true"></i> Notifications</h2>
+      		<h2 class="meh"> &nbsp; <i class="fa fa-flag" aria-hidden="true"></i> Notifications</h2>
       		<hr />
       	</div>
 
@@ -37,21 +37,18 @@
               <h3>&nbsp;<b> <i class="fa fa-user-plus" aria-hidden="true"></i> [% invitation.size %] New Invitation(s) to Join the Blog(s)</b></h3>
             </div>
             <div class="awidget-body">
-                <div class="notification-text">
-                  [% FOREACH Notification in notifications %]
-                  [% Notification.old_status %]
-                  [% END %]
-                  <a href="#">[% session.user.name %]</a> added you as an <a href="#">{role}</a> to the <a href="#">{blogname}</a> blog.
-                  <a href="#" data-toggle="modal" data-target="#invitation_modal" class="pull-right">View Invitation</a>
+                <div class="invitation-row notification-text">
+                  <!-- <a href="#">[% session.user.name %]</a> added you as an <a href="#">{role}</a> to the <a href="#">{blogname}</a> blog.
+                  <a href="#" data-toggle="modal" data-target="#invitation_modal" class="pull-right">View Invitation</a> -->
                 </div>
-                <div class="notification-text">
+                <!-- <div class="notification-text">
                   <a href="#">{username}</a> added you as an <a href="#">{role}</a> to the <a href="#">{blogname}</a> blog.
                   <a href="#" data-toggle="modal" data-target="#invitation_modal" class="pull-right">View Invitation</a>
                 </div>
                 <div class="notification-text">
                   <a href="#">{username}</a> added you as an <a href="#">{role}</a> to the <a href="#">{blogname}</a> blog.
                   <a href="#" data-toggle="modal" data-target="#invitation_modal" class="pull-right">View Invitation</a>
-                </div>
+                </div> -->
                 <br>
                 <div class="text-center">
                   <i class="fa fa-arrow-circle-o-down custom-fonts" aria-hidden="true"></i>
@@ -94,10 +91,9 @@
       				<h3>&nbsp;<b><i class="fa fa-reply-all" aria-hidden="true"></i> {number} New Responses to Your Invitations</b></h3>
       			</div>
             <div class="awidget-body">
-              <div class="notification-text">
+              <div class="notification-text response-row">
                 <i class="fa fa-plus-circle custom-fonts" aria-hidden="true"></i>
-                <a href="#">{username}</a> <a href="#">{accepted}</a> your invitation to join
-                <a href="#">{blogname}</a> blog.
+                <a href="#">{username}</a> <a href="#">{accepted}</a> your invitation to join <a href="#">{blogname}</a> blog.
                 <a href="#" class="pull-right">View Users</a>
               </div>
               <div class="notification-text">
@@ -134,3 +130,5 @@
 
    </div>
 </div>
+
+<script src="/admin/js/notification.js"></script>
