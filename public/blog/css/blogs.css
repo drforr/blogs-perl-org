@@ -56,6 +56,14 @@
 @media all and (max-width: 995px) {
     .blog-top-part .blog-info {
         padding-left: 50px;
+<<<<<<< HEAD
+    }
+}
+@media all and (max-width: 570px) {
+    .blog-top-part .blog-info {
+        padding-left: 75px;
+=======
+>>>>>>> a31f56744b4eed3f61a4051f636b013c2839b00d
     }
 }
 @media all and (max-width: 570px) {

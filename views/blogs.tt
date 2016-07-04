@@ -31,7 +31,6 @@
                                             <p class="entry-name">[% searched_blog.name %] </p>
                                             <ul>
                                                 <li><a data-toggle="modal" class="number-authors" href="#author-modal">[% searched_blog.nr_of_contributors %]  author[% IF searched_blog.nr_of_contributors > 1 %]s[% END %]<a></li>
-
                                                 <li class="information-blog"> [% searched_blog.description %] </li>
                                                 <a href="/feed/author/[% searched_blog.blog_creator.username  %]/blog/[%searched_blog.slug%]" target="_blank">
                                                     <button id="rss" class="btn btn-primary btn-xs" type="button" >RSS</button>

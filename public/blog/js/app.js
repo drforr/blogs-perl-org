@@ -210,6 +210,11 @@ $(document).ready(function() {
                             $(elem).attr("src", "/blog/img/blog_dark_large.png");
                         }
                     });
+<<<<<<< HEAD
+
+
+=======
+>>>>>>> a31f56744b4eed3f61a4051f636b013c2839b00d
                 });
         });
     });
