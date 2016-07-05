@@ -93,4 +93,16 @@ type: 'GET'
 
 
 
+ // More arrow/button
+
+ $('.down-arrow').click(function() {
+     var button = $(this),
+         pageURL = window.location.pathname.split('/'),
+         pageNumber =  +(button.attr("data-page-number")) + 1;
+        //  userName = "/" + pageURL[3],
+         debugger;
+     $('.progressloader').show();
+
+   });
+
 // });

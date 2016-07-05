@@ -30,7 +30,7 @@ get '/notification' => sub {
   sender_id    => $res_user->id,
   name         => 'response'
   })->count;
-  template 'notification',
+  template 'admin/notification/notification',
     {
       counter => $counter
     };
