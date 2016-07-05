@@ -88,13 +88,14 @@ sub find_by_slug_uid {
     $_->blog_id => 1
   } $schema->resultset('BlogOwner')->search({ user_id => $user_id });
 
-  my @blogs = map { $schema->resultset('Blog')->find({ id => $_ }) }
-                  keys %blog_ids;
-  my @found_blogs = grep {
-    $_->slug eq $slug
-  } @blogs;
+  my $blog;
+  for my $blog_id ( keys %blog_ids ) {
+    my $temp_blog = $schema->resultset('Blog')->find({ id => $blog_id });
+    next if $temp_blog->slug ne $slug;
+    return $temp_blog
+  }
 
-  return @found_blogs;
+  return;
 }
 
 1;

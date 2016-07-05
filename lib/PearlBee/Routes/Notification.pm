@@ -21,10 +21,18 @@ View all notifications
 
 get '/notification' => sub {
 
-  my $res_user              = resultset('Users')->find_by_session(session);
-
-  template 'admin/notification/notification',
+  my $res_user = resultset('Users')->find_by_session(session);
+  my $counter  = resultset('Notification')->search({
+  user_id      => $res_user->id,
+  name         => { '!=' => 'response'}
+  })->count;
+  $counter     += resultset('Notification')->search({
+  sender_id    => $res_user->id,
+  name         => 'response'
+  })->count;
+  template 'notification',
     {
+      counter => $counter
     };
 
 };

@@ -18,7 +18,7 @@
                                         [% IF user.avatar_path %]
                                         <img class="blog-image" src="/avatar/[% user.username %]" />
                                         [% ELSE %]
-                                        <img class="blog-image defaultAvatar" src="/avatar/" />
+                                        <img class="blog-image defaultAvatar" src="[% searched_blog.avatar_path %]" />
                                         [% END %]
                                     </div>
                                 </div>
@@ -29,9 +29,8 @@
 
                                         <div class="info-blog">
                                             <p class="entry-name">[% searched_blog.name %] </p>
-                                            <ul class="info-blog">
+                                            <ul>
                                                 <li><a data-toggle="modal" class="number-authors" href="#author-modal">[% searched_blog.nr_of_contributors %]  author[% IF searched_blog.nr_of_contributors > 1 %]s[% END %]<a></li>
-
                                                 <li class="information-blog"> [% searched_blog.description %] </li>
                                                 <a href="/feed/author/[% searched_blog.blog_creator.username  %]/blog/[%searched_blog.slug%]" target="_blank">
                                                     <button id="rss" class="btn btn-primary btn-xs" type="button" >RSS</button>

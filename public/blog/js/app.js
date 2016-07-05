@@ -177,9 +177,9 @@ $(document).ready(function() {
                             var defaultAvatar = (src.match(/\/blog\/img/g)||[]).length;
 
                             if (themeq === "light") {
-                                $(".defaultAvatar").attr("src", "/blog/img/male-user-light.png");
+                                $(".defaultAvatar:not(.blog-image)").attr("src", "/blog/img/male-user-light.png");
                             } else if (themeq === "dark") {
-                                $(".defaultAvatar").attr("src", "/blog/img/male-user.png");
+                                $(".defaultAvatar:not(.blog-image)").attr("src", "/blog/img/male-user.png");
                             }
 
                             if (themeq === "light" && defaultAvatar === 1) {
@@ -200,6 +200,14 @@ $(document).ready(function() {
                                 $("#theme").attr("href", "/blog/css/dark.css");
                                 $("#cmn-toggle-4").attr('checked', false);
                             }
+                        }
+                    });
+
+                    $('.blog-image.defaultAvatar').each(function(idx, elem) {
+                        if (themeq === "light") {
+                            $(elem).attr("src", "/blog/img/blog_light_large.png");
+                        } else if (themeq === "dark") {
+                            $(elem).attr("src", "/blog/img/blog_dark_large.png");
                         }
                     });
                 });

@@ -210,19 +210,17 @@ post '/author/posts/add' => sub {
     warn "***** Redirecting guest away from /author/posts/add";
     redirect '/author/posts';
   }
+  my $blog_slug        = params->{'posts_blog_slug'};
   my ($slug, $changed) = resultset('Post')->check_slug( params->{slug} );
-  my @blog_owners      = resultset('BlogOwner')->search({ user_id => $user_obj->id });
-  my $post;
-  my $cover_filename;
-  my @blogs;
-  my $blog;
-  
-  for my $blog_owner ( @blog_owners ) {
-    push @blogs, map { $_->as_hashref }
-                 resultset('Blog')->search({ id => $blog_owner->blog_id });
-  }
+  my $user_id          = $user_obj->id;
 
-  $blog = $blogs[0];  
+  my $blog = resultset('Blog')->find_by_slug_uid({
+    user_id => $user_id,
+    slug    => $blog_slug
+  });
+  my $cover_filename;
+  my $post;
+
   session warning => 'The slug was already taken but we generated a similar slug for you! Feel free to change it as you wish.' if ($changed);
 
   # Upload the cover image first so we'll have the generated filename
@@ -241,13 +239,12 @@ post '/author/posts/add' => sub {
   my $params = {
     title   => params->{title},
     slug    => $slug,
-    blogs   => \@blogs,
     content => params->{post},
     user_id => $user_obj->id,
     status  => params->{status},
     cover   => ( $cover_filename ) ? $cover_filename : '',
     type    => params->{type} || 'HTML',
-    blog_id => $blog->{id},
+    blog_id => $blog->id,
   };
   my $count = () = $params->{content} =~ m{ <p> }gx;
   if ( $count == 1 ) {
@@ -288,10 +285,21 @@ Display page for add method
 
 get '/author/posts/add' => sub {
 
-  my @categories = resultset('Category')->all();
+  my @categories  = resultset('Category')->all();
+  my $user_obj    = resultset('Users')->find_by_session(session);
+  my @blog_owners = resultset('BlogOwner')->search({ user_id => $user_obj->id });
+  my @blogs;
+
+  for my $blog_owner ( @blog_owners ) {
+    push @blogs, map { $_->as_hashref }
+                 resultset('Blog')->search({ id => $blog_owner->blog_id });
+  }
 
   template 'admin/posts/add',
-           { categories => \@categories },
+           { 
+            categories => \@categories,
+            blogs      => \@blogs 
+           },
            { layout => 'admin' };
 };
 
@@ -312,7 +320,7 @@ get '/author/posts/edit/:slug' => sub {
   # Check if the author has enough permissions for editing this post
   my $user     = session('user');
   my $user_obj = resultset('Users')->find_by_session(session);
-  unless ( $user and $user->can_do( 'update post' ) ) {
+  unless ( $user_obj and $user_obj->can_do( 'update post' ) ) {
     warn "***** Redirecting guest away from /author/posts/edit/:slug";
     return redirect '/author/posts';
   }

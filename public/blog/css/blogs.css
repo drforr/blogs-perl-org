@@ -53,8 +53,13 @@
 }
 
 /*Media queries*/
-@media all and (max-width: 768px) {
-    .blog .info-blog {
-        padding-left: 25%;
+@media all and (max-width: 995px) {
+    .blog-top-part .blog-info {
+        padding-left: 50px;
     }
 }
+@media all and (max-width: 570px) {
+    .blog-top-part .blog-info {
+        padding-left: 75px;
+    }
+} 

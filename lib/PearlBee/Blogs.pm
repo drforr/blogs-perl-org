@@ -37,20 +37,25 @@ get '/blogs/user/:username/slug/:slug' => sub {
   my $slug        = route_parameters->{'slug'};
   my $username    = route_parameters->{'username'};
   my ( $user )    = resultset('Users')->match_lc( $username );
+  my @blog_ids;
+  my @posts;
   unless ($user) {
     return error "No such user '$username'";
   }
   my ( $searched_blog ) = resultset('Blog')->find_by_slug_uid({
     slug => $slug, user_id => $user->id
   });
-  my @posts       = resultset('Post')->search_published(
-    { 'user_id' => $user->id },
-    { order_by => { -desc => "created_date" }, rows => $num_user_posts }
-  );
-  my $nr_of_posts = resultset('Post')->search_published({
-    'user_id' => $user->id
-  })->count;
 
+  push @blog_ids, resultset('BlogPost')->search({ blog_id => $searched_blog->id });
+
+  foreach my $iterator (@blog_ids){
+    push @posts, resultset('Post')->search (
+      { id => $iterator->post_id},
+      { order_by => { -desc => "created_date" }, rows => $num_user_posts }
+      );
+  }
+
+  my $nr_of_posts = scalar @posts;
   # extract demo posts info
   my @mapped_posts = map_posts(@posts);
   my $movable_type_url = config->{movable_type_url};
@@ -86,7 +91,8 @@ get '/blogs/user/:username/slug/:slug' => sub {
         blogs          => \@blogs,
         user           => $user,
         authors        => \@authors,
-        searched_blog  => $searched_blog
+        searched_blog  => $searched_blog,
+        nr_of_posts    => $nr_of_posts
     };
 };
 

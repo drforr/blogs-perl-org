@@ -477,8 +477,8 @@ sub can_do {
   });
 
   my $id = $self->id;
-  warn "***** Testing user ID $id for ability '$ability' " .
-       $acl ? 'passed' : 'failed';
+  my $pass = $acl ? 'passed' : 'failed';
+  warn "***** Testing user ID $id for ability '$ability' $pass";
 
   return $acl ? 1 : undef
 }

@@ -18,10 +18,9 @@
 
                            <div class="awidget-body">
 
-                             <select name="posts_blog_options" onChange="window.location.href=this.value">
+                             <select name="posts_blog_slug">
                               [% FOREACH blog IN blogs %]
-                              [% SET role = ( session.user.is_admin ) ? "admin" : "author" %]
-                              <option [% selected %] > [% blog.name %] </option>
+                                <option [% blog.selected %] value="[% blog.slug %]">[% blog.name %]</option>
                               [% END %]
                              </select>
                            </div>
@@ -32,12 +31,12 @@
 
                            <div class="awidget-body">
                              <select name="type">
-                               <option name="HTML">HTML</option>
-                               <option name="Markdown">Markdown</option>
+                               <option value="HTML">HTML</option>
+                               <option value="Markdown">Markdown</option>
 <!-- Keep these other options for later
-                               <option name="Markdown_With_Smartypants">Markdown with Smartypants</option>
-                               <option name="RichText">RichText</option>
-                               <option name="Textile2">Textile2</option>
+                               <option value="Markdown_With_Smartypants">Markdown with Smartypants</option>
+                               <option value="RichText">RichText</option>
+                               <option value="Textile2">Textile2</option>
 -->
                              </select>
                            </div>

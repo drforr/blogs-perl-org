@@ -79,8 +79,12 @@ blog-avatar:
     height: 140
     width:  140
   default:
-    dark:  'blog/img/blog-pic.png'
-    light: 'blog/img/blog-pic-light.png'
+    dark:
+      large:  'blog/img/blog_dark_large.png'
+      small:  'blog/img/blog_dark_small.png'
+    light:
+      large:  'blog/img/blog_light_large.png'
+      small:  'blog/img/blog_light_small.png'
 
 # Constants
 covers_folder:   'public/uploads/covers/'
