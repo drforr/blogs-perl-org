@@ -1,11 +1,10 @@
-<!--
-<link href="/blog/css/profile.css" rel="stylesheet">
-<link href="/blog/css/style.css" rel="stylesheet">
+<!--[% SET global.template_name = 'create_blog' %]-->
+<!--<link href="/blog/css/profile.css" rel="stylesheet">-->
+<link href="/blog/css/style.css" rel="stylesheet"> 
 <link href="/blog/css/croppie.css" rel="stylesheet">
-<script src="/js/croppie.js"></script>
+<script src="/admin/js/croppie.js"></script>
 <script src="public/blog/js/profile.js"></script>
-<script src="public/blog/js/app.js"></script>
--->
+<!--<script src="public/blog/js/app.js"></script>-->
 
 	
 
@@ -13,31 +12,31 @@
 	<div class="profile-modal">
 
 	<!-- Modal -->
-	<div class="modal fade" id="changeImg" tabindex="-1" role="dialog" aria-labelledby="changeImgLabel">
+	<div class="modal fade" id="changeImgBlog" tabindex="-1" role="dialog" aria-labelledby="changeImgBlogLabel">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-					<h4 class="modal-title" id="changeImgLabel">Change Photo</h4>
+					<h4 class="modal-title" id="changeImgBlogLabel">Change Photo</h4>
 				</div>
 				<div class="modal-body clearfix">
 					<div class="col-xs-12 col-sm-6 profile-pic">
 						<div class="bubble text-center">
 
 							[% IF session.user.avatar_path %]
-							<img id="image_upload_preview" class="user-image" src="/avatar/[% session.user.username %]" /> [% ELSE %]
-							<img id="image_upload_preview" class="user-image defaultAvatar" src="/avatar/[% session.user.username %]" /> [% END %]
-							<div id="croppie-avatars">
+							<img id="blog_img_preview" class="user-image" src="/avatar/[% session.user.username %]" /> [% ELSE %]
+							<img id="blog_img_preview" class="user-image defaultAvatar" src="/avatar/[% session.user.username %]" /> [% END %]
+							<div id="croppie_pic">
 							</div>
 
 
 						</div>
 					</div>
 					<div class="col-xs-12 col-sm-6 picture-btn">
-						<form action="/profile-image" enctype="multipart/form-data" method="post" id="upload-img">
+						<form action="/profile-image" enctype="multipart/form-data" method="post" id="upload_blog_img">
 							<span class="file-input btn btn-file light-button buttons-group change-pic">
 					<p>Choose picture</p> <!-- <input type="file" name="file"> -->
-					<input type="file" id="file-upload" class="form-control" name="file">
+					<input type="file" id="file-upload-blog" class="form-control" name="file">
 					<input type="text" class="form-control hidden" name="width">
 					<input type="text" class="form-control hidden" name="height">
 					<input type="text" class="form-control hidden" name="top">
@@ -82,7 +81,7 @@
 
 					[% INCLUDE components/alerts.tt %]
 
-					<form class="form-horizontal" role="form" method="post" action>
+					<form class="form-horizontal" role="form" method="post" action="/create-blog">
 						<div class="col-lg-9">
 							<div class="form-group">
 								<label class="col-lg-4 control-label">Blog Name</label>
@@ -111,9 +110,7 @@
 								<label class="col-lg-4 control-label">Social media buttons</label>
 								<div class="col-lg-8">
 									<div class="make-switch" data-on="success" data-off="danger">
-										[% IF setting.social_media %]
-										<input id="newblog_social_media_check" name="newblog_social_media" type="checkbox" checked> [% ELSE %]
-										<input id="newblog_social_media_check" name="newblog_social_media" type="checkbox"> [% END %]
+										<input id="newblog_social_media_check" name="newblog_social_media" type="checkbox" [% IF setting.social_media %]checked[% END %]>
 									</div>
 									<input id="newblog_social_media_state" type="hidden" value="[% setting.social_media %]" />
 								</div>
@@ -125,10 +122,7 @@
 								<label class="col-lg-4 control-label">Multiuser</label>
 								<div class="col-lg-8">
 									<div class="make-switch" data-on="success" data-off="danger">
-										[% IF setting.social_media %]
-										<!--									trebe schimbat pt user conditia-->
-										<input id="newblog_multiuser_check" name="newblog_multiuser" type="checkbox" checked> [% ELSE %]
-										<input id="newblog_multiuser_check" name="newblog_multiuser" type="checkbox"> [% END %]
+										<input id="newblog_multiuser_check" name="newblog_multiuser" type="checkbox" [% IF setting.multiuser %]checked[% END %]>
 									</div>
 									<input id="newblog_multiuser_state" type="hidden" value="[% setting.social_media %]" />
 								</div>
@@ -140,10 +134,7 @@
 								<label class="col-lg-4 control-label">Accepting comments</label>
 								<div class="col-lg-8">
 									<div class="make-switch" data-on="success" data-off="danger">
-										[% IF setting.social_media %]
-										<!--trebe scghimbat pt comentarii-->
-										<input id="newblog_comments_check" name="newblog_comments" type="checkbox" checked> [% ELSE %]
-										<input id="newblog_comments_check" name="newblog_comments" type="checkbox"> [% END %]
+										<input id="newblog_comments_check" name="newblog_comments" type="checkbox" [% IF setting.accept_comments %]checked[% END %]>
 									</div>
 									<input id="newblog_comments_state" type="hidden" value="[% setting.social_media %]" />
 								</div>
@@ -173,19 +164,17 @@
 							</div>
 						</div>
 
-<!--
 						<div class="col-lg-3 profile-pic">
 							<div class="bubble">
 								[% IF session.user.avatar_path %]
-								<img id="image_upload_preview" class="user-image" src="/avatar/[% session.user.username %]" /> [% ELSE %]
-								<img id="image_upload_preview" class="user-image defaultAvatar" src="/avatar/[% session.user.username %]" /> [% END %]
+								<img id="blog_img_preview" class="user-image" src="/avatar/[% session.user.username %]" /> [% ELSE %]
+								<img id="blog_img_preview" class="user-image defaultAvatar" src="/avatar/[% session.user.username %]" /> [% END %]
 							</div>
 							<div>
-								<button type="button" class="btn change-pic" data-toggle="modal" data-target="#changeImg">Change photo
+								<button type="button" class="btn change-pic" data-toggle="modal" data-target="#changeImgBlog">Change photo
 								</button>
 							</div>
 						</div>
--->
 					</form>
 
 				</div>

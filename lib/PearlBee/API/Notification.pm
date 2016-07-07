@@ -38,7 +38,7 @@ get '/api/notification/comment/user/:username/page/:page' => sub {
     resultset('Notification')->search(
       { user_id  => $user->id,
         name     => 'comment' },
-      { num_rows => config->{api}{notification}{comment}{max_rows},
+      { rows     => config->{api}{notification}{comment}{max_rows},
         page     => $page,
         order_by => { -desc => 'created_date' } }
     );
@@ -74,14 +74,15 @@ get '/api/notification/invitation/user/:username/page/:page' => sub {
   my @notifications =
     resultset('Notification')->search(
       { user_id  => $user->id,
-        name     => 'invitation' },
-      { num_rows => config->{api}{notification}{comment}{max_rows},
+        name     => 'invitation',
+        viewed   =>0 },
+      { rows     => config->{api}{notification}{comment}{max_rows},
         page     => $page,
         order_by => { -desc => 'created_date' } }
     );
 
   my $count_invitations = resultset('Notification')->search({
-  user_id => $user->id, name => 'invitation'
+  user_id => $user->id, name => 'invitation', viewed => 0
   })->count;
   my %data;
   @notifications = map { $_->as_hashref_sanitized } @notifications;
@@ -111,7 +112,7 @@ get '/api/notification/response/user/:username/page/:page' => sub {
     resultset('Notification')->search(
       { sender_id  => $user->id,
         name       => 'response' },
-      { num_rows   => config->{api}{notification}{comment}{max_rows},
+      { rows       => config->{api}{notification}{comment}{max_rows},
         page       => $page,
         order_by   => { -desc => 'created_date' } }
     );
@@ -146,7 +147,7 @@ get '/api/notification/changed_role/user/:username/page/:page' => sub {
     resultset('Notification')->search(
       { user_id  => $user->id,
         name     => 'changed role' },
-      { num_rows => config->{api}{notification}{comment}{max_rows},
+      { rows     => config->{api}{notification}{comment}{max_rows},
         page     => $page,
         order_by => { -desc => 'created_date' } }
     );

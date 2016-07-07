@@ -34,6 +34,8 @@
         <script src="/blog/js/home.js"></script>
     [% ELSIF global.template_name == 'notification' %]
         <script src="/admin/js/notification.js"></script>
+		[% ELSIF global.template_name == 'create_blog' %]
+				<script src="/js/croppie.js"></script>
     [% END %]
 
 

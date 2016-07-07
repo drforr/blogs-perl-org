@@ -38,6 +38,7 @@
 
             <button type="submit" class="submitRegister" id="submitRegister">Submit</button>
           </form>
+
          <div class="social_register">
             <p>You can register using the following accounts:</p>
             <div class="separator"></div>
@@ -57,4 +58,5 @@
        </div>
      </div>
    </div>
+
 </div>

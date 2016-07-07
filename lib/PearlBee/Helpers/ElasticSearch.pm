@@ -178,12 +178,8 @@ sub search_blogs {
     for my $result ( @{ $elastic_results->{hits}{hits} } ) {
         my $rs = resultset('Blog')->find({ id => $result->{_id} });
         next unless $rs and $rs->id;
-        # my $blog_avatar = $rs->blog->avatar;
-        # if ( $blog_avatar and $blog_avatar =~ m{ ^/blog }x ) {
-        #     $blog_avatar = "";
-        # }                
-    my $href = $rs->as_hashref;
-    push @results, $href;
+        my $href = $rs->as_hashref;
+        push @results, $href;
     }
 
     return @results;

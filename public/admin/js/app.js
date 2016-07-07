@@ -100,4 +100,56 @@ function getStatus(gs) {
 $(document).ready(function(){
 	var statusName = sessionStorage.selectedStatus;
 	$(".chosen-container-single-nosearch > a.chosen-single > span").html(statusName);
+	$(".sidey .nav").click(function(){
+		sessionStorage.clear();
+	});
+});
+
+//----------------------------
+
+
+$(document).ready(function() {
+	
+// Image upload preview modal cancel button
+    $(".modal-footer .cancel-img").on('click', function(){
+        var src = $( ".credentials .bubble" ).parent().find('img').attr('src');
+        $('#image_upload_preview').attr('src', src);
+
+        if (!$('#image_upload_preview').hasClass('defaultAvatar')) {
+            $('#image_upload_preview').addClass('hidden');
+            $('#croppie-avatars').croppie('bind', {
+                url: src
+            }, function() {
+                $('#croppie-avatars .cr-image').css({
+                    'transform-origin': '20px 20px 0',
+                    '-webkit-transform-origin': '20px 20px 0',
+                    'transform': 'translate3d(20px, 20px, 0)',
+                    'width': '140px',
+                    'height': '140px'
+                });
+                $('#croppie-avatars .cr-slider').attr('min', 1).attr('max', 2).val(1);
+            });
+
+            $('#croppie-avatars').removeClass('hidden');
+        } else {
+            $('#croppie-avatars').addClass('hidden');
+            $('#image_upload_preview').removeClass('hidden');
+            $('#image_upload_preview').hasClass('defaultAvatar').show();
+        }
+        $('#upload-img').get(0).reset();
+    });
+
+
+    $('#croppie_pic').croppie({
+        url: $('#blog_img_preview').attr('src'),
+        viewport: {
+            width: 140,
+            height: 140,
+            type: 'circle'
+        },
+        boundary: {
+            width: 180,
+            height: 180
+        }
+    });
 });

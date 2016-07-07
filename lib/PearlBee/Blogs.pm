@@ -212,19 +212,48 @@ post '/create-blog' => sub{
     warn "***** Redirecting guest away from /create-blog";
     redirect '/'
   }
+
+  my $flag = 0;
+  my $check_blog = resultset('Blog')->find({ name=> $params->{blog_name}});
+  if ($check_blog){
+      $flag = 1;
+  }
+  
   my $blog     = resultset('Blog')->create_with_slug({
-    name         => $params->{name},
-    description  => $params->{description},
+    name         => $params->{blog_name},
+    description  => $params->{blog_description},
     timezone     => $params->{timezone},
+    slug         => $params->{blog_url},
+    social_media => $params->{newblog_social_media},
+    multiuser    => $params->{newblog_multiuser},
+    accept_comments=>$params->{newblog_comments},
   });
 
-  resultset('BlogOwner')->create({
+  my $blog_owner = resultset('BlogOwner')->create({
     blog_id   => $blog->id,
     user_id   => $user->id,
     is_admin  =>"true",
   });
-};
 
+  if ($flag){
+  template 'admin/blogs/add', {
+      error => 'There already exists a blog with this name.'
+    },
+  { layout => 'admin' };
+  }
+  elsif ($blog && $blog_owner){
+  template 'admin/blogs/add', {
+      success => 'The blog was created.'
+    },
+  { layout => 'admin' };
+  }
+  else {
+  template 'admin/blogs/add', {
+      error => 'There was an error when creating the blog'
+    },
+  { layout => 'admin' };
+  }
+};
 =head2 admin/create-blog
 
   Getter for blog-creation for admins;

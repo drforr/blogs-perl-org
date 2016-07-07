@@ -216,7 +216,7 @@ get '/admin/comments/blog/:blog/:status/page/:page' => sub {
   my $page       = params->{page} || 1;
   my $blog       = params->{blog};
   my $status     = params->{status};
-  my $blog_ref   =resultset('Blog')->find({name => params->{blog}});
+  my $blog_ref   = resultset('Blog')->find({name => params->{blog}});
   my $user       = resultset('Users')->find_by_session(session);
   my @blog_posts = resultset('BlogPost')->search({ blog_id => $blog_ref->get_column('id')});
   my @comments;

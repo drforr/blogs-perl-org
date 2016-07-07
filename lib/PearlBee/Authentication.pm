@@ -4,7 +4,7 @@ use Try::Tiny;
 use JSON qw//;
 use Dancer2;
 use Dancer2::Plugin::DBIC;
-use Captcha::reCAPTCHA::V2;
+use Dancer2::Plugin::reCAPTCHA;
 use HTTP::Tiny;
 use WWW::OAuth;
 use WWW::OAuth::Util 'form_urldecode';
@@ -122,9 +122,8 @@ get '/register_success' => sub { template 'register_success' };
 post '/register_success' => sub {
   my $params   = body_parameters;
   my $response = $params->{'g-recaptcha-response'};
-  my $rc       = Captcha::reCAPTCHA::V2->new;
-  my $result   = $rc->verify(config->{plugins}{reCAPTCHA}{secret} || $ENV{bpo_recaptcha_secret}, $response);
-  my $captcha  = $rc->html(config->{plugins}{reCAPTCHA}{site_key} || $ENV{bpo_recaptcha_site_key});
+  my $result   = recaptcha_verify($response);
+  my $captcha  = recaptcha_display();
   my $err;
 
   my $template_params = {
@@ -138,7 +137,7 @@ post '/register_success' => sub {
     template 'register', {
       error => "Please provide a username",
       email => $params->{'email'},
-      recaptcha => $rc->html(config->{plugins}{reCAPTCHA}{site_key} || $ENV{bpo_recaptcha_site_key})
+      recaptcha => recaptcha_display()
     };
   }
 
@@ -150,7 +149,7 @@ post '/register_success' => sub {
       email => $params->{'email'},
       username => $params->{'username'},
       name => $params->{'name'},
-      recaptcha => $rc->html(config->{plugins}{reCAPTCHA}{site_key} || $ENV{bpo_recaptcha_site_key})
+      recaptcha => recaptcha_display()
     };
   }
 
@@ -163,7 +162,7 @@ post '/register_success' => sub {
       email => $params->{'email'},
       username => $params->{'username'},
       name => $params->{'name'},
-      recaptcha => $rc->html(config->{plugins}{reCAPTCHA}{site_key} || $ENV{bpo_recaptcha_site_key})
+      recaptcha => recaptcha_display()
     };
   }
 
@@ -176,7 +175,7 @@ post '/register_success' => sub {
       warning => "The provided username is already in use.",
       email => $params->{'email'},
       name => $params->{'name'},
-      recaptcha => $rc->html(config->{plugins}{reCAPTCHA}{site_key} || $ENV{bpo_recaptcha_site_key})
+      recaptcha => recaptcha_display()
     };
   }
 
@@ -248,66 +247,6 @@ post '/register_success' => sub {
   template 'register_success';
 };
 
-# =head2 /oauth/:username/service/:service/service_id/:service_id route
-
-# Add OpenAuth ID to an existing user
-
-# =cut
-
-post '/oauth/:username/service/:service/service_id/:service_id' => sub {
-  my $username   = route_parameters->{'username'};
-  my $service    = route_parameters->{'service'};
-  my $service_id = route_parameters->{'service_id'};
-  my $user       = resultset('Users')->find(
-    \[ 'lower(username) = ?' => $username ] );
-  unless ( $user and $user->can_do( 'create user_oauth' ) ) {
-    warn "***** Redirecting guest away from /oauth/:username/service/:service/service_id/:service_id";
-    error "You are not allowed to add OpenAuth to this user";
-  }
-  error "No username specified to attach a service to"
-    unless $username;
-  error "No service name specified to attach a service to"
-    unless $service;
-  error "No service ID specified to attach a service to"
-    unless $service_id;
-  try {
-    my $user_oauth = resultset("Useroauth")->create(
-      user_id    => $user->{id},
-      service    => $service,
-      service_id => $service_id
-    );
-  }
-  catch {
-    error "Could not assign $service ID";
-  };
-};
-
-# =head2 /oauth/:service/service_id/:service_id
-
-# Validate OpenAuth ID for an existing user
-
-# =cut
-
-# get '/oauth/:service/service_id/:service_id' => sub {
-#   my $service    = route_parameters->{'service'};
-#   my $service_id = route_parameters->{'service_id'};
-#   error "No service name specified to attach a service to"
-#     unless $service;
-#   error "No service ID specified to attach a service to"
-#     unless $service_id;
-
-#   my $user;
-#   try {
-#     my $user_oauth = resultset('UserOAuth')->
-#                   find({ service => $service, service_id => $service_id });
-#     $user       = resultset('Users')->find($user->{id});
-#   }
-#   catch {
-#     return to_json({ username => undef });
-#   };
-
-#   return to_json({ username => $user->{username} });
-# };
 
 =head2 /login route
 

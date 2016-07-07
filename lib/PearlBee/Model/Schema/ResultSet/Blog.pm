@@ -31,6 +31,8 @@ sub create_with_slug {
 
 =head2 search_by_user_id_and_slug({ user_id => 'drforr', slug => 'hi' })
 
+=cut
+
 sub search_by_user_id_and_slug {
   my ($self, $args) = @_;
   my $slug    = $args->{slug};

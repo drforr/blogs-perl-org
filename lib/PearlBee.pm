@@ -169,6 +169,14 @@ post '/comments' => sub {
   my $comment = resultset('Comment')->can_create( $parameters, $user );
   my $author = $post->user;
 
+  my  $args;
+  if ($user->id != $author->id) { 
+    $args->{comment_id} = $comment->id;
+    $args->{user_id}    = $author->id;
+    $args->{sender_id}  = $user->id;
+    my $notification    = resultset('Notification')->create_comment($args);
+  }
+
   try {
     # If the person who leaves the comment is either the author or the admin the comment is automaticaly approved
 

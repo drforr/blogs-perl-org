@@ -191,8 +191,6 @@ post '/admin/posts/add' => sub {
     my $post;
     
     try {
-        
-          
           # Set the proper timezone
           #
           my $user             = session('user');

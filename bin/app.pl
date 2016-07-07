@@ -5,11 +5,12 @@ use FindBin;
 use Term::ANSIColor;
 use lib "$FindBin::Bin/../lib";
 
+use constant WHITE_ON_RED => 'white on_red';
+
 chdir("$FindBin::Bin/../");
 
 use PearlBee;
 
-# Read config
 my $cfg = Config::Any->load_stems({
   stems   => [ 'config' ],
   use_ext => 1
@@ -17,72 +18,65 @@ my $cfg = Config::Any->load_stems({
 $cfg = $cfg->[0];
 $cfg = $cfg->{(keys %$cfg)[0]};
 
-# Needed for mail server
-my $mail_server_host = $cfg->{mail_server}{host};
-my $mail_server_user = $cfg->{mail_server}{user};
-my $mail_server_password = $cfg->{mail_server}{password} || $ENV{bpo_mail_server_password};
-
-# Needed for captcha
-my $recaptcha_site_key = $cfg->{plugins}{reCAPTCHA}{site_key} || $ENV{bpo_recaptcha_site_key};
-my $recaptcha_secret = $cfg->{plugins}{reCAPTCHA}{secret} || $ENV{bpo_recaptcha_secret};
-
-# Needed for login with facebook
-my $facebook_client_id = $cfg->{plugins}->{social_media}->{facebook}->{client_id} || $ENV{bpo_social_media_facebook_client_id};
-my $facebook_client_secret = $cfg->{plugins}->{social_media}->{facebook}->{client_secret} || $ENV{bpo_social_media_facebook_client_secret};
-
-# Needed for login with twitter
-my $twitter_consumer_key = $cfg->{plugins}->{social_media}->{twitter}->{consumer_key} || $ENV{bpo_social_media_twitter_consumer_key};
-my $twitter_consumer_secret = $cfg->{plugins}->{social_media}->{twitter}->{consumer_secret} || $ENV{bpo_social_media_twitter_consumer_secret};
-
-
-# Needed for login with google
-my $google_client_id = $cfg->{plugins}->{social_media}->{google}->{client_id} || $ENV{bpo_social_media_google_client_id};
-my $google_client_secret = $cfg->{plugins}->{social_media}->{google}->{client_secret} || $ENV{bpo_social_media_google_client_secret};
-
-# Needed for login with github
-my $github_client_id = $cfg->{plugins}->{social_media}->{github}->{client_id} || $ENV{bpo_social_media_github_client_id};
-my $github_client_secret = $cfg->{plugins}->{social_media}->{github}->{client_secret} || $ENV{bpo_social_media_github_client_secret};
-
-# Needed for login with linkedin
-my $linkedin_client_id = $cfg->{plugins}->{social_media}->{linkedin}->{client_id} || $ENV{bpo_social_media_linkedin_client_id};
-my $linkedin_client_secret = $cfg->{plugins}->{social_media}->{linkedin}->{client_secret} || $ENV{bpo_social_media_linkedin_client_secret};
-
-# Misc
-my $color = 'white on_red';
-my $delimiter = "###################################";
-my $message;
-
-# Buffer all the warnings
-$message .= ( "Missing public/avatars/ symlink - run '" . q{ln -s ~/avatars public/avatars'} . "'\n" ) unless -e 'public/avatars';
-$message .= ( "Missing public/userpics/ symlink - run '" . q{ln -s ~/userpics public/userpics'} . "'\n" ) unless -e 'public/userpics';
-
-$message .= "Missing mail server host\n" unless $mail_server_host;
-$message .= "Missing mail server user\n" unless $mail_server_user;
-$message .= "Missing mail server password\n" unless $mail_server_password;
-
-$message .= "Missing reCaptcha site key\n" unless $recaptcha_site_key;
-$message .= "Missing reCaptcha secret\n" unless $recaptcha_secret;
-
-$message .= "Missing facebook client_id\n" unless $facebook_client_id;
-$message .= "Missing facebook client_secret\n" unless $facebook_client_secret;
-
-$message .= "Missing twitter consumer_key\n" unless $twitter_consumer_key;
-$message .= "Missing twitter consumer_secret\n" unless $twitter_consumer_secret;
-
-$message .= "Missing google client_id\n" unless $google_client_id;
-$message .= "Missing google client_secret\n" unless $google_client_secret;
-
-$message .= "Missing github client_id\n" unless $github_client_id;
-$message .= "Missing github client_secret\n" unless $github_client_secret;
-
-$message .= "Missing linkedin client_id\n" unless $linkedin_client_id;
-$message .= "Missing linkedin client_secret\n" unless $linkedin_client_secret;
-
-# Spit out the warnings
-if ($message) {
-  $message = $delimiter . "\n" . $message . $delimiter;
-  warn "\n".colored($message, 'white on_red')."\n";
+my $error = 0;
+$error++ unless -e 'public/avatars';
+$error++ unless -e 'public/userpics';
+for my $plugin ( qw( mail_server ) ) {
+  for ( qw( user password host ) ) {
+    $error++ unless $cfg->{$plugin}{$_};
+  }
+}
+for my $plugin ( qw( reCAPTCHA ) ) {
+  for ( qw( client_id secret ) ) {
+    $error++ unless $cfg->{plugins}{$plugin}{$_};
+  }
+}
+for my $plugin ( qw( facebook twitter google github linkedin ) ) {
+  for ( qw( client_id secret ) ) {
+    $error++ unless $cfg->{plugins}{social_media}{$plugin}{$_};
+  }
 }
 
-# Start dancing
+sub warn_missing {
+  my ( $message ) = @_;
+  my $color = WHITE_ON_RED;
+
+  warn colored($message, $color) . "\n";
+}
+
+sub warn_missing_secret {
+  my ( $name, $config ) = @_;
+
+  warn_missing("Missing " . $name . " site key") unless $config->{site_key};
+  warn_missing("Missing " . $name . " secret") unless $config->{secret};
+}
+
+if ( $error ) {
+  warn_missing("###################################");
+
+  my $color = WHITE_ON_RED;
+  -e 'public/avatars' or
+    warn colored("Missing public/avatars/ symlink - run '",$color) .
+      q{ln -s ~/avatars public/avatars'} .
+      colored(q{'},$color);
+  -e 'public/userpics' or
+    warn colored("Missing public/userpics/ symlink - run '",$color) .
+      q{ln -s ~/userpics public/userpics'} .
+      colored(q{'},$color);
+
+  my $mail_server = $cfg->{mail_server};
+  $mail_server->{user}     or warn_missing("Missing mail server user");
+  $mail_server->{password} or warn_missing("Missing mail server password");
+  $mail_server->{host}     or warn_missing("Missing mail server host");
+
+  warn_missing_secret( 'reCAPTCHA', $cfg->{plugins}{reCAPTCHA}              );
+  warn_missing_secret( 'facebook',  $cfg->{plugins}{social_media}{facebook} );
+  warn_missing_secret( 'twitter',   $cfg->{plugins}{social_media}{twitter}  );
+  warn_missing_secret( 'google',    $cfg->{plugins}{social_media}{google}   );
+  warn_missing_secret( 'github',    $cfg->{plugins}{social_media}{github}   );
+  warn_missing_secret( 'linkedin',  $cfg->{plugins}{social_media}{linkedin} );
+
+  warn colored("###################################",$color)."\n";
+}
+
 PearlBee->dance;

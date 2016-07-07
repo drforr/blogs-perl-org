@@ -112,13 +112,14 @@ post '/profile' => sub {
 
   my $params      = body_parameters;
   my $user        = session('user');
-  unless ( $user and $user->can_do( 'update user' ) ) {
+  my $res_user    = resultset('Users')->find_by_session(session);
+  unless ( $res_user and $res_user->can_do( 'update user' ) ) {
     warn "***** Redirecting guest away from /profile";
     return template 'profile', {
       warning => "You are not allowed to update this user"
     }, { layout => 'admin' };
   }
-  my $res_user    = resultset('Users')->find_by_session(session);
+ 
   my $new_columns = { };
   my @message;
 
@@ -188,13 +189,14 @@ post '/profile-image' => sub {
   my $params   = params;
   my $file     = $params->{file};
   my $user     = session('user');
-  unless ( $user and $user->can_do( 'update user' ) ) {
+  my $res_user = resultset('Users')->find_by_session(session);
+  unless ( $res_user and $res_user->can_do( 'update user' ) ) {
     warn "***** Redirecting guest away from /profile-image";
     return template 'profile', {
       warning => "You are not allowed to update this user"
     }, { layout => 'admin' };
   }
-  my $res_user = resultset('Users')->find_by_session(session);
+  
   my $message;
 
   my $upload_dir  = "/" . config->{'avatar'}{'path'};
@@ -329,13 +331,14 @@ post '/blog-image/slug/:slug/user/:username' => sub {
 post '/profile_password' => sub {
   my $params   = body_parameters;
   my $user     = session('user');
-  unless ( $user and $user->can_do( 'update user' ) ) {
+  my $res_user = resultset('Users')->find_by_session(session);
+  unless ( $res_user and $res_user->can_do( 'update user' ) ) {
     warn "***** Redirecting guest away from /profile_password";
     return template 'profile', {
       warning => "You are not allowed to update this user",
     }, { layout => 'admin' };
   }
-  my $res_user = resultset('Users')->find_by_session(session);
+  
   my $template_data;
 
   if (defined($res_user) && ($params->{'new_password'} ne '')) {

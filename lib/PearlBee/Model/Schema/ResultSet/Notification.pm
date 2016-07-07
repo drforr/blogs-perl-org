@@ -22,6 +22,7 @@ sub create_comment {
 
   $schema->resultset('Notification')->create({
     name       => 'comment',
+    viewed     => 0,
     generic_id => $args->{comment_id},
     sender_id  => $args->{sender_id},
     user_id    => $args->{user_id}

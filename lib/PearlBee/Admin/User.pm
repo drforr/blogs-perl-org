@@ -218,7 +218,6 @@ get '/admin/users/blog/:blog/:status/:role/:page/:page' => sub {
   }
 
   my $blog       = resultset('Blog')->find({ name => params->{blog} });
-  #my $user_obj   = resultset('Users')->find_by_session(session);
   my @blogs;
   my @blogs2;
   my @users;
