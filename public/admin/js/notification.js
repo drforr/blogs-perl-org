@@ -1,18 +1,19 @@
 $(document).ready(function(){
     var pageURL = window.location.pathname.split('/');
+    var SessionUsername = $('#sessionUsername').text();
     // userName = "/" + pageURL[5];
-
+    // var userName = '<%=Session["user.username"]%>';
 
     // Comments Function =====================
 var  CommentsSection = function() {
 
+
     $.ajax({
-    url:  '/api/notification/comment/user/' + 'victor' + '/page/' + '0',
+    url:  '/api/notification/comment/user/' + SessionUsername + '/page/' + '0',
     type: 'GET'
   })
     .done(function(data) {
-          var data = JSON.parse(data);
-
+      var data = JSON.parse(data);
           // Update nr of new Comments
           $('.commentsNr').prepend( data.total + ' New Comments');
       });
@@ -22,7 +23,7 @@ var  CommentsSection = function() {
     // Invitation Function ===========================
 var InvitationSection = function() {
     $.ajax({
-    url:  '/api/notification/invitation/user/' + 'victor' + '/page/' + '0',
+    url:  '/api/notification/invitation/user/' + SessionUsername + '/page/' + '0',
     type: 'GET'
   })
   .done(function(data) {
@@ -57,6 +58,7 @@ var InvitationSection = function() {
            newRow.find('.inviteUsername').attr('href', 'profile/author/' + data.notifications[i].sender.username);
            newRow.insertBefore('.invitation-arrow');
     } // <- end for
+
   });
 }; // <- end of Invitation Function
 
@@ -64,7 +66,7 @@ var InvitationSection = function() {
   // Response Function =========================
 var ResponseSection = function() {
   $.ajax({
-  url:  '/api/notification/response/user/' + 'victor' + '/page/' + '0',
+  url:  '/api/notification/response/user/' + SessionUsername + '/page/' + '0',
   type: 'GET'
 })
 
@@ -123,9 +125,10 @@ var RoleSection = function() {
 
 $('.invitation-arrow').click(function() {
     var button = $(this),
-        pageURL = window.location.pathname.split('/'),
-        pageNumber =  +(button.attr("moreInvitations")) + 1;
-        debugger;
+        pageURL = window.location.pathname.split('/');
+        // CurrentPage = $('.down-arrow'),
+        // pageNumber =  +(CurrentPage.attr("moreInvitations")) + 1;
+        // debugger;
 
     $('.progressloader').show();
     InvitationSection();

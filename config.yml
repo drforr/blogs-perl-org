@@ -19,7 +19,7 @@ charset: "UTF-8"
 # simple: default and very basic template engine
 # template_toolkit: TT
 
-session: "YAML"
+session: Memcached
 
 #Logging
 #logger: "file"
@@ -27,21 +27,21 @@ session: "YAML"
 template: "template_toolkit"
 engines:
   session:
-    YAML:
-      session_dir: "sessions"
+    Memcached:
+      memcached_servers: localhost:11211
 
 mail_server:
     user: 'jobs@builtinperl.com'
-    password:
+    password: '4guFG0s8mDl@z'
     host: 'mail.evozon.com'
     port: 587
 
 plugins:
       DBIC:
         default:
-          dsn: dbi:Pg:database=blogs_perl_org_multiblog
+          dsn: dbi:Pg:host=139.162.204.109;database=blogs_perl_org_multiblog
           schema_class: PearlBee::Model::Schema
-          user: paulm
+          user: jgoff
           password:
           options:
             RaiseError:        1
@@ -52,8 +52,8 @@ plugins:
         format:    'Atom'
         max_posts: 10
       reCAPTCHA:
-        site_key:
-        secret:
+        site_key: '6LdQmhITAAAAAP7enD0cWGnmfVkzTTcV1d6r6vkp'
+        secret:   '6LdQmhITAAAAANf8ueWfMzWmhWBfaJlQuEMNjc83'
         options:
           theme: 'light'
           type:  'image'
