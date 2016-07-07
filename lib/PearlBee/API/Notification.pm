@@ -45,10 +45,12 @@ get '/api/notification/comment/user/:username/page/:page' => sub {
   my $count_comments = resultset('Notification')->search({
   user_id => $user->id, name => 'comment'
   })->count;
+
   my %data;
-  @notifications = map { $_->as_hashref_sanitized } @notifications;
-  $data{total}= $count_comments;
+  @notifications       = map { $_->as_hashref_sanitized } @notifications;
+  $data{total}         = $count_comments;
   $data{notifications} = \@notifications;
+  $data{username}      = $user->username;
 
   # Le sigh, something stuffed up the serializer plugin.  
   my $json = JSON->new;
@@ -84,10 +86,12 @@ get '/api/notification/invitation/user/:username/page/:page' => sub {
   my $count_invitations = resultset('Notification')->search({
   user_id => $user->id, name => 'invitation', viewed => 0
   })->count;
+
   my %data;
-  @notifications = map { $_->as_hashref_sanitized } @notifications;
+  @notifications       = map { $_->as_hashref_sanitized } @notifications;
   $data{total}         = $count_invitations;
   $data{notifications} = \@notifications;
+  $data{username}      = $user->username;
 
   # Le sigh, something stuffed up the serializer plugin.  
   my $json = JSON->new;
@@ -119,10 +123,12 @@ get '/api/notification/response/user/:username/page/:page' => sub {
   my $count_responses = resultset('Notification')->search({
   sender_id => $user->id, name => 'response'
   })->count;
+
   my %data;
   @notifications       = map { $_->as_hashref_sanitized } @notifications;
   $data{total}         = $count_responses;
   $data{notifications} = \@notifications;
+  $data{username}      = $user->username;
 
   # Le sigh, something stuffed up the serializer plugin.  
   my $json = JSON->new;
@@ -154,10 +160,12 @@ get '/api/notification/changed_role/user/:username/page/:page' => sub {
   my $count_notifications = resultset('Notification')->search({
   user_id => $user->id, name => 'changed role'
   })->count;
+
   my %data;
-  @notifications = map { $_->as_hashref_sanitized } @notifications;
+  @notifications       = map { $_->as_hashref_sanitized } @notifications;
   $data{total}         = $count_notifications;
   $data{notifications} = \@notifications;
+  $data{username}      = $user->username;
 
   # Le sigh, something stuffed up the serializer plugin.  
   my $json = JSON->new;
