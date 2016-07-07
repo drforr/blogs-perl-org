@@ -4,7 +4,7 @@
         <ul class="nav">
             <!-- Main menu -->
 
-            [% SET role = ( session.user.is_admin ) ? "admin" : "author" %]  
+            [% SET role = ( session.user.is_admin ) ? "admin" : "author" %]
             <li class="has_submenu">
                  <a href="#">
                     <i class="icon-th"></i> Blogs
@@ -15,8 +15,8 @@
                     <li><a href="/admin/blogs">All</a></li>
                     <li><a href="/admin/create-blog">New Blog</a></li>
                 </ul>
-            </li>            
-            
+            </li>
+
             <li class="has_submenu">
                  <a href="#">
                     <i class="icon-file"></i> Posts
@@ -61,7 +61,7 @@
                        <li><a href="/admin/settings/import">Import</a></li>
                     </ul>
                 </li>
-                <li><a href="/admin/notification"><i class="icon-list"></i> Notifications</a></li>
+                <li><a href="/notification"><i class="icon-list"></i> Notifications</a></li>
             [% END %]
         </ul>
      </div>

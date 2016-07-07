@@ -1,51 +1,68 @@
 $(document).ready(function(){
     var pageURL = window.location.pathname.split('/');
-    userName = "/" + pageURL[5];
+    // userName = "/" + pageURL[5];
 
 
-    // Comments Section
+    // Comments Function =====================
+var  CommentsSection = function() {
+
     $.ajax({
     url:  '/api/notification/comment/user/' + 'victor' + '/page/' + '0',
     type: 'GET'
   })
-  .done(function(data) {
+    .done(function(data) {
+          var data = JSON.parse(data);
 
-        var data = JSON.parse(data);
-
-        // Update nr of new Comments
-        $('.commentsNr').text(data.total + ' New Comments');
-    });
-
+          // Update nr of new Comments
+          $('.commentsNr').prepend( data.total + ' New Comments');
+      });
+    }; // <- End of Comments Function
 
 
-    // Invitations
+    // Invitation Function ===========================
+var InvitationSection = function() {
     $.ajax({
     url:  '/api/notification/invitation/user/' + 'victor' + '/page/' + '0',
     type: 'GET'
   })
   .done(function(data) {
     var data = JSON.parse(data);
+    var totalPages = data.total;
+    var invitation = $(".invitation-row").get(0);
+
+
+
+
 
     // Update the Number of Invitations
-    $('.invitationNr').text(data.total + ' New Invitation(s) to Join the Blog(s)');
+    $('.invitationNr').prepend(' ' + data.total + ' New Invitation(s) to Join the Blog(s)');
 
     // invitation variables
-    var invitation = document.getElementsByClassName("invitation-row");
     var invitationModal = $('<a href="#" data-toggle="modal" data-target="#invitation_modal" class="pull-right">View Invitation</a>');
     // var newInvitation = $(invitation).clone().appendTo(".card-design");
 
 
     // Content for New Invitations
-    $(invitation).text(data.notifications[0].sender.username + " added you as an " +data.notifications[0].role + " to the " +  data.notifications[0].blog.name +' blog');
+    $(invitation).prepend('<a class="inviteUsername" href="profile/author/' + data.notifications[0].sender.username +  '">' + data.notifications[0].sender.username + '</a>' + " added you as an " +  data.notifications[0].role  + " to the " +  '<a href="/blogs/user/' + data.notifications[0].blog.blog_creator.username  +'/slug/' + data.notifications[0].blog.slug + '">' + data.notifications[0].blog.name + '</a>'+' blog');
 
     // Modal Stuff
     $(invitationModal).appendTo(invitation);
-    $('.invitation-blogname').text('I would like to invite you to join my blog ' + data.notifications[0].blog.name);
-    $('.invitation-username').text(data.notifications[0].sender.username);
+    $('.invitation-blogname').prepend('I would like to invite you to join my blog ' + '<a href="#">' + data.notifications[0].blog.name + '</a>' + '.');
+    $('.invitation-username').prepend('<a href="#">' + data.notifications[0].sender.username + '</a>');
+
+    for( var i= 1; i < data.notifications.length; i++){
+
+          newRow = $(invitation).clone();
+
+           newRow.find('.inviteUsername').attr('href', 'profile/author/' + data.notifications[i].sender.username);
+           newRow.insertBefore('.invitation-arrow');
+    } // <- end for
   });
+}; // <- end of Invitation Function
 
 
-  // Response Section
+  // Response Function =========================
+var ResponseSection = function() {
   $.ajax({
   url:  '/api/notification/response/user/' + 'victor' + '/page/' + '0',
   type: 'GET'
@@ -55,7 +72,7 @@ $(document).ready(function(){
     var response = JSON.parse(data);
 
     // Update the Number of Responses
-    $('.responseNr').text(response.total + ' New Responses to Your Invitations');
+    $('.responseNr').prepend(response.total + ' New Responses to Your Invitations');
 
     // response variables
     var responseRow = $('.response-row');
@@ -66,43 +83,52 @@ $(document).ready(function(){
     response.notifications[0].accepted === 0 ? responseStatus = "rejected" : responseStatus = "accepted";
 
     // Populating response row
-    $(responseRow).text(response.notifications[0].receiver.username + ' ' + responseStatus + ' your invitation to join ' + response.notifications[0].blog.name);
+    $(responseRow).prepend('<a href="/profile/author/' + response.notifications[0].receiver.username + '">' + response.notifications[0].receiver.username + '</a>' + ' ' + responseStatus + ' your invitation to join ' + '<a href="/blogs/user/' + response.notifications[0].blog.blog_creator.username  +'/slug/' + response.notifications[0].blog.slug + '">' + response.notifications[0].blog.name + '</a>');
+
 
     // Didn't combine with the above condition responseStatus needs to be defined, but icons need the row populated to prepend on
      (response.notifications[0].accepted === 0) ? (responseRow.prepend('<i class="fa fa-times-circle custom-fonts" aria-hidden="true"></i>').append('<a href="#" class="pull-right">View Users</a>')) : ($('.response-row').prepend('<i class="fa fa-plus-circle custom-fonts" aria-hidden="true"></i>').append('<a href="#" class="pull-right">View Users</a>'));
   });
+};  // <- end of Response Function
 
 
-});
+  // Role Function ============================
+var RoleSection = function() {
 
+  // Role Section
+    $.ajax({
+    url:  '/api/notification/changed_role/user/' + 'victor' + '/page/' + '0',
+    type: 'GET'
+    })
+    .done(function(data) {
+    var role = JSON.parse(data);
 
-// Response Section
-$.ajax({
-url:  '/api/notification/changed_role/user/' + 'victor' + '/page/' + '0',
-type: 'GET'
-})
+    // Update the Number of Responses
+    $('.roleNr').prepend('<a href="#">' + role.total + '</a>' + ' Other Notifications');
+    $('.role-row').prepend('Your role on the ' + '<a href="/blogs/user/' + role.notifications[0].blog.blog_creator.username + '/slug/' +  role.notifications[0].blog.slug + '">' + role.notifications[0].blog.name + '</a>' + ' blog has been changed from ' + role.notifications[0].old_status + ' to ' + role.notifications[0].role);
+    });
 
-.done(function(data) {
-  var role = JSON.parse(data);
+}; // <- end of Role Function
 
-  // Update the Number of Responses
-  $('.roleNr').text(role.total + ' Other Notifications');
+  // Init comments
+  CommentsSection();
+  // Init Invitation Section
+  InvitationSection();
+  // Init Response Section
+  ResponseSection();
+  // Init Role Section
+  RoleSection();
 
-      $('.role-row').text('Your role on the ' + role.notifications[0].blog.name + ' blog has been changed from ' + role.notifications[0].old_status + ' to ' + role.notifications[0].role);
-});
+// More arrow/button
 
+$('.invitation-arrow').click(function() {
+    var button = $(this),
+        pageURL = window.location.pathname.split('/'),
+        pageNumber =  +(button.attr("moreInvitations")) + 1;
+        debugger;
 
+    $('.progressloader').show();
+    InvitationSection();
+  });
 
- // More arrow/button
-
- $('.down-arrow').click(function() {
-     var button = $(this),
-         pageURL = window.location.pathname.split('/'),
-         pageNumber =  +(button.attr("data-page-number")) + 1;
-        //  userName = "/" + pageURL[3],
-         debugger;
-     $('.progressloader').show();
-
-   });
-
-// });
+}); // <- end of Document ready

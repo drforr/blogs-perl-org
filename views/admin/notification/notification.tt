@@ -13,7 +13,7 @@
       		<hr />
       	</div>
 
-    <!-- <form method="post" action="/admin/notification/notification"> -->
+
       <div class="row">
         <div class="col-md-12">
       		<div class="card-design">
@@ -42,9 +42,9 @@
                   <!-- <a href="#" data-toggle="modal" data-target="#invitation_modal" class="pull-right">View Invitation</a> -->
                 </div>
 
-                <br>
-                <div class="text-center">
-                  <i class="fa fa-arrow-circle-o-down custom-fonts down-arrow" aria-hidden="true"></i>
+                <!-- <br> -->
+                <div class="text-center invitation-arrow">
+                  <i class="fa fa-arrow-circle-o-down custom-fonts down-arrow" aria-hidden="true" moreInvitations = "0"></i>
                 </div>
 
               <!-- Modal -->
