@@ -79,7 +79,7 @@
                                         <div class="user">
                                             <a class="user-name" href="/profile/author/[% post.user.username | uri %]"></a>
                                             <span>in</span>
-                                            <a class="blog-name" href="/blogs/user/[% post.user.username | uri %]/slug/[% post.blog.slug %]" >[% post.blog.name %]</a>
+                                            <a class="blog-name" href="/blogs/user/[% post.user.username | uri %]/slug/[% post.blog.slug %]/name/[%post.blog.name%]" >[% post.blog.name %]</a>
                                         </div>
                                         <div class="date">
                                         </div>

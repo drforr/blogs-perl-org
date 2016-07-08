@@ -210,13 +210,13 @@ post '/author/posts/add' => sub {
     warn "***** Redirecting guest away from /author/posts/add";
     redirect '/author/posts';
   }
-  my $blog_slug        = params->{'posts_blog_slug'};
+  my $blog_name        = params->{'posts_blog_name'};
   my ($slug, $changed) = resultset('Post')->check_slug( params->{slug} );
   my $user_id          = $user_obj->id;
 
-  my $blog = resultset('Blog')->find_by_slug_uid({
+  my $blog = resultset('Blog')->find_by_name_uid({
     user_id => $user_id,
-    slug    => $blog_slug
+    name    => $blog_name
   });
   my $cover_filename;
   my $post;

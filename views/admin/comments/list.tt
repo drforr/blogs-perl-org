@@ -94,7 +94,7 @@
 
 							<td width="15%"> <a href="/post/[% comment.post.slug %]"> [% comment.post.title %] </a> </td>
 
-							<td width="15%"> <a href="/blogs/user/[% comment.post.user.username %]/slug/[%comment.post.blog.slug%]">[% comment.post.blog.name %] </a> </td>
+							<td width="15%"> <a href="/blogs/user/[% comment.post.user.username %]/slug/[%comment.post.blog.slug%]/name/[%comment.post.blog.name%]">[% comment.post.blog.name %] </a> </td>
 
 							<td width="15%"> <a href="/blogs/user/[][% comment.post.slug %]"> [% comment.post.blog.status %] </a> </td>
 

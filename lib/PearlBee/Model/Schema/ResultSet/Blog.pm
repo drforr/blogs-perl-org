@@ -80,9 +80,9 @@ search on.
 
 =cut
 
-sub find_by_slug_uid {
+sub find_by_name_uid {
   my ($self, $args) = @_;
-  my $slug          = $args->{slug};
+  my $name          = $args->{name};
   my $user_id       = $args->{user_id};
 
   my $schema = $self->result_source->schema;
@@ -93,7 +93,7 @@ sub find_by_slug_uid {
   my $blog;
   for my $blog_id ( keys %blog_ids ) {
     my $temp_blog = $schema->resultset('Blog')->find({ id => $blog_id });
-    next if $temp_blog->slug ne $slug;
+    next if $temp_blog->name ne $name;
     return $temp_blog
   }
 

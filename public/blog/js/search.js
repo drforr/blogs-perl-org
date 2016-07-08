@@ -78,7 +78,7 @@ $(document).ready(function(){
                         newItem.find(".user a.user-name").html(posts[i].user.name);
                         newItem.find(".user a.user-name").attr("href", "/profile/author/" + posts[i].user.username);
                         newItem.find(".user a.blog-name").html(posts[i].blog.name);
-                        newItem.find(".user a.blog-name").attr('href', '/blogs/user/' + posts[i].user.username + '/slug/' +  posts[i].blog.slug);
+                        newItem.find(".user a.blog-name").attr('href', '/blogs/user/' + posts[i].user.username + '/slug/' +  posts[i].blog.slug + '/name/' +posts[i].blog.name);
                         newItem.find(".post_preview_wrapper").html(posts[i].content.replace(/<img[^>]+>(<\/img>)?|<iframe.+?<\/iframe>|<video[^>]+>(<\/video>)?/g, ''));
                         newItem.find(".post-heading h2 a").attr("href", "/post/" + posts[i].slug);
                         newItem.find(".post-heading h2 a").html(posts[i].title);
@@ -283,11 +283,11 @@ $(document).ready(function(){
 
                         //newItem.find(".bubble img.user-image").attr("src", avatarPath);
                         newItem.find(".blog-part a.blog-name").html(posts[i].name);
-                        newItem.find(".blog-part a.blog-name").attr('href', '/blogs/user/' + posts[i].user_info.username + '/slug/' +  posts[i].slug);
+                        newItem.find(".blog-part a.blog-name").attr('href', '/blogs/user/' + posts[i].user_info.username + '/slug/' +  posts[i].slug +'/name/'+posts[i].name);
                         newItem.find(".info-blog li.information-blog").html(posts[i].description);
                         newItem.find(".info-blog li span.entries-count").html(posts[i].counts.entries);
                         newItem.find(".info-blog li span.authors-count").html(posts[i].counts.contributors);
-                        newItem.find(".info-blog a.blog-slug").attr('href', '/blogs/user/' + posts[i].user_info.username + '/slug/' +  posts[i].slug);
+                        newItem.find(".info-blog a.blog-slug").attr('href', '/blogs/user/' + posts[i].user_info.username + '/slug/' +  posts[i].slug + '/name/' + posts[i].name);
                         newItem.find(".date").text(posts[i].created_date_human);
 
 

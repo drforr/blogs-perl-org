@@ -42,7 +42,7 @@
 
 							<tr>
 								<td width="20%">
-									<b><a href="/blogs/user/[% blog.blog_creator.username %]/slug/[%blog.slug%]">[% blog.name %]</a></b>
+									<b><a href="/blogs/user/[% blog.blog_creator.username %]/slug/[%blog.slug%]/name/[%blog.name%]">[% blog.name %]</a></b>
 								</td>
 
 								<td width="25%">
@@ -63,7 +63,7 @@
 
 								<td width="11%">
 									[% SET role = ( session.user.is_admin ) ? "admin" : "author" %]
-									<a href="/blogs/user/[% blog.blog_creator.username %]/slug/[%blog.slug%]">
+									<a href="/blogs/user/[% blog.blog_creator.username %]/slug/[%blog.slug%]/name/[%blog.name%]	">
 										<button class="btn btn-xs btn-success"><i class="icon-eye-open"></i> </button>
 									</a>
 									<a href="/[% role %]/posts/edit/[% post.slug %]">

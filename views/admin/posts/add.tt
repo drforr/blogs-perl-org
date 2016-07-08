@@ -18,9 +18,9 @@
 
                            <div class="awidget-body">
 
-                             <select name="posts_blog_slug">
+                             <select name="posts_blog_name">
                               [% FOREACH blog IN blogs %]
-                                <option [% blog.selected %] value="[% blog.slug %]">[% blog.name %]</option>
+                                <option [% blog.selected %] value="[% blog.name %]">[% blog.name %]</option>
                               [% END %]
                              </select>
                            </div>

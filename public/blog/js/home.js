@@ -50,7 +50,7 @@ $(document).ready(function(){
                         newItem.find(".user a.user-name").html(posts[i].user.name);
                         newItem.find(".user a.user-name").attr("href", "/profile/author/" + posts[i].user.username);
                         newItem.find(".user a.blog-name").html(posts[i].blog.name);
-                        newItem.find(".user a.blog-name").attr('href', '/blogs/user/' + posts[i].user.username + '/slug/' +  posts[i].blog.slug);
+                        newItem.find(".user a.blog-name").attr('href', '/blogs/user/' + posts[i].user.username + '/slug/' +  posts[i].blog.slug + '/name/' + posts[i].blog.name);
                         newItem.find(".comments-listings a").text(commentsText);
                         newItem.find(".comments-listings a").attr("href", "/post/" + posts[i].slug +"#comments");
                         newItem.find(".text-listing-entries a.read-more").attr("href", "/post/" + posts[i].slug);
@@ -137,7 +137,7 @@ $(document).ready(function(){
                         newItem.find(".user a.user-name").html(posts[i].user.name);
                         newItem.find(".user a.user-name").attr("href", "/profile/author/" + posts[i].user.username);
                         newItem.find(".user a.blog-name").html(posts[i].blog.name);
-                        newItem.find(".user a.blog-name").attr('href', '/blogs/user/' + posts[i].user.username + '/slug/' +  posts[i].blog.slug);
+                        newItem.find(".user a.blog-name").attr('href', '/blogs/user/' + posts[i].user.username + '/slug/' +  posts[i].blog.slug +'/name/' +posts[i].blog.name);
                         newItem.find(".post-heading h2 a").html(posts[i].title);
                         newItem.find(".comments-listings a").text(commentsText);
                         newItem.find(".comments-listings a").attr("href", "/post/" + posts[i].slug +"#comments");
@@ -230,7 +230,7 @@ $(document).ready(function(){
                         newItem.find(".user a.user-name").html(posts[i].user.name);
                         newItem.find(".user a.user-name").attr("href", "/profile/author/" + posts[i].user.username);
                         newItem.find(".user a.blog-name").html(posts[i].blog.name);
-                        newItem.find(".user a.blog-name").attr('href', '/blogs/user/' + posts[i].user.username + '/slug/' +  posts[i].blog.slug);
+                        newItem.find(".user a.blog-name").attr('href', '/blogs/user/' + posts[i].user.username + '/slug/' +  posts[i].blog.slug + '/name/' +posts[i].blog.name);
                         newItem.find(".post-heading h2 a").html(posts[i].title);
                         newItem.find(".comments-listings a").text(commentsText);
                         newItem.find(".comments-listings a").attr("href", "/post/" + posts[i].slug +"#comments");
@@ -315,7 +315,7 @@ $(document).ready(function(){
                     newItem.find(".user a.user-name").html(posts[i].user.name);
                     newItem.find(".user a.user-name").attr("href", "/profile/author/" + posts[i].user.username);
                     newItem.find(".user a.blog-name").html(posts[i].blog.name);
-                    newItem.find(".user a.blog-name").attr('href', '/blogs/user/' + posts[i].user.username + '/slug/' +  posts[i].blog.slug);
+                    newItem.find(".user a.blog-name").attr('href', '/blogs/user/' + posts[i].user.username + '/slug/' +  posts[i].blog.slug + '/name/' + posts[i].blog.name);
                     newItem.find(".post-heading h2 a").html(posts[i].title);
                     newItem.find(".comments-listings a").text(commentsText);
                     newItem.find(".comments-listings a").attr("href", "/post/" + posts[i].slug +"#comments");

@@ -17,7 +17,7 @@ our $VERSION = '0.1';
 
 =head2 /blogs/user/:username/slug/:slug ; /users/:username
 
-View blog posts by username and blog slug
+View blog posts by username and blog's slug and name.
 
 =cut
 
@@ -31,10 +31,11 @@ get '/users/:username' => sub {
   redirect "/blogs/user/$username/slug/$slug"
 };
 
-get '/blogs/user/:username/slug/:slug' => sub {
+get '/blogs/user/:username/slug/:slug/name/:name' => sub {
 
   my $num_user_posts = config->{blogs}{user_posts} || 10;
   my $slug        = route_parameters->{'slug'};
+  my $blog_name   = route_parameters->{'name'};
   my $username    = route_parameters->{'username'};
   my ( $user )    = resultset('Users')->match_lc( $username );
   my @blog_ids;
@@ -42,8 +43,8 @@ get '/blogs/user/:username/slug/:slug' => sub {
   unless ($user) {
     return error "No such user '$username'";
   }
-  my ( $searched_blog ) = resultset('Blog')->find_by_slug_uid({
-    slug => $slug, user_id => $user->id
+  my ( $searched_blog ) = resultset('Blog')->find_by_name_uid({
+    name => $blog_name, user_id => $user->id
   });
 
   push @blog_ids, resultset('BlogPost')->search({ blog_id => $searched_blog->id });

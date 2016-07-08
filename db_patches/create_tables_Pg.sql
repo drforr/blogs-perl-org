@@ -106,7 +106,8 @@ CREATE TABLE blog (
   multiuser integer NOT NULL DEFAULT '0', -- Because mySQL lacks bool type
   accept_comments integer NOT NULL DEFAULT '0', -- Because mySQL lacks bool type
   timezone varchar(255) NOT NULL,
-  avatar_path varchar(255) NOT NULL
+  large_avatar_path varchar(255) NULL,
+  small_avatar_path varchar(255) NULL
 );
 
 

@@ -89,7 +89,7 @@ avatar:
     light: 'blog/img/male-user-light.png'
 blog-avatar:
   path:    'blogpics/'
-  format:  'blogpic-%d-100x100.png'
+  format:  'blogpic-%s-%d-100x100.png'
   bounds:
     height: 140
     width:  140

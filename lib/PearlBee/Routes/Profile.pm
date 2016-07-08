@@ -247,12 +247,13 @@ post '/profile-image' => sub {
     };
 };
 
-=head2 /blog-image route
+=head2 /blog-image/:size/slug/:slug/user/:username
 
 =cut
 
-post '/blog-image/slug/:slug/user/:username' => sub {
+post '/blog-image/:size/slug/:slug/user/:username' => sub {
 
+  my $size        = route_parameters->{'size'};
   my $slug        = route_parameters->{'slug'};
   my $username    = route_parameters->{'username'};
   my $file        = params->{'file'};
@@ -275,12 +276,16 @@ post '/blog-image/slug/:slug/user/:username' => sub {
 
   if ( $blog ) {
     my $message  = "Your profile picture has been changed.";
-    my $filename = sprintf( config->{'blog-avatar'}{'format'}, $blog->id );
+    my $filename = sprintf( config->{'blog-avatar'}{'format'},
+                            $size,
+                            $blog->id );
     my $scale    = {
       xpixels => config->{'blog-avatar'}{'bounds'}{'width'},
       ypixels => config->{'blog-avatar'}{'bounds'}{'height'},
     };
 
+    my $blog_column =
+      $size eq 'large' ? 'large_avatar_path' : 'small_avatar_path';
     if ( $params->{action_form} eq 'crop' ) {
       if ( $params->{width} > 0 ) {
         if ( $params->{file} ) {
@@ -302,11 +307,11 @@ post '/blog-image/slug/:slug/user/:username' => sub {
         }
       }
  
-      $blog->update({ avatar_path => $upload_dir . $filename });
-      $blog->{avatar_path} = $upload_dir . $filename;
+      $blog->update({ $blog_column => $upload_dir . $filename });
+      $blog->{$blog_column} = $upload_dir . $filename;
     }
     elsif ( $params->{action_form} eq 'delete' ) {
-      $blog->update({ avatar_path => '' });
+      $blog->update({ $blog_column => '' });
  
       $message = "Your picture has been deleted";
     }
