@@ -51,15 +51,17 @@ get '/post/:slug' => sub {
     }
 
     my $user       = resultset('Users')->find_by_session(session);
-    foreach my $comment( @comments){
-    my $notifications =resultset('Notification')->search ({
-      name        => 'comment', 
-      user_id     => $user->id, 
-      generic_id  => $comment->id,
-      viewed      => 0 })
-      ->update({ viewed=>1 });
+    
+    if ($user){
+      foreach my $comment( @comments){
+      my $notifications =resultset('Notification')->search ({
+        name        => 'comment', 
+        user_id     => $user->id, 
+        generic_id  => $comment->id,
+        viewed      => 0 })
+        ->update({ viewed=>1 });
+      }
     }
-
    map { $_->as_hashref } @comments;
  
     template 'post', {
