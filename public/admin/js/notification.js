@@ -2,14 +2,17 @@ $(document).ready(function(){
     var pageURL = window.location.pathname.split('/');
     var SessionUsername = $('#sessionUsername').text();
     // userName = "/" + pageURL[5];
-    // var userName = '<%=Session["user.username"]%>';
+    var CurrentPage =  1;
+    var invitation = $(".invitation-row")[0];
+    // var CurrentPage = $('.down-arrow').attr("moreInvitations");
+
 
     // Comments Function =====================
 var  CommentsSection = function() {
 
 
     $.ajax({
-    url:  '/api/notification/comment/user/' + SessionUsername + '/page/' + '0',
+    url:  '/api/notification/comment/user/' + SessionUsername + '/page/' + CurrentPage,
     type: 'GET'
   })
     .done(function(data) {
@@ -23,20 +26,20 @@ var  CommentsSection = function() {
     // Invitation Function ===========================
 var InvitationSection = function() {
     $.ajax({
-    url:  '/api/notification/invitation/user/' + SessionUsername + '/page/' + '0',
+    url:  '/api/notification/invitation/user/' + SessionUsername + '/page/' + CurrentPage++,
     type: 'GET'
   })
   .done(function(data) {
     var data = JSON.parse(data);
     var totalPages = data.total;
-    var invitation = $(".invitation-row").get(0);
+    var invitation_arrow = $(".invitation-arrow");
 
-
-
-
+    for (var i = (CurrentPage == 2) ? 1 : 0; i < data.notifications.length; i++) {
+      $(invitation).clone().insertBefore(invitation_arrow);
+    }
 
     // Update the Number of Invitations
-    $('.invitationNr').prepend(' ' + data.total + ' New Invitation(s) to Join the Blog(s)');
+    $('.invitationNr').html(' ' + data.total + ' New Invitation(s) to Join the Blog(s)');
 
     // invitation variables
     var invitationModal = $('<a href="#" data-toggle="modal" data-target="#invitation_modal" class="pull-right">View Invitation</a>');
@@ -44,19 +47,30 @@ var InvitationSection = function() {
 
 
     // Content for New Invitations
-    $(invitation).prepend('<a class="inviteUsername" href="profile/author/' + data.notifications[0].sender.username +  '">' + data.notifications[0].sender.username + '</a>' + " added you as an " +  data.notifications[0].role  + " to the " +  '<a href="/blogs/user/' + data.notifications[0].blog.blog_creator.username  +'/slug/' + data.notifications[0].blog.slug + '">' + data.notifications[0].blog.name + '</a>'+' blog');
+    // $(invitation).prepend('<a class="inviteUsername" href="profile/author/' + data.notifications[0].sender.username +  '">' + data.notifications[0].sender.username + '</a>' + " added you as an " +  data.notifications[0].role  + " to the " +  '<a href="/blogs/user/' + data.notifications[0].blog.blog_creator.username  +'/slug/' + data.notifications[0].blog.slug + '">' + data.notifications[0].blog.name + '</a>'+' blog');
+    //
+    // // Modal Stuff
+    // $(invitationModal).appendTo(invitation);
+    // $('.invitation-blogname').prepend('I would like to invite you to join my blog ' + '<a href="#">' + data.notifications[0].blog.name + '</a>' + '.');
+    // $('.invitation-username').prepend('<a href="#">' + data.notifications[0].sender.username + '</a>');
 
-    // Modal Stuff
-    $(invitationModal).appendTo(invitation);
-    $('.invitation-blogname').prepend('I would like to invite you to join my blog ' + '<a href="#">' + data.notifications[0].blog.name + '</a>' + '.');
-    $('.invitation-username').prepend('<a href="#">' + data.notifications[0].sender.username + '</a>');
+    $('.invitation-row').each(function(idx, invitation) {
+      $(invitation).prepend('<a class="inviteUsername" href="profile/author/' + data.notifications[idx].sender.username +  '">' + data.notifications[idx].sender.username + '</a>' + " added you as an " +  data.notifications[idx].role  + " to the " +  '<a href="/blogs/user/' + data.notifications[idx].blog.blog_creator.username  +'/slug/' + data.notifications[idx].blog.slug + '">' + data.notifications[idx].blog.name + '</a>'+' blog');
 
-    for( var i= 1; i < data.notifications.length; i++){
+      var modal = invitationModal.clone();
+      // Modal Stuff
+      $(modal).appendTo(invitation);
+      $(modal).on('click', function() {
+        $('.invitation-blogname').html('I would like to invite you to join my blog ' + '<a href="#">' + data.notifications[idx].blog.name + '</a>' + '.');
+        $('.invitation-username').html('<a href="#">' + data.notifications[idx].sender.username + '</a>');
+      });
+      $(invitation).removeClass("invitation-row");
+    });
 
-          newRow = $(invitation).clone();
+    for( var i= 0; i < data.notifications.length; i++){
 
-           newRow.find('.inviteUsername').attr('href', 'profile/author/' + data.notifications[i].sender.username);
-           newRow.insertBefore('.invitation-arrow');
+          //  newRow.find('.inviteUsername').attr('href', 'profile/author/' + data.notifications[i].sender.username);
+          //  newRow.insertBefore('.invitation-arrow');
     } // <- end for
 
   });
@@ -124,12 +138,6 @@ var RoleSection = function() {
 // More arrow/button
 
 $('.invitation-arrow').click(function() {
-    var button = $(this),
-        pageURL = window.location.pathname.split('/');
-        // CurrentPage = $('.down-arrow'),
-        // pageNumber =  +(CurrentPage.attr("moreInvitations")) + 1;
-        // debugger;
-
     $('.progressloader').show();
     InvitationSection();
   });

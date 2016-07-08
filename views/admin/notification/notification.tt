@@ -44,7 +44,7 @@
 
                 <!-- <br> -->
                 <div class="text-center invitation-arrow">
-                  <i class="fa fa-arrow-circle-o-down custom-fonts down-arrow" aria-hidden="true" moreInvitations = "0"></i>
+                  <i class="fa fa-arrow-circle-o-down custom-fonts down-arrow" aria-hidden="true" moreInvitations = "1"></i>
                 </div>
 
               <!-- Modal -->
