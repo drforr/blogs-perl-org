@@ -246,10 +246,10 @@ sub as_hashref {
     nr_of_contributors => $self->nr_of_contributors,
     nr_of_comments     => $self->nr_of_comments,
     blog_creator       => $self->blog_creator->as_hashref_sanitized,
-  };          
-              
+  };
+
   return $blog_as_href;
-}             
+}
 
 =head2 as_hashref_sanitized
 
@@ -266,7 +266,7 @@ sub as_hashref_sanitized {
 }
 
 =head2
-  
+
   Return the number of posts for each blog.
 
 =cut
@@ -274,15 +274,15 @@ sub as_hashref_sanitized {
 sub nr_of_posts {
   my ($self)    = @_;
   my $schema    = $self->result_source->schema;
-  
+
   my $nr_of_posts = $schema->resultset('BlogPost')->
                     search({ blog_id => $self->id })->count;
- 
+
   return $nr_of_posts;
 }
 
 =head2
-  
+
   Return the number of contributors for each blog.
 
 =cut
@@ -290,15 +290,15 @@ sub nr_of_posts {
 sub nr_of_contributors {
   my ($self)    = @_;
   my $schema    = $self->result_source->schema;
-  
+
   my $nr_of_contributors = $schema->resultset('BlogOwner')->
                     search({ blog_id => $self->id })->count;
- 
+
   return $nr_of_contributors;
 }
 
 =head2
-  
+
   Return the contributors for each blog.
 
 =cut
@@ -312,12 +312,12 @@ sub contributors {
   my @contributor_objects = map {
     $schema->resultset('Users')->find({ id => $_->user_id })
   } @contributors;
- 
+
   return @contributor_objects;
 }
 
 =head2
-  
+
   Return the number of comments from all the posts for each blog.
 
 =cut
@@ -353,8 +353,8 @@ sub blog_creator {
    my $blog_creator = $schema->resultset('Users')->find({
      id => $blog_owner->user_id
    });
-   
-   return $blog_creator; 
+
+   return $blog_creator;
 }
 
 1;

@@ -1,0 +1,116 @@
+[% SET global.template_name = 'notification' %]
+<div class="page-content blocky">
+   <div class="container">
+
+      [% IF session.user %]
+          [% INCLUDE layouts/admin.tt %]
+      [% END %]
+
+      <div class="mainy">
+      	<!-- Page title -->
+      	<div class="page-title">
+      		<h2> &nbsp; <i class="fa fa-flag" aria-hidden="true"></i> Notifications</h2>
+      		<hr />
+      	</div>
+
+
+      <div class="row">
+        <div class="col-md-12">
+      		<div class="card-design">
+      			<div class="awidget-head ">
+      				<h3>&nbsp;<i class="fa fa-commenting" aria-hidden="true"></i> <b class="commentsNr"></b></h3>
+      			</div>
+            <div class="awidget-body">
+              <a href="/admin/comments">Go to comments Administration</a>
+              <a href="/admin/comments" class="pull-right"><i class="fa fa-arrow-circle-right custom-fonts" aria-hidden="true"></i></a>
+            </div>
+      		</div>
+      	</div>
+      </div>
+
+      <!-- Invitation Row -->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card-design">
+            <div class="awidget-head">
+
+              <h3>&nbsp; <i class="fa fa-user-plus" aria-hidden="true"></i><b class="invitationNr"></b></h3>
+            </div>
+            <div class="awidget-body">
+                <div class="invitation-row notification-text"></div>
+                <div class="text-center invitation-arrow">
+                  <i class="fa fa-arrow-circle-o-down custom-fonts down-arrow" aria-hidden="true" moreInvitations = "1"></i>
+                </div>
+
+              <!-- Modal -->
+              <div class="modal fade" id="invitation_modal" aria-labelledby="invitation_modal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title">Hi, [% session.user.username %]</h4>
+                        </div>
+
+                        <div class="modal-body">
+                            <p class="invitation-blogname"></p>
+                            <p>You can accept the invitation by clicking below. Until you take an action, you will be marked as pending.</p>
+                            <p>Hope you'll join my blog!</p>
+                            <div class="pull-right">
+                              <p> All the best, </p>
+                              <p class="invitation-username"></p>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-primary btn-ok" data-dismiss="modal">OK</button>
+                          <button type="button" class="btn btn-default" data-dismiss="modal">Reject</button>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- end modal -->
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <!-- Response row -->
+      <div class="row">
+        <div class="col-md-12">
+      		<div class="card-design">
+      			<div class="awidget-head">
+      				<h3>&nbsp;<i class="fa fa-reply-all" aria-hidden="true"></i> <b class="responseNr"></b></h3>
+      			</div>
+            <div class="awidget-body">
+              <div class="notification-text response-row"></div>
+              <div class="text-center response-arrow">
+                <i class="fa fa-arrow-circle-o-down custom-fonts" aria-hidden="true"></i>
+              </div>
+            </div>
+      		</div>
+      	</div>
+      </div>
+
+      <!-- Role Row -->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card-design">
+            <div class="awidget-head">
+              <h3>&nbsp;<i class="fa fa-map-signs custom-fonts" aria-hidden="true"></i> <b class="roleNr"></b></h3>
+            </div>
+            <div class="awidget-body">
+              <div class="notification-text role-row"></div>
+              <div class="text-center role-arrow">
+                <i class="fa fa-arrow-circle-o-down custom-fonts" aria-hidden="true"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      </div>
+
+   </div>
+</div>
+
+<script src="/admin/js/notification.js"></script>

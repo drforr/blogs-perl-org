@@ -23,14 +23,14 @@ get '/notification' => sub {
 
   my $res_user = resultset('Users')->find_by_session(session);
   my $counter  = resultset('Notification')->search({
-  user_id      => $res_user->id, 
-  name         => { '!=' => 'response'} 
+  user_id      => $res_user->id,
+  name         => { '!=' => 'response'}
   })->count;
   $counter     += resultset('Notification')->search({
-  sender_id    => $res_user->id, 
-  name         => 'response' 
+  sender_id    => $res_user->id,
+  name         => 'response'
   })->count;
-  template 'notification',
+  template 'admin/notification/notification',
     {
       counter => $counter
     };

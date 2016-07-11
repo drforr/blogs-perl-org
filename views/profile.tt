@@ -85,10 +85,8 @@
 </div>
 
 <div class="myprofile register sign-up">
-
 	<div class="container">
 		[% INCLUDE components/alerts.tt %]
-
 		<div class="row">
 			<div class="myprofile-head">
 				<div class="col-sm-6">
@@ -254,9 +252,10 @@
 					[% END %]
 			</div>
 		</div>
+
 	</div>
 
 	 </div>
 	</div>
-
+ </div>
 </div>

@@ -63,7 +63,7 @@ if ( $error ) {
     warn colored("Missing public/userpics/ symlink - run '",$color) .
       q{ln -s ~/userpics public/userpics'} .
       colored(q{'},$color);
-  
+
   my $mail_server = $cfg->{mail_server};
   $mail_server->{user}     or warn_missing("Missing mail server user");
   $mail_server->{password} or warn_missing("Missing mail server password");

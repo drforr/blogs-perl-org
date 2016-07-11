@@ -4,7 +4,7 @@ This is the base structure of the blog -->
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>    
+  <head>
     [% INCLUDE theme/styles.tt %]
     <!-- Hotjar Tracking Code for http://blogsperlorg.pearlbee.org -->
     <script>
@@ -29,14 +29,15 @@ This is the base structure of the blog -->
   </head>
 
   <body>
-   
-  [% INCLUDE theme/header.tt %]
-  
-  [% content %]
-  
-  [% IF (request.uri != '/register_success') && (request.uri != '/register')&& (request.uri != '/register_done') && (request.uri != '/sign-up') && (request.uri != '/password_recovery') && (request.uri != '/recover-password') && (request.uri != '/login') %] 
 
-      [% INCLUDE theme/footer.tt %] 
+
+  [% INCLUDE theme/header.tt %]
+
+  [% content %]
+
+  [% IF (request.uri != '/register_success') && (request.uri != '/register')&& (request.uri != '/register_done') && (request.uri != '/sign-up') && (request.uri != '/password_recovery') && (request.uri != '/recover-password') && (request.uri != '/login') %]
+
+      [% INCLUDE theme/footer.tt %]
 
   [% END %]
     [% INCLUDE theme/scripts.tt %]

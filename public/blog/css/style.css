@@ -58,7 +58,7 @@ a:hover,a:active,a:focus {
 strong{
    font-family: 'Open Sans', sans-serif !important;
    font-weight:600;
-}  
+}
 
 :focus {
    outline:none;
@@ -84,7 +84,7 @@ strong{
   line-height: 80px;
 }
 .container{
-   width:980px;   
+   width:980px;
 }
 .color{
    color:#16cbe6;
@@ -228,10 +228,10 @@ strong{
     -moz-animation-delay: 0.5s;
     -ms-animation-duration: 3s;
     -ms-animation-delay: 0.5s;
-    -o-animation-duration: 3s;    
-    -o-animation-delay: 0.5s;   
+    -o-animation-duration: 3s;
+    -o-animation-delay: 0.5s;
     animation-duration:3s;
-    animation-delay:0.5s; 
+    animation-delay:0.5s;
 }
 .carousel .carousel-caption h2{
     -webkit-animation-duration: 2s;
@@ -3384,24 +3384,3 @@ Paul: L-am scos fiindca aranja poza aiurea in modal ope mobile
 .search-page .tabs .loading-posts {
    margin-bottom: 115px;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

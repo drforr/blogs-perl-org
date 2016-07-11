@@ -53,7 +53,7 @@ post '/recover-password' => sub {
   if ($existing_users == 0) {
     template 'password_recovery', {
       warning => "The email does not exist in the database."
-    }; 
+    };
   }
   else {
 
@@ -84,7 +84,7 @@ post '/recover-password' => sub {
           signature => config->{'email_signature'}
         }
       });
- 
+
       PearlBee::Helpers::Email::send_email_complete({
         template => 'forgot-password.tt',
         from     => config->{'default_email_sender'},
@@ -133,9 +133,9 @@ post '/register_success' => sub {
   };
 
   unless ( $params->{'username'} ) {
-    return 
+    return
     template 'register', {
-      error => "Please provide a username",  
+      error => "Please provide a username",
       email => $params->{'email'},
       recaptcha => recaptcha_display()
     };
@@ -143,23 +143,23 @@ post '/register_success' => sub {
 
   unless ( $result->{success} || $ENV{CAPTCHA_BYPASS} ) {
     # The user entered the correct secret code
-    return 
+    return
     template 'register', {
-      error => "Make sure you introduced the captcha",  
+      error => "Make sure you introduced the captcha",
       email => $params->{'email'},
       username => $params->{'username'},
       name => $params->{'name'},
       recaptcha => recaptcha_display()
-    }; 
+    };
   }
 
   my $existing_users =
     resultset('Users')->search({ email => $params->{'email'} })->count;
   if ($existing_users > 0) {
-    return 
+    return
     template 'register', {
       warning => "An user with this email address already exists.",
-      email => $params->{'email'},  
+      email => $params->{'email'},
       username => $params->{'username'},
       name => $params->{'name'},
       recaptcha => recaptcha_display()
@@ -170,9 +170,9 @@ post '/register_success' => sub {
     resultset('Users')->search( \[ 'lower(username) = ?' =>
                                    $params->{username} ] )->count;
   if ($existing_users > 0) {
-    return 
+    return
     template 'register', {
-      warning => "The provided username is already in use.",  
+      warning => "The provided username is already in use.",
       email => $params->{'email'},
       name => $params->{'name'},
       recaptcha => recaptcha_display()
@@ -273,11 +273,11 @@ post '/login' => sub {
     "lower(username) = ? AND (status = 'active' or status = 'inactive')",
     $username ]
   )->first;
-  
+
   if ( defined $user ) {
 
     if ( $user->validate($password) ) {
-      
+
       session user    => $user->as_hashref;
       session user_id => $user->id;
       setConnectedAccountsOntoSession();

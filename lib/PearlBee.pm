@@ -3,7 +3,7 @@ package PearlBee;
 
 use Dancer2 0.163000;
 use Dancer2::Plugin::DBIC;
-use Dancer2::Plugin::reCAPTCHA;
+use Captcha::reCAPTCHA::V2;
 
 # Other used modules
 use DateTime;
@@ -20,6 +20,8 @@ use PearlBee::Routes::Notification;
 use PearlBee::Routes::Profile;
 use PearlBee::Routes::Post;
 use PearlBee::Routes::Pages;
+use PearlBee::Routes::Notification;
+use PearlBee::API::Notification;
 
 # Common controllers
 use PearlBee::Authentication;
@@ -63,7 +65,7 @@ hook before_template_render => sub {
   my ( $tokens ) = @_;
   $tokens->{copyright_year} = ((localtime)[5]+1900);
 };
-  
+
 =head2 Prepare the blog path
 
 =cut
@@ -85,14 +87,14 @@ post '/theme' => sub {
   my $session_user = session('user');
   my $theme        = body_parameters->get('theme') eq 'true' ? 'light' : 'dark';
   if ($session_user) {
-     return unless $session_user->{username}; 
+     return unless $session_user->{username};
      my $user = resultset('Users')->find_by_session(session);
      $user->update({ theme => $theme });
-  } 
+  }
   my $json = JSON->new;
   $json->allow_blessed(1);
   $json->convert_blessed(1);
-  $json->encode([$theme]); 
+  $json->encode([$theme]);
 
   session theme => $theme;
   content_type 'application/json';
@@ -119,7 +121,7 @@ get '/' => sub {
 
   my $total_pages                 = get_total_pages($nr_of_posts, $nr_of_rows);
   my ($previous_link, $next_link) = get_previous_next_link(1, $total_pages);
-  
+
   template 'index',
     {
       posts         => \@mapped_posts,
@@ -160,7 +162,7 @@ post '/comments' => sub {
 
   $parameters->{id}  = $post->id;
   $parameters->{uid} = $user->id;
-  
+
   my %result;
 
   # Notify the author that a new comment was submitted
@@ -187,7 +189,7 @@ post '/comments' => sub {
           template        => 'new_comment.tt',
           template_params =>
           { name      => $author->name,
-            fullname  => $username, 
+            fullname  => $username,
             title     => $post->title,
             comment   => $parameters->{'comment'},
             signature => config->{email_signature},
@@ -199,7 +201,7 @@ post '/comments' => sub {
 #    }
      }
     my $expurgated_user = $user->as_hashref_sanitized;
-    delete $expurgated_user->{email};       
+    delete $expurgated_user->{email};
     %result = (
         user => $expurgated_user,
         comment_date => $comment->comment_date,
@@ -224,7 +226,7 @@ post '/comments' => sub {
   $json->allow_blessed(1);
   $json->convert_blessed(1);
 #  delete $result{content} unless $result{status} eq 'approved';
-  return $json->encode(\%result); 
+  return $json->encode(\%result);
 };
 
 =head2 /register
@@ -234,9 +236,11 @@ Register for the site.
 =cut
 
 get '/register' => sub {
-   
+
+  my $rc = Captcha::reCAPTCHA::V2->new;
+
   template 'register', {
-      recaptcha  => recaptcha_display(),
+      recaptcha  => $rc->html(config->{plugins}{reCAPTCHA}{site_key} || $ENV{bpo_recaptcha_site_key})
   };
 
 };
@@ -248,7 +252,7 @@ Sign in to the site
 =cut
 
 get '/passwordSignin' => sub {
-   
+
   template 'passwordSignin';
 
 };
@@ -271,9 +275,10 @@ Sign up to the site (this is also signing in.)
 
 get '/sign-up' => sub {
   my $redirect = param('redirect');
+  my $rc = Captcha::reCAPTCHA::V2->new;
 
   template 'signup', {
-    recaptcha => recaptcha_display(),
+    recaptcha => $rc->html(config->{plugins}{reCAPTCHA}{site_key} || $ENV{bpo_recaptcha_site_key}),
     redirect  => $redirect
   };
 };
@@ -296,11 +301,12 @@ post '/sign-up' => sub {
   };
   my $err      = "Invalid secret code.";
   my $response = $params->{'g-recaptcha-response'};
-  my $result   = recaptcha_verify($response);
+  my $rc       = Captcha::reCAPTCHA::V2->new;
+  my $result   = $rc->verify(config->{plugins}{reCAPTCHA}{secret} || $ENV{bpo_recaptcha_secret}, $response);
 
   unless ( $params->{'username'} =~ m{ ^ [-_a-zA-Z0-9]+ $ }x ) {
     $template_params->{warning}   = "Username must must consist of a-z, A-Z, 0-9, '-', '_'";
-    $template_params->{recaptcha} = recaptcha_display();
+    $template_params->{recaptcha} = $rc->html(config->{plugins}{reCAPTCHA}{site_key} || $ENV{bpo_recaptcha_site_key});
 
     template 'signup', $template_params;
   }
@@ -384,7 +390,7 @@ post '/sign-up' => sub {
 
   if ($err) {
     $template_params->{warning}   = $err;
-    $template_params->{recaptcha} = recaptcha_display();
+    $template_params->{recaptcha} = $rc->html(config->{plugins}{reCAPTCHA}{site_key} || $ENV{bpo_recaptcha_site_key});
 
     template 'signup', $template_params;
   } else {

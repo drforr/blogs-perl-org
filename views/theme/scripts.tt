@@ -15,6 +15,9 @@
     <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
 
 
+
+
+
 <!-- Page specific javascript -->
     [% IF  global.template_name == 'profile' %]
         <script src="/js/croppie.js"></script>
@@ -29,6 +32,8 @@
         <script src="/blog/js/author.js"></script>
     [% ELSIF global.template_name == 'homepage' %]
         <script src="/blog/js/home.js"></script>
+    [% ELSIF global.template_name == 'notification' %]
+        <script src="/admin/js/notification.js"></script>
 		[% ELSIF global.template_name == 'create_blog' %]
 				<script src="/js/croppie.js"></script>
     [% END %]
