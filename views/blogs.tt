@@ -15,7 +15,11 @@
 
                                 <div class="col-xs-2 no-padding">
                                     <div class="bubble">
-                                        <img class="blog-image [% IF !user.avatar_path %]defaultAvatar[% END %]" src="/blog-avatar/large/slug/[% searched_blog.slug %]/user/[% user.username %]" />
+                                        [% IF searched_blog.large_avatar_path %]
+                                            <img class="blog-image " src="/blog-avatar/large/slug/[% searched_blog.slug %]/user/[%searched_blog.blog_creator.username %]/name/[% searched_blog.name %]" />
+                                        [% ELSE %]
+                                            <img class="blog-image defaultAvatar" src="/blog-avatar/large/" />
+                                        [% END %]
                                     </div>
                                 </div>
 

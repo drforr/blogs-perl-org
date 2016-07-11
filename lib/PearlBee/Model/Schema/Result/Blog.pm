@@ -121,6 +121,22 @@ __PACKAGE__->table("blog");
 
 =cut
 
+=head2 large_avatar_path
+
+  data_type: 'varchar'
+  is_nullable: 0
+  size: 255
+
+=cut
+
+=head2 small_avatar_path
+
+  data_type: 'varchar'
+  is_nullable: 0
+  size: 255
+
+=cut
+
 __PACKAGE__->add_columns(
   "id",
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
@@ -162,6 +178,10 @@ __PACKAGE__->add_columns(
   "timezone",
   { data_type => "varchar", is_nullable => 0, size => 255 },
   "avatar_path",
+  { data_type => "varchar", is_nullable => 0, size => 255 },
+  "large_avatar_path",
+  { data_type => "varchar", is_nullable => 0, size => 255 },
+  "small_avatar_path",
   { data_type => "varchar", is_nullable => 0, size => 255 },
 );
 
@@ -220,6 +240,8 @@ sub as_hashref {
     accept_comments    => $self->accept_comments,
     timezone           => $self->timezone,
     avatar_path        => $self->avatar_path,
+    large_avatar_path  => $self->large_avatar_path,
+    small_avatar_path  => $self->small_avatar_path,
     nr_of_posts        => $self->nr_of_posts,
     nr_of_contributors => $self->nr_of_contributors,
     nr_of_comments     => $self->nr_of_comments,
@@ -308,9 +330,9 @@ sub nr_of_comments {
   my @posts = $schema->resultset('BlogPost')->
                     search({ blog_id => $self->id });
 
-	if (scalar @posts == 0){
-		$nr_of_comments = 0;
-	}
+  if (scalar @posts == 0){
+    $nr_of_comments = 0;
+  }
 
   for my $iterator (@posts){
     my $total =  $schema -> resultset('Comment')->search({post_id => $iterator->post_id})->count;
